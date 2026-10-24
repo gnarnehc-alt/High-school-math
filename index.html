@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="高一數學第二章「直線與圓」從頭學：白話教學、互動圖形、四級難度到第一志願段考程度。">
+<meta name="description" content="高一數學第二章「直線與圓」從頭學：白話教學、四級難度練習、大考歷屆題與模擬段考。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317233A'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23CF3127' stroke-width='3'/%3E%3C/svg%3E">
 <title>高一數學練功房</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -164,6 +164,20 @@ h1 em{font-style:normal;color:var(--pen)}
 .lvtab.top{border-color:var(--pen);color:var(--pen)}.lvtab.top[aria-pressed="true"]{background:var(--pen);color:var(--card);border-color:var(--pen)}
 .diffrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
 .diffrow>span:first-child{font-family:var(--f-hand);font-size:17px;font-weight:700}
+.past{display:flex;flex-direction:column;gap:20px}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.pcard h2{margin:0;font-family:var(--f-hand);font-size:24px}
+.pitem{border-top:1px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.src{margin:0;font-size:13px;color:var(--muted)}.src a{color:var(--blue)}
+.mocklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:mq}
+.mocklist>li{counter-increment:mq}.mocklist>li .qbox::before{content:"第 " counter(mq) " 題　";font-family:var(--f-hand);font-weight:700}
+.mockbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--card);padding:8px 0;z-index:2;border-bottom:1px solid var(--line)}
+.timer{font-family:var(--f-math);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums}.timer.low{color:var(--pen)}
+.score{font-family:var(--f-hand);font-size:40px;font-weight:700;color:var(--pen);line-height:1}
+details summary{cursor:pointer;color:var(--blue);font-size:14px}
+.links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.links li{display:flex;flex-direction:column;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.links a{color:var(--blue);font-weight:500}.links span{font-size:13.5px;color:var(--muted)}
 /* ---- random practice (tab 2) ---- */
 .stats{display:flex;gap:10px;flex-wrap:wrap}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 14px;min-width:84px}
@@ -221,6 +235,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
     <div class="tabs" role="tablist" aria-label="模式">
       <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="view-learn" type="button">從頭學・第二章</button>
       <button class="tab" role="tab" id="tab-prac" aria-selected="false" aria-controls="view-prac" type="button">隨機練習</button>
+      <button class="tab" role="tab" id="tab-past" aria-selected="false" aria-controls="view-past" type="button">考古題・模擬考</button>
     </div>
   </header>
 
@@ -281,6 +296,18 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
           <div class="confirm" id="reset-area"><button class="linkbtn" id="reset" type="button">清除所有紀錄</button></div>
         </aside>
       </div>
+    </div>
+  </div>
+  <!-- ============ PAST EXAMS VIEW ============ -->
+  <div id="view-past" role="tabpanel" aria-labelledby="tab-past" hidden>
+    <div class="past">
+      <section class="pcard"><h2>模擬段考</h2><div id="mock"></div></section>
+      <section class="pcard"><h2>大考歷屆題・直線與圓</h2>
+        <p class="fmt">以下是大考中心官方試卷中屬於高一「直線與圓」範圍的題目。題目是用我的話重新敘述，數字和原題相同；原題的選項和官方答案請點來源連結。</p>
+        <div id="pastlist"></div></section>
+      <section class="pcard"><h2>各校段考原卷</h2>
+        <p class="fmt">段考試題的著作權屬於各校，這裡不轉載，請到學校官方網站下載原卷練習。</p>
+        <ul class="links" id="official"></ul></section>
     </div>
   </div>
 </div>
@@ -995,11 +1022,11 @@ const $=id=>document.getElementById(id);
 const NEED=3;
 
 /* ---------- tabs ---------- */
-function setTab(t){S.tab=t;save();
-  $('tab-learn').setAttribute('aria-selected',t==='learn');$('tab-prac').setAttribute('aria-selected',t==='prac');
-  $('view-learn').hidden=t!=='learn';$('view-prac').hidden=t!=='prac';
-  $('subline').textContent=t==='learn'?'從頭學第二章「直線與圓」：每一課先看懂，再跟著做，最後自己練。':'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。';}
-$('tab-learn').onclick=()=>setTab('learn');$('tab-prac').onclick=()=>setTab('prac');
+const SUB={learn:'從頭學第二章「直線與圓」：每一課先看懂，再跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。'};
+function setTab(t){if(!SUB[t])t='learn';S.tab=t;save();
+  for(const k of ['learn','prac','past']){$('tab-'+k).setAttribute('aria-selected',k===t);$('view-'+k).hidden=k!==t}
+  $('subline').textContent=SUB[t];}
+$('tab-learn').onclick=()=>setTab('learn');$('tab-prac').onclick=()=>setTab('prac');$('tab-past').onclick=()=>setTab('past');
 
 /* ---------- lesson path ---------- */
 function lvOf(id){S.lv=S.lv||{};if(!S.lv[id]){const old=(S.lessons&&S.lessons[id])||0;S.lv[id]={c:[Math.min(old,NEED),0,0,0],cur:1,miss:0}}const o=S.lv[id];while(o.c.length<MAXLV)o.c.push(0);return o}
@@ -1148,6 +1175,92 @@ const LABS={
   $('lt-t').addEventListener('input',up);up()}
 };
 
+/* ---------- past exams & mock exam ---------- */
+const CEEC={
+ 113:'https://www.ceec.edu.tw/files/file_pool/1/0o051426180137211766/03-113%E5%AD%B8%E6%B8%AC%E6%95%B8a%E8%A9%A6%E9%A1%8C%E5%AE%9A%E7%A8%BF.pdf',
+ 114:'https://www.ceec.edu.tw/files/file_pool/1/0p056503510203248955/03-114%E5%AD%B8%E6%B8%AC%E6%95%B8%E5%AD%B8a%E8%A9%A6%E9%A1%8C.pdf',
+ 115:'https://www.ceec.edu.tw/files/file_pool/1/0q054344158947111283/03-115%E5%AD%B8%E6%B8%AC%E6%95%B8%E5%AD%B8a%E8%A9%A6%E5%8D%B7.pdf'};
+const PAST=[
+ {src:'114 學年度學測數學A 第 2 題',y:114,topic:'直線方程式・截距與面積',
+  q:`點 ${M('P(<i>a</i>, 0)')}，${M('<i>a</i> &gt; 0')}。過 P 作兩條直線，斜率分別是 ${M('−'+fr(4,3))} 和 ${M('−'+fr(3,2))}，每條直線都和兩坐標軸圍成一個直角三角形。已知兩個三角形的面積相差 3，求 ${M('<i>a</i>')}。`,
+  ans:[6,1],fig:()=>plane({R:10,lines:[{a:4,b:3,c:-24},{a:3,b:2,c:-18,col:'pen'}],pts:[{x:6,y:0,label:'P',dy:14}]}),steps:[
+  `斜率 ${M('−'+fr(4,3))} 的直線過 ${M('(<i>a</i>, 0)')}：往左走 ${M('<i>a</i>')} 到 y 軸時上升 ${M(`${fr(4,3)}<i>a</i>`)}，所以 y 截距是 ${M(`${fr(4,3)}<i>a</i>`)}。面積 ${M(`${fr(1,2)} · <i>a</i> · ${fr(4,3)}<i>a</i> = ${fr(2,3)}<i>a</i><sup>2</sup>`)}`,
+  `同理，斜率 ${M('−'+fr(3,2))} 的直線 y 截距 ${M(`${fr(3,2)}<i>a</i>`)}，面積 ${M(`${fr(1,2)} · <i>a</i> · ${fr(3,2)}<i>a</i> = ${fr(3,4)}<i>a</i><sup>2</sup>`)}`,
+  `相差：${M(`(${fr(3,4)} − ${fr(2,3)})<i>a</i><sup>2</sup> = ${fr(1,12)}<i>a</i><sup>2</sup> = 3`)} ⇒ ${M('<i>a</i><sup>2</sup> = 36')}`,
+  `${M('<i>a</i> &gt; 0')}，所以 ${M('<i>a</i> = 6')}。答案是 <b>6</b>。`]},
+ {src:'114 學年度學測數學A 第 16 題',y:114,topic:'點到直線距離・相切・弦長',
+  q:`兩直線 ${M('L<sub>1</sub>')}、${M('L<sub>2</sub>')} 都通過點 ${M('(3, 1)')}，斜率分別是 ${M('<i>m</i>')} 和 ${M('−<i>m</i>')}。以原點 O 為圓心的圓 Γ 和 ${M('L<sub>2</sub>')} 相切，並和 ${M('L<sub>1</sub>')} 交於相異兩點 A、B。已知 O 到 ${M('L<sub>1</sub>')} 的距離是 1，求弦長 ${M('AB')}。（分數請寫成 a/b）`,
+  ans:[24,5],fig:()=>plane({R:5,circles:[{x:0,y:0,r:13/5}],lines:[{a:3,b:-4,c:-5},{a:3,b:4,c:-13,col:'pen'}],pts:[{x:3,y:1,label:'(3, 1)'},{x:0,y:0,label:''}]}),steps:[
+  `${M('L<sub>1</sub>')}：${M('<i>y</i> − 1 = <i>m</i>(<i>x</i> − 3)')}，整理成 ${M('<i>m</i><i>x</i> − <i>y</i> + 1 − 3<i>m</i> = 0')}。O 到它的距離 ${M(`${fr('|1 − 3<i>m</i>|',rt('<i>m</i><sup>2</sup> + 1'))} = 1`)}`,
+  `平方：${M('(1 − 3<i>m</i>)<sup>2</sup> = <i>m</i><sup>2</sup> + 1')} ⇒ ${M('8<i>m</i><sup>2</sup> − 6<i>m</i> = 0')} ⇒ ${M('<i>m</i> = 0')} 或 ${M(fr(3,4))}。若 ${M('<i>m</i> = 0')}，兩線都是 ${M('<i>y</i> = 1')}，圓和 ${M('L<sub>1</sub>')} 也只會相切、不會交兩點，不合。所以 ${M(`<i>m</i> = ${fr(3,4)}`)}`,
+  `${M('L<sub>2</sub>')}：斜率 ${M('−'+fr(3,4))} 過 ${M('(3, 1)')}，即 ${M('3<i>x</i> + 4<i>y</i> − 13 = 0')}。相切 ⇒ 半徑 ${M(`<i>r</i> = ${fr('|−13|',5)} = ${fr(13,5)}`)}`,
+  `弦長 ${M(`AB = 2${rt(`<i>r</i><sup>2</sup> − 1<sup>2</sup>`)} = 2${rt(`${fr(169,25)} − 1`)} = 2 × ${fr(12,5)} = ${fr(24,5)}`)}。答案是 <b>${M(fr(24,5))}</b>。`]},
+ {src:'113 學年度學測數學A 第 17 題',y:113,topic:'圓與直線・區域面積',
+  q:`單位正方形的頂點是 ${M('(0, 0)')}、${M('(1, 0)')}、${M('(1, 1)')}、${M('(0, 1)')}。所有滿足下列條件的點 ${M('P(<i>x</i>, <i>y</i>)')} 形成區域 R：以 P 為圓心、${M('|<i>x</i> − <i>y</i>|')} 為半徑的圓，整個落在正方形內（可以碰到邊）。求 R 的面積。（分數請寫成 a/b）`,
+  ans:[1,3],steps:[
+  `圓在正方形內 ⇔ 半徑不超過 P 到四條邊的距離 ${M('<i>x</i>, 1 − <i>x</i>, <i>y</i>, 1 − <i>y</i>')}。圖形對直線 ${M('<i>y</i> = <i>x</i>')} 對稱，先看 ${M('<i>y</i> ≥ <i>x</i>')} 的一半，這時半徑是 ${M('<i>y</i> − <i>x</i>')}。`,
+  `${M('<i>y</i> − <i>x</i> ≤ <i>y</i>')} 和 ${M('<i>y</i> − <i>x</i> ≤ 1 − <i>x</i>')} 一定成立。剩下兩個：${M('<i>y</i> − <i>x</i> ≤ <i>x</i>')} ⇒ ${M('<i>y</i> ≤ 2<i>x</i>')}；${M('<i>y</i> − <i>x</i> ≤ 1 − <i>y</i>')} ⇒ ${M(`<i>y</i> ≤ ${fr('1 + <i>x</i>',2)}`)}`,
+  `三條直線 ${M('<i>y</i> = <i>x</i>')}、${M('<i>y</i> = 2<i>x</i>')}、${M(`<i>y</i> = ${fr('1 + <i>x</i>',2)}`)} 圍成三角形，頂點 ${M('(0, 0)')}、${M(`(${fr(1,3)}, ${fr(2,3)})`)}、${M('(1, 1)')}。用鞋帶公式：面積 ${M(`= ${fr(1,2)}|${fr(1,3)} × 1 − 1 × ${fr(2,3)}| = ${fr(1,6)}`)}`,
+  `另一半對稱也是 ${M(fr(1,6))}，R 的面積 ${M(`= ${fr(1,3)}`)}。答案是 <b>${M(fr(1,3))}</b>。`]},
+ {src:'115 學年度學測數學A 第 14 題（原題用向量，這裡改寫成斜率）',y:115,topic:'兩直線垂直・二次函數最大值',
+  q:`過原點與點 ${M('(<i>a</i>, <i>b</i>)')} 的直線，和直線 ${M('<i>y</i> = <i>b</i><i>x</i> + 1')} 互相垂直（${M('<i>a</i> ≠ 0')}）。求 ${M('<i>a</i> + <i>b</i>')} 的最大值。（分數請寫成 a/b）`,
+  ans:[1,4],steps:[
+  `過原點與 ${M('(<i>a</i>, <i>b</i>)')} 的直線斜率是 ${M(fr('<i>b</i>','<i>a</i>'))}；另一條斜率是 ${M('<i>b</i>')}。`,
+  `垂直 ⇒ 斜率相乘 −1：${M(`${fr('<i>b</i>','<i>a</i>')} · <i>b</i> = −1`)} ⇒ ${M('<i>a</i> = −<i>b</i><sup>2</sup>')}`,
+  `${M('<i>a</i> + <i>b</i> = −<i>b</i><sup>2</sup> + <i>b</i>')}，配方：${M(`−(<i>b</i> − ${fr(1,2)})<sup>2</sup> + ${fr(1,4)}`)}`,
+  `${M(`<i>b</i> = ${fr(1,2)}`)}（此時 ${M(`<i>a</i> = −${fr(1,4)}`)}）有最大值 <b>${M(fr(1,4))}</b>。`]}
+];
+const OFFICIAL=[
+ {name:'北一女中數學科網站・高一試題',url:'https://sites.google.com/a/gapps.fg.tp.edu.tw/math/exam/%E9%AB%98%E4%B8%80%E8%A9%A6%E9%A1%8C',note:'上學期第一～三次段考的資料夾。直線與圓通常在第一或第二次段考。'},
+ {name:'建國中學・歷年段考試題',url:'https://www2.ck.tp.edu.tw/academics/14/279',note:'建中教務處公告的各科段考試題。'},
+ {name:'高師大附中數學科・高一試題',url:'http://sites.tea.nknush.kh.edu.tw/math/-3/gao-zhong-duan-kao-shi-ti-1/gao-yi-shi-ti-1',note:'高雄師大附中數學科教學研究會整理的高一段考題。'},
+ {name:'教育部普高數學學科中心・各校定期考試題',url:'https://mathcenter.ck.tp.edu.tw/MCenter/Center/ExamationResources.aspx',note:'全國多所高中上傳的段考題。較舊的考卷屬於舊課綱，當時直線與圓在高二才教。'},
+ {name:'大考中心・學測歷屆試題與答案',url:'https://www.ceec.edu.tw/xmfile?xsmsid=0J052424829869345634',note:'上面四題改寫題的原卷、選項和官方答案都在這裡。'}
+];
+function renderPast(){
+  $('pastlist').innerHTML=PAST.map((p,i)=>`<div class="pitem" id="past-${i}">
+    <p class="src">來源：<a href="${CEEC[p.y]}" target="_blank" rel="noopener">${p.src}</a>・${p.topic}</p>
+    <div class="pq-wrap"><div class="qbox">${p.q}</div>${p.fig?p.fig():''}</div>
+    <form class="answer-row" data-past="${i}" autocomplete="off"><label for="pa-${i}">答：</label><input id="pa-${i}" class="ansin" spellcheck="false">
+      <button class="btn btn-primary" type="submit">對答案</button><button class="btn btn-ghost" type="button" data-sol="${i}">看詳解</button></form>
+    <div class="verdict" id="pv-${i}"></div><ol class="steps" id="ps-${i}" hidden>${p.steps.map(s=>`<li><div>${s}</div></li>`).join('')}</ol></div>`).join('');
+  $('official').innerHTML=OFFICIAL.map(o=>`<li><a href="${o.url}" target="_blank" rel="noopener">${o.name}</a><span>${o.note}</span></li>`).join('');
+}
+$('pastlist').addEventListener('submit',e=>{e.preventDefault();const i=+e.target.dataset.past,v=parseAns($('pa-'+i).value),el=$('pv-'+i);
+  if(!v){el.className='verdict no';el.innerHTML='<small>看不懂這個答案，請填整數或分數（如 24/5）。</small>';return}
+  const ok=same(v,PAST[i].ans);el.className='verdict '+(ok?'ok':'no');el.innerHTML=ok?'答對了！':`再想想看<small>可以先看詳解的第一步</small>`;if(ok)$('ps-'+i).hidden=false});
+$('pastlist').addEventListener('click',e=>{const b=e.target.closest('[data-sol]');if(!b)return;const s=$('ps-'+b.dataset.sol);s.hidden=!s.hidden;b.textContent=s.hidden?'看詳解':'收起詳解'});
+
+let mock=null,mockTimer=null;
+const MOCK_LV=[2,2,2,3,3,3,3,4,4,4],MOCK_MIN=50;
+function mockIntro(){clearInterval(mockTimer);mock=null;
+  $('mock').innerHTML=`<p class="prose" style="margin:0">10 題、${MOCK_MIN} 分鐘，範圍是第二章第 3～10 課，難度 Lv2 三題、Lv3 四題、Lv4 三題，每題 10 分。作答時不能看提示，交卷後才會顯示詳解，時間到會自動交卷。</p>
+   ${S.mockBest!=null?`<p class="fmt">你的最高分：${S.mockBest} 分（共考過 ${S.mockN||0} 次）</p>`:''}
+   <div><button class="btn btn-primary" type="button" id="mock-start">開始模擬考</button></div>`;
+  $('mock-start').onclick=startMock}
+function startMock(){
+  const pool=LESSONS.slice(2).sort(()=>Math.random()-.5);
+  mock={items:MOCK_LV.map((lv,i)=>{const l=pool[i%pool.length];return{l,p:genLv(l,lv)}}),end:Date.now()+MOCK_MIN*60000,done:false};
+  $('mock').innerHTML=`<div class="mockbar"><span>剩餘時間 <span class="timer" id="mock-time"></span></span><button class="btn btn-primary" type="button" id="mock-submit">交卷</button></div>
+   <ol class="mocklist">${mock.items.map((it,i)=>`<li class="pitem" id="mi-${i}"><div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${it.p.lv}">Lv${it.p.lv}</span> <span class="fmt">${it.l.title}</span><br>${it.p.q}</div>${it.p.fig||''}</div>
+     <div class="answer-row"><label for="mq-${i}">答：</label><input id="mq-${i}" class="ansin" spellcheck="false"></div><div id="mr-${i}"></div></li>`).join('')}</ol>
+   <div><button class="btn btn-primary" type="button" id="mock-submit2">交卷</button></div>`;
+  $('mock-submit').onclick=$('mock-submit2').onclick=submitMock;
+  tick();mockTimer=setInterval(tick,1000);$('mock').scrollIntoView({behavior:'smooth',block:'start'})}
+function tick(){if(!mock||mock.done)return;const left=Math.max(0,mock.end-Date.now()),m=Math.floor(left/60000),s=Math.floor(left%60000/1000);
+  const t=$('mock-time');if(t){t.textContent=`${m}:${String(s).padStart(2,'0')}`;t.classList.toggle('low',left<5*60000)}
+  if(left<=0)submitMock()}
+function submitMock(){if(!mock||mock.done)return;mock.done=true;clearInterval(mockTimer);let score=0;
+  mock.items.forEach((it,i)=>{const v=parseAns($('mq-'+i).value),ok=!!v&&same(v,it.p.ans);if(ok)score+=10;$('mq-'+i).disabled=true;
+    $('mr-'+i).innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'○ 正確':'✗ 錯誤'}<small>${ok?'':`正確答案 ${M(rFmt(it.p.ans))}`}</small></div>
+     <details${ok?'':' open'}><summary>看詳解</summary><ol class="steps" style="margin-top:8px">${it.p.steps.map(s=>`<li><div>${s}</div></li>`).join('')}</ol>${it.p.fig2?`<div class="sol-fig" style="margin-top:8px">${it.p.fig2}</div>`:''}</details>`});
+  S.mockN=(S.mockN||0)+1;const best=S.mockBest==null||score>S.mockBest;if(best)S.mockBest=score;save();
+  const bar=document.querySelector('.mockbar');
+  bar.innerHTML=`<span><span class="score">${score}</span> 分${best&&S.mockN>1?'・新的最高分！':''}</span><button class="btn btn-primary" type="button" id="mock-again">再考一次</button>`;
+  $('mock-submit2').parentElement.remove();
+  $('mock-again').onclick=()=>{mockIntro();startMock()};
+  bar.scrollIntoView({behavior:'smooth',block:'start'})}
+
 /* ---------- random practice ---------- */
 let cur=null,answered=false,qn=1;
 function weight(k){const st=S.stats[k];if(!st||st.t<3)return 1.5;return 1+2*(1-st.r/st.t)}
@@ -1216,7 +1329,7 @@ $('reset-area').addEventListener('click',e=>{
 function restoreReset(){$('reset-area').innerHTML='<button class="linkbtn" id="reset" type="button">清除所有紀錄</button>'}
 
 $('diff').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;S.diff=b.dataset.d;save();renderDiff();if(!answered&&cur.retryIdx===null)newProblem()});
-renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
+renderPast();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
 }
 </script>
 
