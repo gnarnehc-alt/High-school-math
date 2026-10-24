@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="高一數學第二章「直線與圓」從頭學：白話教學、互動圖形、逐步例題與隨機練習。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317233A'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23CF3127' stroke-width='3'/%3E%3C/svg%3E">
+<title>高一數學練功房</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* standalone reset */
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+
+/* Layout: graph-paper desk — lesson path on the left, the lesson sheet on the right; red pen grades, blue pen is the student's own work */
+:root{
+  --paper:#F3F6FA; --grid:#DFE6EF; --card:#FFFFFF; --line:#CBD5E2; --gridline:#E8EDF4;
+  --ink:#17233A; --muted:#58657D; --pen:#CF3127; --pen-soft:#FBE6E3;
+  --blue:#2650B5; --blue-soft:#E3EAFB; --ok:#1F7A4D; --ok-soft:#E1F3E9; --amber:#A8650B;
+  --f-hand:"LXGW WenKai TC","Kaiti TC","DFKai-SB","KaiTi",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-math:"STIX Two Text","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#10151F; --grid:#1B2433; --card:#161E2C; --line:#2A3548; --gridline:#1F2939;
+  --ink:#E4E9F2; --muted:#94A1B8; --pen:#FF6B5F; --pen-soft:#3A1E1D;
+  --blue:#86A6FF; --blue-soft:#1E2A47; --ok:#5FD39A; --ok-soft:#173326; --amber:#F2B356; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#10151F; --grid:#1B2433; --card:#161E2C; --line:#2A3548; --gridline:#1F2939;
+  --ink:#E4E9F2; --muted:#94A1B8; --pen:#FF6B5F; --pen-soft:#3A1E1D;
+  --blue:#86A6FF; --blue-soft:#1E2A47; --ok:#5FD39A; --ok-soft:#173326; --amber:#F2B356; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;color:var(--ink);font-family:var(--f-body);font-size:15.5px;line-height:1.75}
+.wrap{max-width:1160px;margin:0 auto;padding-block:26px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+h1{font-family:var(--f-hand);font-weight:700;font-size:clamp(28px,5vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--pen)}
+.sub{margin:6px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:4px}
+.tab{font:inherit;font-size:14.5px;border:0;background:transparent;color:var(--muted);padding:6px 16px;border-radius:5px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--card)}
+
+/* ---- shared bits ---- */
+.m{font-family:var(--f-math);font-size:1.1em;white-space:nowrap}
+.m i,i{font-family:var(--f-math)}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.86em;line-height:1.15;margin:0 2px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.rt{white-space:nowrap}.rt .rad{border-top:1px solid currentColor;padding:0 2px 0 1px;margin-left:1px}
+.btn{font:inherit;font-size:15px;font-weight:500;border-radius:6px;padding:8px 18px;cursor:pointer;border:1px solid transparent}
+.btn-primary{background:var(--ink);color:var(--card)}
+.btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.linkbtn{background:none;border:0;color:var(--blue);font:inherit;font-size:13.5px;cursor:pointer;padding:2px 4px;border-radius:4px}
+.btn:focus-visible,.tab:focus-visible,.linkbtn:focus-visible,.chip:focus-visible,.lesson-link:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ansin{font-family:var(--f-math);font-size:22px;color:var(--blue);background:transparent;border:0;border-bottom:2px solid var(--line);width:150px;padding:2px 6px;outline:none}
+.ansin:focus{border-bottom-color:var(--blue)}
+.answer-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.answer-row label{font-family:var(--f-hand);font-size:18px}
+.fmt{font-size:12.5px;color:var(--muted);margin:0}
+.fmt.err{color:var(--pen)}
+.verdict{font-family:var(--f-hand);font-size:22px;font-weight:700}
+.verdict small{font-family:var(--f-body);font-size:14px;font-weight:400;color:var(--muted);margin-left:8px}
+.verdict.ok{color:var(--ok)}.verdict.no{color:var(--pen)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:st}
+.steps li{counter-increment:st;display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:start;background:var(--paper);border-radius:6px;padding:8px 12px;line-height:2;overflow-x:auto}
+.steps li::before{content:counter(st);font-family:var(--f-hand);font-weight:700;color:var(--card);background:var(--blue);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;margin-top:7px;line-height:1}
+.mark{position:absolute;top:14px;right:14px;width:80px;height:80px;pointer-events:none}
+.mark path{fill:none;stroke:var(--pen);stroke-width:5;stroke-linecap:round;stroke-dasharray:320;stroke-dashoffset:320;animation:draw .55s ease-out forwards}
+.mark path:nth-child(2){animation-delay:.18s}
+@keyframes draw{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.mark path{animation:none;stroke-dashoffset:0}}
+
+/* coordinate plane */
+.plane{width:100%;max-width:320px;height:auto;display:block;background:var(--card);border:1px solid var(--line);border-radius:6px}
+.pg{stroke:var(--gridline);stroke-width:1}
+.pa{stroke:var(--muted);stroke-width:1.3}
+.pt{fill:var(--muted);font-size:10px;font-family:var(--f-math)}
+.pl{fill:var(--ink);font-size:13px;font-style:italic;font-family:var(--f-math)}
+.pq{fill:var(--muted);font-size:12px;font-family:var(--f-body);opacity:.8}
+.pln,.pc,.ps{fill:none;stroke-width:2.2;stroke-linecap:round}
+.ps{stroke-width:2}.dash{stroke-dasharray:5 4}
+.s-blue{stroke:var(--blue)}.s-pen{stroke:var(--pen)}.s-ok{stroke:var(--ok)}.s-ink{stroke:var(--ink)}.s-amber{stroke:var(--amber)}
+.pp{stroke:var(--card);stroke-width:1.5}
+.f-blue{fill:var(--blue)}.f-pen{fill:var(--pen)}.f-ok{fill:var(--ok)}.f-ink{fill:var(--ink)}.f-amber{fill:var(--amber)}
+.plab{font-size:12px;font-family:var(--f-body);font-weight:500;fill:var(--ink);paint-order:stroke;stroke:var(--card);stroke-width:3px;stroke-linejoin:round}
+.plab.c-blue{fill:var(--blue)}.plab.c-pen{fill:var(--pen)}.plab.c-ok{fill:var(--ok)}.plab.c-amber{fill:var(--amber)}
+
+/* ---- lessons ---- */
+.learn{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.learn{grid-template-columns:1fr}}
+.path{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 12px;position:sticky;top:max(12px,env(safe-area-inset-top,0px))}
+@media (max-width:860px){.path{position:static}}
+.path h2{margin:0 4px 4px;font-family:var(--f-hand);font-size:19px}
+.path p{margin:0 4px 10px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.path ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+@media (max-width:860px){.path ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
+.lesson-link{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:8px;align-items:center;text-align:left;font:inherit;font-size:14px;background:transparent;border:0;border-radius:6px;padding:6px 8px;color:var(--ink);cursor:pointer;line-height:1.35}
+.lesson-link:hover{background:var(--paper)}
+.lesson-link[aria-current="true"]{background:var(--blue-soft);color:var(--blue)}
+.lesson-link .no{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--f-math);font-size:12.5px;color:var(--muted)}
+.lesson-link.done .no{background:var(--ok);border-color:var(--ok);color:var(--card)}
+.lesson-link .cnt{font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.path .overall{margin:12px 4px 0;font-size:12.5px;color:var(--muted)}
+.overall .bar{height:6px;border-radius:3px;background:var(--grid);overflow:hidden;margin-top:4px}
+.overall .bar i{display:block;height:100%;background:var(--ok)}
+
+.lesson{background:var(--card);border:1px solid var(--line);border-radius:8px;min-width:0}
+.lesson section{padding:22px 24px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:14px}
+.lesson section:first-child{border-top:0}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted);margin:0}
+.lesson h2{margin:0;font-family:var(--f-hand);font-size:clamp(24px,4vw,32px);line-height:1.2;text-wrap:balance}
+.lesson h3{margin:0;font-family:var(--f-hand);font-size:21px;display:flex;align-items:center;gap:10px}
+.lesson h3 .kicker{font-family:var(--f-body);font-size:11.5px;letter-spacing:.12em;color:var(--card);background:var(--ink);border-radius:3px;padding:1px 7px;font-weight:500}
+.goal{margin:0;background:var(--paper);border-radius:6px;padding:10px 14px;font-size:14.5px}
+.goal b{color:var(--blue)}
+.prose{max-width:66ch}
+.prose p{margin:0 0 10px}.prose p:last-child{margin-bottom:0}
+.prose ul{margin:0 0 10px;padding-left:1.3em}.prose li{margin:4px 0}
+.concept-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
+@media (max-width:720px){.concept-grid{grid-template-columns:1fr}}
+.tip{border-left:3px solid var(--pen);background:var(--pen-soft);padding:8px 14px;border-radius:0 6px 6px 0;font-size:14.5px;max-width:66ch}
+.tip b{color:var(--pen)}
+.note{border-left:3px solid var(--blue);background:var(--blue-soft);padding:8px 14px;border-radius:0 6px 6px 0;font-size:14.5px;max-width:66ch}
+.formula{font-family:var(--f-math);font-size:20px;text-align:center;padding:12px;border:1.5px solid var(--ink);border-radius:6px;background:var(--card);max-width:520px;overflow-x:auto}
+.formula small{display:block;font-family:var(--f-body);font-size:12.5px;color:var(--muted);margin-top:2px}
+
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:center;background:var(--paper);border-radius:8px;padding:16px}
+@media (max-width:720px){.lab{grid-template-columns:1fr}}
+.lab-ctrl{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lab-ctrl label{font-size:14px;display:flex;justify-content:space-between}
+.lab-ctrl output{font-family:var(--f-math);font-weight:600;color:var(--blue)}
+.lab-ctrl input[type=range]{width:100%;accent-color:var(--blue)}
+.lab-eq{font-family:var(--f-math);font-size:21px;margin:8px 0 0}
+.lab-say{font-size:14px;color:var(--muted);margin:0}
+.lab-say b{color:var(--ink)}
+.lab-title{font-size:12px;letter-spacing:.12em;color:var(--muted);margin:0}
+
+.example{display:flex;flex-direction:column;gap:12px}
+.qbox{font-size:17px;line-height:2}
+.practice{position:relative}
+.dots{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.dots i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line)}
+.dots i.on{background:var(--ok);border-color:var(--ok)}
+.pq-wrap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start}
+@media (max-width:720px){.pq-wrap{grid-template-columns:1fr}}
+.pq-wrap .plane{max-width:240px}
+.result{display:flex;flex-direction:column;gap:12px;border-top:1px dashed var(--line);padding-top:14px}
+.done-box{background:var(--ok-soft);border-radius:6px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.done-box b{font-family:var(--f-hand);font-size:19px;color:var(--ok)}
+.sol-fig .plane{max-width:260px}
+
+/* ---- random practice (tab 2) ---- */
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 14px;min-width:84px}
+.stat b{display:block;font-family:var(--f-math);font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.units{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.units-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.units-head h2{margin:0;font-size:13px;letter-spacing:.12em;color:var(--muted);font-weight:500}
+.chapters{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 20px}
+.chapter h3{margin:0 0 6px;font-family:var(--f-hand);font-size:17px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13.5px;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--blue-soft);color:var(--blue);border-color:var(--blue)}
+.pmain{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+@media (max-width:860px){.pmain{grid-template-columns:1fr}}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:8px;position:relative;overflow:hidden;min-width:0}
+.sheet-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 22px;border-bottom:1px dashed var(--line);flex-wrap:wrap}
+.qno{font-family:var(--f-hand);font-size:20px;font-weight:700}
+.tag{font-size:12.5px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 8px}
+.tag.retry{color:var(--pen);border-color:var(--pen)}
+.sheet-body{padding:24px 22px 22px;display:flex;flex-direction:column;gap:18px}
+.question{font-size:18px;line-height:2;min-height:3.6em;padding-right:80px}
+.hint{background:var(--blue-soft);border-radius:6px;padding:10px 14px;font-size:14.5px}
+.hint b{color:var(--blue)}
+.sol{font-size:15.5px;line-height:2;background:var(--paper);border-radius:6px;padding:12px 16px;overflow-x:auto}
+.sol h4{margin:0 0 4px;font-size:12px;letter-spacing:.14em;color:var(--muted);font-weight:500}
+aside{display:flex;flex-direction:column;gap:16px;min-width:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+.panel h2{margin:0 0 10px;font-family:var(--f-hand);font-size:19px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 span{font-family:var(--f-body);font-size:12px;font-weight:400;color:var(--muted)}
+.mastery{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.mastery li{display:grid;grid-template-columns:96px 1fr 52px;gap:8px;align-items:center;font-size:13px}
+.mastery .bar{height:8px;border-radius:4px;background:var(--grid);overflow:hidden}
+.mastery .bar i{display:block;height:100%;border-radius:4px;background:var(--blue)}
+.mastery .bar i.weak{background:var(--pen)}
+.pct{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+.advice{margin:12px 0 0;font-size:13.5px;color:var(--muted)}
+.advice b{color:var(--pen);font-weight:500}
+.wrong{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto}
+.wrong li{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px dashed var(--line);padding:4px 0;font-size:13.5px}
+.wrong .wq{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.wrong .wq b{color:var(--ink);font-weight:500;margin-right:6px}
+.empty{color:var(--muted);font-size:13.5px;margin:0}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>高一數學<em>練功房</em></h1>
+      <p class="sub" id="subline">從頭學第二章「直線與圓」：每一課先看懂，再跟著做，最後自己練。</p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="模式">
+      <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="view-learn" type="button">從頭學・第二章</button>
+      <button class="tab" role="tab" id="tab-prac" aria-selected="false" aria-controls="view-prac" type="button">隨機練習</button>
+    </div>
+  </header>
+
+  <!-- ============ LEARN VIEW ============ -->
+  <div id="view-learn" role="tabpanel" aria-labelledby="tab-learn">
+    <div class="learn">
+      <nav class="path" aria-label="課程路線">
+        <h2>學習路線</h2>
+        <p>建議照順序學。每課小練習答對 3 題就算過關。</p>
+        <ol id="path-list"></ol>
+        <div class="overall" id="overall"></div>
+      </nav>
+      <article class="lesson" id="lesson"></article>
+    </div>
+  </div>
+
+  <!-- ============ PRACTICE VIEW ============ -->
+  <div id="view-prac" role="tabpanel" aria-labelledby="tab-prac" hidden>
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div class="stats" aria-label="練習紀錄">
+        <div class="stat"><b id="s-total">0</b><span>已作答</span></div>
+        <div class="stat"><b id="s-acc">—</b><span>正確率</span></div>
+        <div class="stat"><b id="s-streak">0</b><span>連續答對</span></div>
+        <div class="stat"><b id="s-best">0</b><span>最高連對</span></div>
+      </div>
+      <section class="units" aria-label="選擇單元">
+        <div class="units-head">
+          <h2>選擇練習單元（可複選）</h2>
+          <div><button class="linkbtn" id="all-on" type="button">全選</button> <button class="linkbtn" id="ch2-only" type="button">只練第二章</button> <button class="linkbtn" id="weak-only" type="button">只練弱項</button></div>
+        </div>
+        <div class="chapters" id="chapters"></div>
+      </section>
+      <div class="pmain">
+        <section class="sheet" aria-live="polite">
+          <div class="sheet-top"><span class="qno" id="qno">第 1 題</span><span class="tag" id="qtag"></span></div>
+          <div class="sheet-body">
+            <div class="question" id="question"></div>
+            <form class="answer-row" id="pform" autocomplete="off">
+              <label for="pans">答：</label>
+              <input id="pans" class="ansin" spellcheck="false" aria-describedby="pfmt">
+              <button class="btn btn-primary" id="psubmit" type="submit">交卷批改</button>
+              <button class="btn btn-ghost" id="phint-btn" type="button">看提示</button>
+            </form>
+            <p class="fmt" id="pfmt">可填整數、分數（如 -3/4）或小數。按 Enter 送出。</p>
+            <div class="hint" id="phint" hidden></div>
+            <div class="result" id="presult" hidden>
+              <div class="verdict" id="pverdict"></div>
+              <div class="sol" id="psol"></div>
+              <div><button class="btn btn-primary" id="pnext" type="button">下一題 →</button></div>
+            </div>
+          </div>
+          <div id="pmark"></div>
+        </section>
+        <aside>
+          <div class="panel"><h2>單元熟練度 <span>答對 / 作答</span></h2><ul class="mastery" id="mastery"></ul><p class="advice" id="advice"></p></div>
+          <div class="panel"><h2>錯題本 <span id="wcount">0 題</span></h2><ul class="wrong" id="wrong"></ul></div>
+          <div class="confirm" id="reset-area"><button class="linkbtn" id="reset" type="button">清除所有紀錄</button></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= helpers ================= */
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const nz=(a,b)=>{let v;do{v=rnd(a,b)}while(v===0);return v};
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+const R=(n,d=1)=>{if(d<0){n=-n;d=-d}const g=gcd(n,d)||1;return [n/g,d/g]};
+const num=n=>n<0?'−'+(-n):''+n;
+const par=n=>n<0?'('+num(n)+')':''+n;
+const X='<i>x</i>',Y='<i>y</i>',X2='<i>x</i><sup>2</sup>',Y2='<i>y</i><sup>2</sup>',X3='<i>x</i><sup>3</sup>';
+const M=s=>`<span class="m">${s}</span>`;
+const fr=(a,b)=>`<span class="frac"><span>${a}</span><span>${b}</span></span>`;
+const rt=n=>`<span class="rt">√<span class="rad">${n}</span></span>`;
+const rFmt=([n,d])=>d===1?num(n):(n<0?'−':'')+fr(Math.abs(n),d);
+const rTxt=([n,d])=>d===1?num(n):num(n)+'/'+d;
+function poly(terms){let s='';for(const [c,v] of terms){if(c===0)continue;const a=Math.abs(c);const body=(a===1&&v)?v:a+v;
+  s+= s===''?(c<0?'−':'')+body:(c<0?' − ':' + ')+body}return s||'0'}
+const sq=(v,c)=>c===0?v+'<sup>2</sup>':`(${poly([[1,v],[-c,'']])})<sup>2</sup>`;
+/* y = m x + b with rational m */
+function lineEq([n,d],b){
+  let s='<i>y</i> = ';
+  if(n===0)return s+num(b);
+  const coef=(d===1&&Math.abs(n)===1)?(n<0?'−':''):rFmt([n,d]);
+  s+=coef+X;
+  if(b!==0)s+=(b<0?' − ':' + ')+Math.abs(b);
+  return s;
+}
+const quadOf=(x,y)=>x>0&&y>0?1:x<0&&y>0?2:x<0&&y<0?3:4;
+const QN=['','一','二','三','四'];
+
+/* ================= coordinate plane ================= */
+const L=(m,b)=>({a:m,b:-1,c:b});                 // y = m x + b  ->  m x − y + b = 0
+function plane(o={}){
+  const Rg=o.R||7,S=300,u=S/(2*Rg);
+  const px=x=>+((x+Rg)*u).toFixed(2),py=y=>+((Rg-y)*u).toFixed(2);
+  let s='';
+  for(let i=-Rg;i<=Rg;i++)s+=`<line class="pg" x1="${px(i)}" y1="0" x2="${px(i)}" y2="${S}"/><line class="pg" x1="0" y1="${py(i)}" x2="${S}" y2="${py(i)}"/>`;
+  if(o.quads){[[1,1,'第一象限'],[-1,1,'第二象限'],[-1,-1,'第三象限'],[1,-1,'第四象限']].forEach(([a,b,t])=>s+=`<text class="pq" x="${px(a*Rg/2)}" y="${py(b*Rg/2)}" text-anchor="middle">${t}</text>`)}
+  s+=`<line class="pa" x1="0" y1="${py(0)}" x2="${S}" y2="${py(0)}"/><line class="pa" x1="${px(0)}" y1="0" x2="${px(0)}" y2="${S}"/>`;
+  const step=Rg>6?2:1;
+  for(let i=-Rg+1;i<Rg;i++){if(i===0||i%step)continue;
+    s+=`<text class="pt" x="${px(i)}" y="${py(0)+12}" text-anchor="middle">${num(i)}</text><text class="pt" x="${px(0)-5}" y="${py(i)+3.5}" text-anchor="end">${num(i)}</text>`}
+  s+=`<text class="pt" x="${px(0)-5}" y="${py(0)+12}" text-anchor="end">O</text><text class="pl" x="${S-12}" y="${py(0)-6}">x</text><text class="pl" x="${px(0)+7}" y="13">y</text>`;
+  for(const c of o.circles||[])s+=`<circle class="pc s-${c.c||'blue'}" cx="${px(c.x)}" cy="${py(c.y)}" r="${(c.r*u).toFixed(2)}"/>`;
+  for(const l of o.lines||[]){let p1,p2;
+    if(l.b!==0){const xa=-Rg-2,xb=Rg+2;p1=[xa,(-l.a*xa-l.c)/l.b];p2=[xb,(-l.a*xb-l.c)/l.b]}
+    else{const x=-l.c/l.a;p1=[x,-Rg-2];p2=[x,Rg+2]}
+    s+=`<line class="pln s-${l.col||'blue'}" x1="${px(p1[0])}" y1="${py(p1[1])}" x2="${px(p2[0])}" y2="${py(p2[1])}"/>`}
+  for(const g of o.segs||[]){s+=`<line class="ps s-${g.c||'ink'} ${g.dash?'dash':''}" x1="${px(g.p[0])}" y1="${py(g.p[1])}" x2="${px(g.q[0])}" y2="${py(g.q[1])}"/>`;
+    if(g.label){const mx=(px(g.p[0])+px(g.q[0]))/2+(g.dx||0),my=(py(g.p[1])+py(g.q[1]))/2+(g.dy||0);
+      s+=`<text class="plab c-${g.c||'ink'}" x="${mx}" y="${my}" text-anchor="middle">${g.label}</text>`}}
+  for(const p of o.pts||[]){const cx=px(p.x),cy=py(p.y);s+=`<circle class="pp f-${p.c||'blue'}" cx="${cx}" cy="${cy}" r="4.5"/>`;
+    if(p.label){let tx=cx+(p.dx??7),ty=cy+(p.dy??-7);tx=Math.min(Math.max(tx,4),S-4);ty=Math.min(Math.max(ty,12),S-4);
+      const anchor=(p.dx??7)<0?'end':'start';
+      s+=`<text class="plab c-${p.c||'blue'}" x="${tx}" y="${ty}" text-anchor="${anchor}">${p.label}</text>`}}
+  return `<svg class="plane" viewBox="0 0 ${S} ${S}" role="img" aria-label="${o.alt||'坐標平面'}">${s}</svg>`;
+}
+const P=(x,y)=>`(${num(x)}, ${num(y)})`;
+/* foot of perpendicular from (x0,y0) to ax+by+c=0 */
+const foot=(a,b,c,x0,y0)=>{const t=(a*x0+b*y0+c)/(a*a+b*b);return [x0-a*t,y0-b*t]};
+
+/* ================= lessons (chapter 2) ================= */
+const LESSONS=[
+{id:'neg',title:'暖身：正負數加減',
+ goal:'這一章的每個公式都會把兩個坐標相減。先把「減掉負數」和「平方」算熟，後面就不會卡。',
+ concept:()=>`<div class="prose">
+  <p>想像一條數線：往右是正，往左是負。</p>
+  <ul>
+   <li><b>減掉正數＝往左走。</b>${M('2 − 7')}：從 2 往左走 7 格，到 ${M('−5')}。</li>
+   <li><b>減掉負數＝加上它的相反數。</b>${M('5 − (−3) = 5 + 3 = 8')}。兩個「負」碰在一起變成「加」。</li>
+   <li><b>負數的平方是正的。</b>${M('(−4)<sup>2</sup> = (−4) × (−4) = 16')}，負負得正。</li>
+  </ul></div>
+  <div class="tip"><b>常見錯誤：</b>${M('−4<sup>2</sup>')} 和 ${M('(−4)<sup>2</sup>')} 不一樣。沒有括號的 ${M('−4<sup>2</sup>')} 是「4 的平方再加負號」＝ −16。這一章代公式時，負數一律<b>加上括號</b>再算，就不會錯。</div>`,
+ example:{q:`計算 ${M('(−2) − (−6)')}`,steps:[
+   `看到「減掉負數」，改寫成「加上相反數」：${M('(−2) − (−6) = (−2) + 6')}`,
+   `從 −2 往右走 6 格，經過 0 再走 4 格：${M('(−2) + 6 = 4')}。答案是 <b>4</b>。`]},
+ gen(){const t=rnd(0,2);
+  if(t===0){const a=rnd(-9,9),b=nz(-9,-1);return{q:`計算 ${M(`${par(a)} − (${num(b)})`)}`,ans:[a-b,1],steps:[
+    `減掉負數＝加上相反數：${M(`${par(a)} − (${num(b)}) = ${par(a)} + ${-b}`)}`,
+    `${M(`${par(a)} + ${-b} = ${num(a-b)}`)}，答案是 <b>${num(a-b)}</b>。`]}}
+  if(t===1){const a=rnd(-6,8),b=rnd(2,9);return{q:`計算 ${M(`${num(a)} − ${b}`)}`,ans:[a-b,1],steps:[
+    `減掉正數＝在數線上往左走：從 ${num(a)} 往左走 ${b} 格。`,
+    `${a>0&&a-b<0?`先走 ${a} 格到 0，再走 ${b-a} 格，`:''}到達 <b>${num(a-b)}</b>。`]}}
+  const a=nz(-6,6),b=nz(-6,6);return{q:`計算 ${M(`${par(a)}<sup>2</sup> + ${par(b)}<sup>2</sup>`)}`,ans:[a*a+b*b,1],steps:[
+    `平方就是自己乘自己，負負得正：${M(`${par(a)}<sup>2</sup> = ${a*a}`)}，${M(`${par(b)}<sup>2</sup> = ${b*b}`)}`,
+    `${M(`${a*a} + ${b*b} = ${a*a+b*b}`)}，答案是 <b>${a*a+b*b}</b>。`]}}},
+
+{id:'coord',title:'坐標平面與象限',
+ goal:'看到 (3, −2) 就知道它在哪裡，會判斷象限，會在平面上「移動」一個點。',
+ concept:()=>`<div class="concept-grid"><div class="prose">
+  <p>坐標平面是兩條數線交叉：橫的叫 <b>x 軸</b>，直的叫 <b>y 軸</b>，交點叫<b>原點 O</b>，坐標是 ${M('(0, 0)')}。</p>
+  <p>一個點寫成 ${M('(<i>x</i>, <i>y</i>)')}，<b>先橫後直</b>：</p>
+  <ul><li>${M(X)}：從原點往<b>右</b>是正、往<b>左</b>是負。</li><li>${M(Y)}：往<b>上</b>是正、往<b>下</b>是負。</li></ul>
+  <p>兩條軸把平面切成四塊，從右上開始<b>逆時針</b>數，叫第一、二、三、四象限。</p>
+  <ul><li>第一 ${M('(+, +)')}　第二 ${M('(−, +)')}</li><li>第三 ${M('(−, −)')}　第四 ${M('(+, −)')}</li></ul>
+  <p>點如果落在軸上（例如 ${M('(0, 5)')}），不屬於任何象限。</p></div>
+  ${plane({quads:true,pts:[{x:3,y:-2,label:'A(3, −2)'},{x:-4,y:3,label:'B(−4, 3)',c:'pen'}],alt:'四個象限與兩個點'})}</div>
+  <div class="note">往右移 ${M('<i>p</i>')} 格：${M(X)} 加 ${M('<i>p</i>')}。往下移 ${M('<i>q</i>')} 格：${M(Y)} 減 ${M('<i>q</i>')}。左右只動 ${M(X)}，上下只動 ${M(Y)}。</div>`,
+ example:{q:`點 ${M('A(3, −2)')} 在第幾象限？`,fig:()=>plane({quads:true,pts:[{x:3,y:-2,label:'A'}],segs:[{p:[0,0],q:[3,0],c:'blue',dash:true,label:'右 3',dy:-6},{p:[3,0],q:[3,-2],c:'pen',dash:true,label:'下 2',dx:20}]}),steps:[
+   `${M('<i>x</i> = 3')}，是正的，從原點往<b>右</b>走 3 格。`,
+   `${M('<i>y</i> = −2')}，是負的，再往<b>下</b>走 2 格。`,
+   `右邊、下面 → ${M('(+, −)')} → <b>第四象限</b>。`]},
+ gen(){if(Math.random()<.55){const x=nz(-7,7),y=nz(-7,7),q=quadOf(x,y);
+   return{q:`點 ${M(`P${P(x,y)}`)} 在第幾象限？（填 1、2、3 或 4）`,ans:[q,1],steps:[
+    `${M(`<i>x</i> = ${num(x)}`)}，${x>0?'正的 → 在 y 軸<b>右邊</b>':'負的 → 在 y 軸<b>左邊</b>'}。`,
+    `${M(`<i>y</i> = ${num(y)}`)}，${y>0?'正的 → 在 x 軸<b>上面</b>':'負的 → 在 x 軸<b>下面</b>'}。`,
+    `${M(`(${x>0?'+':'−'}, ${y>0?'+':'−'})`)} → 第${QN[q]}象限，答案是 <b>${q}</b>。`],fig2:plane({quads:true,pts:[{x,y,label:'P'}]})}}
+  const a=rnd(-4,4),b=rnd(-4,4),h=nz(-3,3),v=nz(-3,3),askX=Math.random()<.5;
+  const hs=h>0?`向右 ${h} 格`:`向左 ${-h} 格`,vs=v>0?`向上 ${v} 格`:`向下 ${-v} 格`;
+  return{q:`點 ${M(`A${P(a,b)}`)} 先${hs}、再${vs}，到達點 B。B 的 ${M(askX?X:Y)} 坐標是多少？`,ans:[askX?a+h:b+v,1],steps:[
+   `左右移動只改 ${M(X)}：${M(`${num(a)} ${h>0?'+':'−'} ${Math.abs(h)} = ${num(a+h)}`)}`,
+   `上下移動只改 ${M(Y)}：${M(`${num(b)} ${v>0?'+':'−'} ${Math.abs(v)} = ${num(b+v)}`)}`,
+   `所以 ${M(`B${P(a+h,b+v)}`)}，${M(askX?X:Y)} 坐標是 <b>${num(askX?a+h:b+v)}</b>。`],
+   fig2:plane({pts:[{x:a,y:b,label:'A'},{x:a+h,y:b+v,label:'B',c:'pen'}],segs:[{p:[a,b],q:[a+h,b],c:'blue',dash:true},{p:[a+h,b],q:[a+h,b+v],c:'pen',dash:true}]})}}},
+
+{id:'dist',title:'兩點距離',
+ goal:'用畢氏定理算出平面上任兩點的距離。',
+ concept:()=>`<div class="concept-grid"><div class="prose">
+  <p>國中學過<b>畢氏定理</b>：直角三角形兩股 ${M('<i>a</i>, <i>b</i>')}，斜邊 ${M('<i>c</i>')}，則 ${M('<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup> = <i>c</i><sup>2</sup>')}。</p>
+  <p>平面上兩點 A、B，從 A 先橫著走、再直著走就能到 B，剛好圍出一個直角三角形：</p>
+  <ul><li>橫的那一邊＝兩點 ${M(X)} 坐標的差</li><li>直的那一邊＝兩點 ${M(Y)} 坐標的差</li><li>AB 就是斜邊</li></ul></div>
+  ${plane({pts:[{x:-2,y:-1,label:'A(−2, −1)',dy:16,dx:-4},{x:1,y:3,label:'B(1, 3)'}],segs:[{p:[-2,-1],q:[1,-1],c:'blue',dash:true,label:'3',dy:15},{p:[1,-1],q:[1,3],c:'pen',dash:true,label:'4',dx:12},{p:[-2,-1],q:[1,3],c:'ink',label:'5',dx:-12,dy:-4}],alt:'3-4-5 直角三角形'})}</div>
+  <div class="formula">${M(`AB = ${rt('(<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>)<sup>2</sup> + (<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>)<sup>2</sup>')}`)}<small>橫差平方 ＋ 直差平方，再開根號</small></div>
+  <div class="tip"><b>小提醒：</b>差是負的沒關係，平方後一定變正。所以誰減誰都可以，只要 ${M(X)} 和 ${M(Y)} 各自相減就好。</div>`,
+ example:{q:`求 ${M('A(−2, −1)')} 和 ${M('B(1, 3)')} 的距離。`,steps:[
+   `橫差：${M('1 − (−2) = 1 + 2 = 3')}`,
+   `直差：${M('3 − (−1) = 3 + 1 = 4')}`,
+   `${M(`AB = ${rt('3<sup>2</sup> + 4<sup>2</sup>')} = ${rt('9 + 16')} = ${rt(25)} = 5`)}，答案是 <b>5</b>。`]},
+ gen(){let [dx,dy,d]=pick([[3,4,5],[4,3,5],[6,8,10],[8,6,10],[0,5,5],[6,0,6],[3,4,5]]);
+  dx*=pick([1,-1]);dy*=pick([1,-1]);
+  const x1=rnd(Math.max(-7,-7-dx),Math.min(7,7-dx)),y1=rnd(Math.max(-7,-7-dy),Math.min(7,7-dy)),x2=x1+dx,y2=y1+dy;
+  return{q:`求 ${M(`A${P(x1,y1)}`)} 和 ${M(`B${P(x2,y2)}`)} 兩點的距離。`,ans:[d,1],fig:plane({R:8,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B',c:'pen'}]}),steps:[
+   `橫差：${M(`${num(x2)} − ${par(x1)} = ${num(dx)}`)}`,
+   `直差：${M(`${num(y2)} − ${par(y1)} = ${num(dy)}`)}`,
+   `${M(`AB = ${rt(`${par(dx)}<sup>2</sup> + ${par(dy)}<sup>2</sup>`)} = ${rt(`${dx*dx} + ${dy*dy}`)} = ${rt(d*d)} = ${d}`)}，答案是 <b>${d}</b>。`],
+   fig2:plane({R:8,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B',c:'pen'}],segs:[{p:[x1,y1],q:[x2,y1],c:'blue',dash:true,label:''+Math.abs(dx),dy:14},{p:[x2,y1],q:[x2,y2],c:'pen',dash:true,label:''+Math.abs(dy),dx:12},{p:[x1,y1],q:[x2,y2],c:'ink'}]})}}},
+
+{id:'mid',title:'中點坐標',
+ goal:'找出兩點正中間的那個點。',
+ concept:()=>`<div class="concept-grid"><div class="prose">
+  <p>兩點的正中間，就是「兩個 ${M(X)} 的平均」和「兩個 ${M(Y)} 的平均」。平均就是加起來除以 2。</p>
+  <p>例如 ${M('A(−3, 1)')}、${M('B(5, 3)')}：</p>
+  <ul><li>${M(X)}：${M(`${fr('−3 + 5',2)} = ${fr(2,2)} = 1`)}</li><li>${M(Y)}：${M(`${fr('1 + 3',2)} = ${fr(4,2)} = 2`)}</li></ul>
+  <p>中點 ${M('M(1, 2)')}。</p></div>
+  ${plane({pts:[{x:-3,y:1,label:'A'},{x:5,y:3,label:'B'},{x:1,y:2,label:'M(1, 2)',c:'pen',dy:-10}],segs:[{p:[-3,1],q:[5,3],c:'blue'}]})}</div>
+  <div class="formula">${M(`中點 = (${fr('<i>x</i><sub>1</sub> + <i>x</i><sub>2</sub>',2)}, ${fr('<i>y</i><sub>1</sub> + <i>y</i><sub>2</sub>',2)})`)}<small>中點用「加」，距離用「減」，不要搞混</small></div>`,
+ example:{q:`求 ${M('A(2, −5)')} 和 ${M('B(−4, 1)')} 的中點。`,steps:[
+   `${M(X)}：${M(`${fr('2 + (−4)',2)} = ${fr('−2',2)} = −1`)}`,
+   `${M(Y)}：${M(`${fr('(−5) + 1',2)} = ${fr('−4',2)} = −2`)}`,
+   `中點是 <b>${M('(−1, −2)')}</b>。`]},
+ gen(){const x1=rnd(-7,7),y1=rnd(-7,7),x2=rnd(-7,7),y2=rnd(-7,7),askX=Math.random()<.5;
+  const s=askX?x1+x2:y1+y2,a=R(s,2),[u,v]=askX?[x1,x2]:[y1,y2];
+  return{q:`${M(`A${P(x1,y1)}`)}、${M(`B${P(x2,y2)}`)} 的中點 M，它的 ${M(askX?X:Y)} 坐標是多少？${a[1]!==1?'':''}`,ans:a,steps:[
+   `只看 ${M(askX?X:Y)}：兩個數是 ${num(u)} 和 ${num(v)}。`,
+   `平均：${M(`${fr(`${num(u)} + ${par(v)}`,2)} = ${fr(num(s),2)} = ${rFmt(a)}`)}${a[1]!==1?`（也可以寫 ${(s/2).toString().replace('-','−')}）`:''}，答案是 <b>${M(rFmt(a))}</b>。`],
+   fig2:plane({R:8,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B'},{x:(x1+x2)/2,y:(y1+y2)/2,label:'M',c:'pen'}],segs:[{p:[x1,y1],q:[x2,y2],c:'blue'}]})}}},
+
+{id:'slope',title:'斜率：線有多斜',
+ goal:'會算兩點連線的斜率，並看懂斜率的正、負、零代表什麼。',
+ concept:()=>`<div class="concept-grid"><div class="prose">
+  <p>斜率就像爬坡的陡度：<b>從左往右走，每往右走 1 格，往上升幾格</b>。</p>
+  <p>算法：${M('斜率 <i>m</i> = 上升 ÷ 往右走')}。</p>
+  <ul><li><b>正斜率</b>：往右上爬。</li><li><b>負斜率</b>：往右下走（「上升」是負的）。</li><li><b>斜率 0</b>：水平線，完全不上升。</li><li><b>鉛直線</b>：往右走 0 格，不能除以 0，所以<b>沒有斜率</b>。</li></ul></div>
+  ${plane({pts:[{x:-1,y:1,label:'A(−1, 1)',dx:-6,dy:16},{x:3,y:3,label:'B(3, 3)'}],segs:[{p:[-1,1],q:[3,1],c:'blue',dash:true,label:'往右 4',dy:15},{p:[3,1],q:[3,3],c:'pen',dash:true,label:'上升 2',dx:28}],lines:[L(.5,1.5)],alt:'斜率 1/2 的直線'})}</div>
+  <div class="formula">${M(`<i>m</i> = ${fr('<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>','<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>')}`)}<small>上面 y 相減，下面 x 相減，順序要一樣</small></div>
+  <div class="tip"><b>常見錯誤：</b>上面用 B − A，下面卻用 A − B，結果正負號會相反。決定好誰是「第 2 點」就上下都用它減。</div>
+  <div class="lab-title">動手試試：拉拉看斜率會怎樣改變直線</div><div id="lab-slope"></div>`,
+ lab:'slope',
+ example:{q:`求通過 ${M('A(−1, 1)')}、${M('B(3, 3)')} 的直線斜率。`,steps:[
+   `上升（y 相減）：${M('3 − 1 = 2')}`,
+   `往右走（x 相減，同樣 B 減 A）：${M('3 − (−1) = 4')}`,
+   `${M(`<i>m</i> = ${fr(2,4)} = ${fr(1,2)}`)}，答案是 <b>${M(fr(1,2))}</b>（可以填 1/2 或 0.5）。`]},
+ gen(){const x1=rnd(-5,5),y1=rnd(-5,5);let x2;do{x2=rnd(-5,5)}while(x2===x1);const y2=rnd(-5,5);
+  const m=R(y2-y1,x2-x1);
+  return{q:`求通過 ${M(`A${P(x1,y1)}`)}、${M(`B${P(x2,y2)}`)} 的直線斜率。（分數請寫成 a/b，例如 -3/4）`,ans:m,
+   fig:plane({R:6,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B',c:'pen'}]}),steps:[
+   `上升（B 的 y 減 A 的 y）：${M(`${num(y2)} − ${par(y1)} = ${num(y2-y1)}`)}`,
+   `往右走（B 的 x 減 A 的 x）：${M(`${num(x2)} − ${par(x1)} = ${num(x2-x1)}`)}`,
+   `${M(`<i>m</i> = ${fr(num(y2-y1),num(x2-x1))} = ${rFmt(m)}`)}${m[0]===0?'，水平線':m[0]>0?'，往右上':'，往右下'}。答案是 <b>${M(rFmt(m))}</b>。`],
+   fig2:plane({R:6,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B',c:'pen'}],lines:[{a:y2-y1,b:-(x2-x1),c:(x2-x1)*y1-(y2-y1)*x1,col:'blue'}],segs:[{p:[x1,y1],q:[x2,y1],c:'blue',dash:true},{p:[x2,y1],q:[x2,y2],c:'pen',dash:true}]})}}},
+
+{id:'line',title:'直線方程式',
+ goal:'看懂 y = mx + b 的意思，會用斜率和一點寫出直線，也會把一般式轉成斜截式。',
+ concept:()=>`<div class="prose">
+  <p>一條直線上有無限多個點，它們的坐標都滿足同一個等式，這個等式就叫<b>直線方程式</b>。</p>
+  <p>最好懂的形式是<b>斜截式</b> ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')}：</p>
+  <ul><li>${M('<i>m</i>')} 是斜率。</li><li>${M('<i>b</i>')} 是 <b>y 截距</b>：直線和 y 軸交在 ${M('(0, <i>b</i>)')}（因為 ${M('<i>x</i> = 0')} 時 ${M('<i>y</i> = <i>b</i>')}）。</li></ul>
+  <p>要判斷一個點在不在線上，就把坐標代進去，看等式成不成立。</p></div>
+  <div class="lab-title">動手試試：拉動 m 和 b</div><div id="lab-line"></div>
+  <div class="prose"><p><b>已知斜率和一個點，怎麼寫出直線？</b>先寫 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')}，把點代入求出 ${M('<i>b</i>')}。</p>
+  <p><b>一般式</b> ${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i> = 0')} 看不出斜率，就移項把 ${M(Y)} 單獨留在左邊：</p></div>
+  <div class="formula">${M(`2<i>x</i> + <i>y</i> − 3 = 0　⇒　<i>y</i> = −2<i>x</i> + 3`)}<small>移項要變號；斜率 −2，y 截距 3</small></div>`,
+ lab:'line',
+ example:{q:`斜率是 2、通過點 ${M('(1, 5)')} 的直線方程式是什麼？`,steps:[
+   `先寫成 ${M('<i>y</i> = 2<i>x</i> + <i>b</i>')}，只差 ${M('<i>b</i>')} 不知道。`,
+   `點 ${M('(1, 5)')} 在線上，代入：${M('5 = 2 × 1 + <i>b</i>')} ⇒ ${M('<i>b</i> = 3')}`,
+   `直線是 <b>${M('<i>y</i> = 2<i>x</i> + 3')}</b>。檢查：${M('<i>x</i> = 1')} 時 ${M('<i>y</i> = 5')}，對。`]},
+ gen(){const t=rnd(0,2);
+  if(t===0){const m=nz(-3,3),b=rnd(-5,5),p=rnd(-4,4),y=m*p+b;
+   return{q:`直線 ${M(lineEq([m,1],b))} 上，${M(`<i>x</i> = ${num(p)}`)} 的那個點，${M(Y)} 坐標是多少？`,ans:[y,1],steps:[
+    `把 ${M(`<i>x</i> = ${num(p)}`)} 代進去：${M(`<i>y</i> = ${num(m)} × ${par(p)}${b===0?'':(b<0?' − ':' + ')+Math.abs(b)}`)}`,
+    `${M(`= ${num(m*p)}${b===0?'':(b<0?' − ':' + ')+Math.abs(b)} = ${num(y)}`)}，答案是 <b>${num(y)}</b>。`],
+    fig2:plane({R:8,lines:[L(m,b)],pts:[{x:p,y,label:P(p,y),c:'pen'}]})}}
+  if(t===1){const m=nz(-3,3),x0=rnd(-4,4),y0=rnd(-6,6),b=y0-m*x0;
+   return{q:`一條直線斜率是 ${num(m)}，通過點 ${M(P(x0,y0))}。把它寫成 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')}，${M('<i>b</i>')} 是多少？`,ans:[b,1],steps:[
+    `先寫 ${M(`<i>y</i> = ${m===1?'':m===-1?'−':num(m)}<i>x</i> + <i>b</i>`)}，把 ${M(P(x0,y0))} 代入：${M(`${num(y0)} = ${num(m)} × ${par(x0)} + <i>b</i>`)}`,
+    `${M(`${num(y0)} = ${num(m*x0)} + <i>b</i>`)}，兩邊減掉 ${par(m*x0)}：${M(`<i>b</i> = ${num(y0)} − ${par(m*x0)} = ${num(b)}`)}`,
+    `直線是 ${M(lineEq([m,1],b))}，答案是 <b>${num(b)}</b>。`],
+    fig2:plane({R:8,lines:[L(m,b)],pts:[{x:x0,y:y0,label:P(x0,y0)},{x:0,y:b,label:`(0, ${num(b)})`,c:'pen'}]})}}
+  const a=nz(-5,5),k=pick([1,1,2]),c=rnd(-6,6),m=R(-a,k);
+  return{q:`直線 ${M(poly([[a,X],[k,Y],[c,'']])+' = 0')} 的斜率是多少？`,ans:m,steps:[
+   `把 ${M(Y)} 以外的項移到右邊（移項變號）：${M(`${k===1?'':k}<i>y</i> = ${poly([[-a,X],[-c,'']])}`)}`,
+   k===1?`已經是 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')} 的樣子，${M(X)} 前面的數就是斜率。`:`兩邊除以 2：${M(`<i>y</i> = ${rFmt(R(-a,2))}<i>x</i>${c===0?'':' '+(c>0?'−':'+')+' '+rFmt(R(Math.abs(c),2))}`)}`,
+   `斜率 ${M(`<i>m</i> = ${rFmt(m)}`)}，答案是 <b>${M(rFmt(m))}</b>。`]}}},
+
+{id:'perp',title:'平行與垂直',
+ goal:'用斜率判斷兩直線平行或垂直，並會求出垂直線的斜率。',
+ concept:()=>`<div class="concept-grid"><div class="prose">
+  <p><b>平行</b>：兩條線一樣斜，永遠不會碰到 → <b>斜率相同</b>。</p>
+  <p><b>垂直</b>：兩條線交成 90° → <b>斜率相乘等於 −1</b>。</p>
+  <p>求垂直線的斜率有個口訣：<b>倒數，再變號</b>。</p>
+  <ul><li>${M('2')} → 倒數 ${M(fr(1,2))} → 變號 ${M('−'+fr(1,2))}</li><li>${M('−'+fr(3,4))} → 倒數 ${M('−'+fr(4,3))} → 變號 ${M(fr(4,3))}</li></ul>
+  <p>檢查：${M(`2 × (−${fr(1,2)}) = −1`)}，對。</p></div>
+  ${plane({lines:[{...L(2,1),col:'blue'},{...L(-.5,1),col:'pen'},{...L(2,-4),col:'ok'}],pts:[{x:4,y:-1,label:'',c:'ink'}].slice(0,0),alt:'平行與垂直的直線'})}</div>
+  <div class="note">圖中藍線 ${M('<i>y</i> = 2<i>x</i> + 1')} 和綠線 ${M('<i>y</i> = 2<i>x</i> − 4')} 斜率都是 2，所以平行；紅線 ${M(`<i>y</i> = −${fr(1,2)}<i>x</i> + 1`)} 和它們垂直。</div>
+  <div class="tip"><b>特例：</b>水平線（斜率 0）和鉛直線（沒有斜率）互相垂直，這組不能用「相乘 = −1」。</div>`,
+ example:{q:`和直線 ${M('<i>y</i> = 3<i>x</i> − 2')} 垂直的直線，斜率是多少？`,steps:[
+   `原本的斜率是 3（${M(X)} 前面的數）。`,
+   `倒數：${M(fr(1,3))}；再變號：${M('−'+fr(1,3))}`,
+   `檢查 ${M(`3 × (−${fr(1,3)}) = −1`)}，答案是 <b>${M('−'+fr(1,3))}</b>。`]},
+ gen(){const m=pick([[2,1],[-3,1],[1,2],[-2,3],[3,4],[-1,1],[4,1],[-1,2],[5,2],[1,1],[-4,3]]),b=rnd(-5,5),par_=Math.random()<.3;
+  const ans=par_?m:R(-m[1],m[0]),inv=R(m[1],m[0]);
+  return{q:`和直線 ${M(lineEq(m,b))} ${par_?'<b>平行</b>':'<b>垂直</b>'}的直線，斜率是多少？`,ans,steps:par_?[
+    `原本直線的斜率是 ${M(rFmt(m))}（${M(X)} 前面的數）。`,
+    `平行代表一樣斜，斜率相同，答案是 <b>${M(rFmt(m))}</b>。`]:[
+    `原本直線的斜率是 ${M(rFmt(m))}。`,
+    `倒數：${M(rFmt(inv))}；再變號：${M(rFmt(ans))}`,
+    `檢查：${M(`${rFmt(m)} × ${ans[0]<0?'('+rFmt(ans)+')':rFmt(ans)} = −1`)}，答案是 <b>${M(rFmt(ans))}</b>。`],
+    fig2:plane({lines:[{...L(m[0]/m[1],b),col:'blue'},{...L(ans[0]/ans[1],0),col:'pen'}]})}}},
+
+{id:'pdist',title:'點到直線的距離',
+ goal:'會用公式算出一個點到一條直線的最短距離。',
+ concept:()=>`<div class="concept-grid"><div class="prose">
+  <p>點到直線的「距離」指的是<b>最短</b>的那一段，也就是從點畫一條<b>垂直</b>於直線的線段。</p>
+  <p>直接找垂足很麻煩，所以有一個公式，照三個步驟做：</p>
+  <ul><li><b>①</b> 把直線整理成 ${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i> = 0')}，右邊是 0。</li>
+  <li><b>②</b> 把點 ${M('(<i>x</i><sub>0</sub>, <i>y</i><sub>0</sub>)')} 代進左邊，取<b>絕對值</b>當分子。</li>
+  <li><b>③</b> 分母是 ${M(rt('<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup>'))}。</li></ul></div>
+  ${plane({lines:[{a:3,b:4,c:-1,col:'blue'}],pts:[{x:1,y:2,label:'P(1, 2)',c:'pen'}],segs:[{p:[1,2],q:foot(3,4,-1,1,2),c:'pen',dash:true,label:'d = 2',dx:-24}],alt:'點到直線的垂直距離'})}</div>
+  <div class="formula">${M(`<i>d</i> = ${fr('|<i>a</i><i>x</i><sub>0</sub> + <i>b</i><i>y</i><sub>0</sub> + <i>c</i>|',rt('<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup>'))}`)}<small>分子：點代進直線；分母：x、y 係數平方和開根號</small></div>
+  <div class="note">如果直線是 ${M('<i>x</i> = 3')} 這種鉛直線，不用公式：點 ${M('(7, 1)')} 到它的距離就是 ${M('|7 − 3| = 4')}，直接數格子也可以。</div>`,
+ example:{q:`求點 ${M('P(1, 2)')} 到直線 ${M('3<i>x</i> + 4<i>y</i> − 1 = 0')} 的距離。`,steps:[
+   `直線已經是 ${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i> = 0')}：${M('<i>a</i> = 3, <i>b</i> = 4, <i>c</i> = −1')}`,
+   `分子：${M('|3 × 1 + 4 × 2 − 1| = |10| = 10')}`,
+   `分母：${M(`${rt('3<sup>2</sup> + 4<sup>2</sup>')} = ${rt(25)} = 5`)}`,
+   `${M(`<i>d</i> = ${fr(10,5)} = 2`)}，答案是 <b>2</b>。`]},
+ gen(){if(Math.random()<.35){const vert=Math.random()<.5,k=rnd(-5,5),x0=rnd(-6,6),y0=rnd(-6,6),v=vert?x0:y0;let kk=k;if(kk===v)kk=v+pick([2,-3]);const d=Math.abs(v-kk);
+   return{q:`求點 ${M(`P${P(x0,y0)}`)} 到直線 ${M(`${vert?'<i>x</i>':'<i>y</i>'} = ${num(kk)}`)} 的距離。`,ans:[d,1],steps:[
+    `${M(`${vert?'<i>x</i>':'<i>y</i>'} = ${num(kk)}`)} 是${vert?'鉛直線':'水平線'}，距離只看 ${M(vert?X:Y)} 坐標的差。`,
+    `${M(`|${num(v)} − ${par(kk)}| = |${num(v-kk)}| = ${d}`)}，答案是 <b>${d}</b>。`],
+    fig2:plane({R:8,lines:[vert?{a:1,b:0,c:-kk}:{a:0,b:1,c:-kk}],pts:[{x:x0,y:y0,label:'P',c:'pen'}],segs:[{p:[x0,y0],q:vert?[kk,y0]:[x0,kk],c:'pen',dash:true}]})}}
+  let [a,b]=pick([[3,4],[4,3]]);const h=5;a*=pick([1,-1]);b*=pick([1,-1]);
+  const x0=rnd(-4,4),y0=rnd(-4,4),d=rnd(1,4),s=pick([1,-1]);let c=s*d*h-a*x0-b*y0;if(a<0){a=-a;b=-b;c=-c}
+  const v=a*x0+b*y0+c;
+  return{q:`求點 ${M(`P${P(x0,y0)}`)} 到直線 ${M(poly([[a,X],[b,Y],[c,'']])+' = 0')} 的距離。`,ans:[d,1],steps:[
+   `${M(`<i>a</i> = ${num(a)}, <i>b</i> = ${num(b)}, <i>c</i> = ${num(c)}`)}`,
+   `分子：${M(`|${a} × ${par(x0)} + ${par(b)} × ${par(y0)} + ${par(c)}| = |${num(v)}| = ${Math.abs(v)}`)}`,
+   `分母：${M(`${rt(`${a}<sup>2</sup> + ${par(b)}<sup>2</sup>`)} = ${rt(a*a+b*b)} = 5`)}`,
+   `${M(`<i>d</i> = ${fr(Math.abs(v),5)} = ${d}`)}，答案是 <b>${d}</b>。`],
+   fig2:plane({R:8,lines:[{a,b,c}],pts:[{x:x0,y:y0,label:'P',c:'pen'}],segs:[{p:[x0,y0],q:foot(a,b,c,x0,y0),c:'pen',dash:true}]})}}},
+
+{id:'circle',title:'圓的方程式',
+ goal:'看到圓的方程式，能說出圓心和半徑；會用配方法把一般式變成標準式。',
+ concept:()=>`<div class="prose">
+  <p>圓就是「和圓心距離都等於半徑」的所有點。用兩點距離公式寫出來，兩邊平方，就得到圓的<b>標準式</b>：</p></div>
+  <div class="formula">${M('(<i>x</i> − <i>h</i>)<sup>2</sup> + (<i>y</i> − <i>k</i>)<sup>2</sup> = <i>r</i><sup>2</sup>')}<small>圓心 (h, k)，半徑 r</small></div>
+  <div class="tip"><b>最常錯的地方：</b>括號裡是「減」。${M('(<i>x</i> − 2)<sup>2</sup>')} 的圓心 ${M(X)} 是 <b>+2</b>；${M('(<i>x</i> + 3)<sup>2</sup>')} 看成 ${M('(<i>x</i> − (−3))<sup>2</sup>')}，圓心 ${M(X)} 是 <b>−3</b>。右邊是半徑的<b>平方</b>，${M('= 16')} 代表半徑 4。</div>
+  <div class="lab-title">動手試試：移動圓心、改變半徑，看方程式怎麼變</div><div id="lab-circle"></div>
+  <div class="prose"><p>考試常把標準式展開成<b>一般式</b> ${M('<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + <i>D</i><i>x</i> + <i>E</i><i>y</i> + <i>F</i> = 0')}，這時要用<b>配方法</b>變回來：</p>
+  <p>${M('<i>x</i><sup>2</sup> − 6<i>x</i>')}：取 ${M(X)} 係數的<b>一半</b>（−3），寫成 ${M('(<i>x</i> − 3)<sup>2</sup>')}，但這樣多了 ${M('(−3)<sup>2</sup> = 9')}，所以要減回來：${M('<i>x</i><sup>2</sup> − 6<i>x</i> = (<i>x</i> − 3)<sup>2</sup> − 9')}。</p></div>`,
+ lab:'circle',
+ example:{q:`求圓 ${M('<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 4<i>x</i> + 6<i>y</i> − 3 = 0')} 的圓心和半徑。`,steps:[
+   `把 ${M(X)} 的放一起、${M(Y)} 的放一起，常數移到右邊：${M('(<i>x</i><sup>2</sup> − 4<i>x</i>) + (<i>y</i><sup>2</sup> + 6<i>y</i>) = 3')}`,
+   `配方：${M('<i>x</i><sup>2</sup> − 4<i>x</i> = (<i>x</i> − 2)<sup>2</sup> − 4')}，${M('<i>y</i><sup>2</sup> + 6<i>y</i> = (<i>y</i> + 3)<sup>2</sup> − 9')}`,
+   `代回去：${M('(<i>x</i> − 2)<sup>2</sup> − 4 + (<i>y</i> + 3)<sup>2</sup> − 9 = 3')} ⇒ ${M('(<i>x</i> − 2)<sup>2</sup> + (<i>y</i> + 3)<sup>2</sup> = 16')}`,
+   `圓心 <b>${M('(2, −3)')}</b>，半徑 ${M(rt(16))} = <b>4</b>。`]},
+ gen(){const h=rnd(-3,3),k=rnd(-3,3),r=rnd(1,4),t=rnd(0,2),std=`${sq(X,h)} + ${sq(Y,k)} = ${r*r}`,fig2=plane({circles:[{x:h,y:k,r}],pts:[{x:h,y:k,label:`圓心${P(h,k)}`,c:'pen'}]});
+  if(t===0)return{q:`圓 ${M(std)} 的半徑是多少？`,ans:[r,1],fig2,steps:[
+    `標準式右邊是<b>半徑的平方</b>：${M(`<i>r</i><sup>2</sup> = ${r*r}`)}`,
+    `${M(`<i>r</i> = ${rt(r*r)} = ${r}`)}，答案是 <b>${r}</b>。`]};
+  if(t===1){const askH=Math.random()<.5,v=askH?h:k,vv=askH?X:Y;
+   return{q:`圓 ${M(std)} 的圓心是 ${M('(<i>h</i>, <i>k</i>)')}，${M(askH?'<i>h</i>':'<i>k</i>')} 是多少？`,ans:[v,1],fig2,steps:[
+    `看 ${M(vv)} 的括號：${M(sq(vv,v))}。${v===0?`沒有加減任何數，代表 ${M(`${vv} − 0`)}。`:`標準式是「${vv} 減圓心」，所以把它看成 ${M(`(${vv} − ${par(v)})<sup>2</sup>`)}。`}`,
+    `圓心的 ${M(vv)} 坐標是 ${num(v)}${v<0?'（括號裡是加號，圓心反而是負的）':''}，答案是 <b>${num(v)}</b>。`]}}
+  const D=-2*h,E=-2*k,F=h*h+k*k-r*r;
+  return{q:`圓 ${M(poly([[1,X2],[1,Y2],[D,X],[E,Y],[F,'']])+' = 0')} 的半徑是多少？`,ans:[r,1],fig2,steps:[
+   `整理：${M(`(${poly([[1,X2],[D,X]])}) + (${poly([[1,Y2],[E,Y]])}) = ${num(-F)}`)}`,
+   `配方：${h===0?M(`${X2} = ${X}<sup>2</sup>`):M(`${poly([[1,X2],[D,X]])} = ${sq(X,h)} − ${h*h}`)}；${k===0?M(`${Y2} = ${Y}<sup>2</sup>`):M(`${poly([[1,Y2],[E,Y]])} = ${sq(Y,k)} − ${k*k}`)}`,
+   `${M(`${sq(X,h)} + ${sq(Y,k)} = ${num(-F)}${h?' + '+h*h:''}${k?' + '+k*k:''} = ${r*r}`)}`,
+   `半徑 ${M(`${rt(r*r)} = ${r}`)}，答案是 <b>${r}</b>。`]}}},
+
+{id:'cline',title:'圓與直線的關係',
+ goal:'用「圓心到直線的距離」和半徑比大小，判斷直線和圓有幾個交點。',
+ concept:()=>`<div class="prose"><p>一條直線和一個圓，只有三種情況。關鍵是算出<b>圓心到直線的距離 d</b>，再和<b>半徑 r</b> 比：</p>
+  <ul><li>${M('<i>d</i> &lt; <i>r</i>')}：直線切進圓裡，<b>相交於 2 點</b>（相割）。</li>
+  <li>${M('<i>d</i> = <i>r</i>')}：剛好碰到一點，<b>相切</b>，1 個交點。</li>
+  <li>${M('<i>d</i> &gt; <i>r</i>')}：離太遠碰不到，<b>相離</b>，0 個交點。</li></ul></div>
+  <div class="lab-title">動手試試：把直線上下移動，看交點個數怎麼變</div><div id="lab-cline"></div>
+  <div class="note">這一課把前面學的全部用上：從圓的方程式讀出圓心和半徑（第 9 課），再算點到直線距離（第 8 課）。</div>`,
+ lab:'cline',
+ example:{q:`圓 ${M('(<i>x</i> − 1)<sup>2</sup> + (<i>y</i> + 2)<sup>2</sup> = 9')} 和直線 ${M('3<i>x</i> + 4<i>y</i> = 0')} 有幾個交點？`,steps:[
+   `圓心 ${M('(1, −2)')}，半徑 ${M(`${rt(9)} = 3`)}`,
+   `直線寫成 ${M('3<i>x</i> + 4<i>y</i> + 0 = 0')}，圓心到直線距離：${M(`<i>d</i> = ${fr('|3 × 1 + 4 × (−2)|',5)} = ${fr('|−5|',5)} = 1`)}`,
+   `${M('<i>d</i> = 1 &lt; 3 = <i>r</i>')}，直線穿過圓，有 <b>2</b> 個交點。`]},
+ gen(){const h=rnd(-2,2),k=rnd(-2,2),r=rnd(2,4),d=Math.max(0,r+pick([-2,-1,0,0,1,2])),cnt=d<r?2:d===r?1:0,word=d<r?'相交（相割）':d===r?'相切':'相離';
+  const std=`${sq(X,h)} + ${sq(Y,k)} = ${r*r}`,steps0=`圓心 ${M(P(h,k))}，半徑 ${M(`${rt(r*r)} = ${r}`)}`;
+  if(Math.random()<.4){const vert=Math.random()<.5,s=pick([1,-1]),line=(vert?h:k)+s*d;
+   return{q:`圓 ${M(std)} 和直線 ${M(`${vert?'<i>x</i>':'<i>y</i>'} = ${num(line)}`)} 有幾個交點？`,ans:[cnt,1],steps:[steps0,
+    `${vert?'鉛直線':'水平線'}，距離看 ${M(vert?X:Y)} 坐標的差：${M(`<i>d</i> = |${num(vert?h:k)} − ${par(line)}| = ${d}`)}`,
+    `${M(`<i>d</i> = ${d} ${d<r?'&lt;':d===r?'=':'&gt;'} ${r} = <i>r</i>`)}，${word}，答案是 <b>${cnt}</b>。`],
+    fig2:plane({circles:[{x:h,y:k,r}],lines:[vert?{a:1,b:0,c:-line,col:'pen'}:{a:0,b:1,c:-line,col:'pen'}],pts:[{x:h,y:k,label:''}]})}}
+  let [a,b]=pick([[3,4],[4,3]]);a*=pick([1,-1]);b*=pick([1,-1]);let c=pick([1,-1])*d*5-a*h-b*k;if(a<0){a=-a;b=-b;c=-c}
+  const v=a*h+b*k+c;
+  return{q:`圓 ${M(std)} 和直線 ${M(poly([[a,X],[b,Y],[c,'']])+' = 0')} 有幾個交點？`,ans:[cnt,1],steps:[steps0,
+   `圓心到直線距離：${M(`<i>d</i> = ${fr(`|${a} × ${par(h)} + ${par(b)} × ${par(k)} + ${par(c)}|`,rt(`${a}<sup>2</sup> + ${par(b)}<sup>2</sup>`))} = ${fr(Math.abs(v),5)} = ${d}`)}`,
+   `${M(`<i>d</i> = ${d} ${d<r?'&lt;':d===r?'=':'&gt;'} ${r} = <i>r</i>`)}，${word}，答案是 <b>${cnt}</b>。`],
+   fig2:plane({circles:[{x:h,y:k,r}],lines:[{a,b,c,col:'pen'}],pts:[{x:h,y:k,label:''}]})}}}
+];
+
+/* ================= random practice topics (all chapters) ================= */
+const TOPICS={
+ abs:{ch:0,name:'絕對值不等式',gen(){
+   const a=rnd(-6,6),b=rnd(1,7),strict=Math.random()<.4,op=strict?'&lt;':'≤';
+   const inner=poly([[1,X],[-a,'']]),lo=a-b,hi=a+b,cnt=strict?2*b-1:2*b+1;
+   return{q:`滿足 ${M(`|${inner}| ${op} ${b}`)} 的整數 ${M(X)} 共有幾個？`,ans:[cnt,1],
+    hint:`${M(`|${X} − <i>a</i>| ≤ <i>b</i>`)} 等價於 ${M(`−<i>b</i> ≤ ${X} − <i>a</i> ≤ <i>b</i>`)}。`,
+    sol:`${M(`|${inner}| ${op} ${b}`)} ⇔ ${M(`${num(-b)} ${op} ${inner} ${op} ${b}`)} ⇔ ${M(`${num(lo)} ${op} ${X} ${op} ${num(hi)}`)}<br>`+
+     (strict?`整數 ${M(X)} 從 ${num(lo+1)} 到 ${num(hi-1)}，共 <b>${cnt}</b> 個。`:`整數 ${M(X)} 從 ${num(lo)} 到 ${num(hi)}，共 <b>${cnt}</b> 個。`)}}},
+ root:{ch:0,name:'根式化簡',gen(){
+   const p=rnd(2,9),r=pick([2,3,5,6,7,10]),n=p*p*r,sum=Math.random()<.4;
+   return{q:`將 ${M(rt(n))} 化為最簡根式 ${M(`<i>a</i>${rt('<i>b</i>')}`)}（${M('<i>a</i>, <i>b</i>')} 為正整數），則 ${M(sum?'<i>a</i> + <i>b</i>':'<i>a</i>')} = ？`,ans:[sum?p+r:p,1],
+    hint:`找出 ${n} 裡面最大的完全平方數因數。`,
+    sol:`${n} = ${p}<sup>2</sup> × ${r}，所以 ${M(`${rt(n)} = ${p}${rt(r)}`)}，答案 <b>${sum?p+r:p}</b>。`}}},
+ mult:{ch:0,name:'乘法公式',gen(){
+   const k=rnd(2,6),inv=fr(1,X),inv2=fr(1,X2);
+   if(Math.random()<.5)return{q:`若 ${M(`${X} + ${inv} = ${k}`)}，求 ${M(`${X2} + ${inv2}`)}。`,ans:[k*k-2,1],
+     hint:`把已知式兩邊平方。`,sol:`${M(`(${X} + ${inv})<sup>2</sup> = ${X2} + 2 + ${inv2}`)}，所以答案 ${k}<sup>2</sup> − 2 = <b>${k*k-2}</b>。`};
+   return{q:`若 ${M(`${X} − ${inv} = ${k}`)}，求 ${M(`${X2} + ${inv2}`)}。`,ans:[k*k+2,1],
+     hint:`平方後中間項是 −2。`,sol:`${M(`(${X} − ${inv})<sup>2</sup> = ${X2} − 2 + ${inv2}`)}，所以答案 ${k}<sup>2</sup> + 2 = <b>${k*k+2}</b>。`}}},
+ dist2:{ch:1,name:'兩點距離',fromLesson:'dist'},
+ slope:{ch:1,name:'直線斜率',fromLesson:'slope'},
+ line:{ch:1,name:'直線方程式',fromLesson:'line'},
+ perp:{ch:1,name:'平行與垂直',fromLesson:'perp'},
+ pdist:{ch:1,name:'點到直線距離',fromLesson:'pdist'},
+ circle:{ch:1,name:'圓的方程式',fromLesson:'circle'},
+ cline:{ch:1,name:'圓與直線',fromLesson:'cline'},
+ rem:{ch:2,name:'餘式定理',gen(){
+   const c3=nz(-3,3),c2=rnd(-4,4),c1=rnd(-5,5),c0=rnd(-6,6),a=nz(-3,3);
+   const f=poly([[c3,X3],[c2,X2],[c1,X],[c0,'']]),val=c3*a**3+c2*a*a+c1*a+c0;
+   return{q:`${M(`<i>f</i>(${X}) = ${f}`)}，以 ${M(poly([[1,X],[-a,'']]))} 除 ${M(`<i>f</i>(${X})`)} 的餘式是多少？`,ans:[val,1],
+    hint:`餘式定理：除以 ${M(`${X} − <i>a</i>`)} 的餘式是 ${M('<i>f</i>(<i>a</i>)')}，這裡 ${M('<i>a</i>')} = ${num(a)}。`,
+    sol:`餘式 = ${M(`<i>f</i>(${num(a)})`)} = <b>${num(val)}</b>`}}},
+ quad:{ch:2,name:'二次函數極值',gen(){
+   const a=pick([1,2,-1,-2]),h=rnd(-4,4),k=rnd(-9,9),b=-2*a*h,c=a*h*h+k,up=a>0,lead=a===1?'':a===-1?'−':num(a);
+   return{q:`二次函數 ${M(`<i>y</i> = ${poly([[a,X2],[b,X],[c,'']])}`)} 的${up?'最小':'最大'}值是多少？`,ans:[k,1],
+    hint:`配方成 ${M('<i>a</i>(<i>x</i> − <i>h</i>)<sup>2</sup> + <i>k</i>')}。`,
+    sol:`${M(`<i>y</i> = ${lead}${sq(X,h)}${k===0?'':(k<0?' − ':' + ')+Math.abs(k)}`)}，開口${up?'向上':'向下'}，${up?'最小':'最大'}值 <b>${num(k)}</b>。`}}}
+};
+const CHAPTERS=['第一章　數與式','第二章　直線與圓','第三章　多項式函數'];
+const lessonById=id=>LESSONS.find(l=>l.id===id);
+function genTopic(k){const t=TOPICS[k];
+  if(t.fromLesson){const p=lessonById(t.fromLesson).gen();
+    return{q:p.q+(p.fig?`<div style="margin-top:8px;max-width:220px">${p.fig}</div>`:''),ans:p.ans,
+      hint:p.steps[0],sol:'<ol class="steps">'+p.steps.map(s=>`<li><div>${s}</div></li>`).join('')+'</ol>'+(p.fig2?`<div class="sol-fig" style="margin-top:10px">${p.fig2}</div>`:'')}}
+  return t.gen();
+}
+
+/* ================= answer parsing ================= */
+function parseAns(s){
+  s=(s||'').normalize('NFKC').replace(/\s/g,'').replace(/[−–—]/g,'-');
+  if(!s)return null;
+  let m=s.match(/^(-?\d+)\/(-?\d+)$/);
+  if(m){const d=+m[2];return d===0?null:R(+m[1],d)}
+  if(/^-?\d+(\.\d+)?$/.test(s)){const p=s.split('.');if(!p[1])return R(+s,1);const k=10**p[1].length;return R(Math.round(parseFloat(s)*k),k)}
+  return null;
+}
+const same=(a,b)=>a[0]===b[0]&&a[1]===b[1];
+
+/* ================= DOM ================= */
+if(typeof document!=='undefined'){
+const KEY='hs-math-dojo-v1';
+const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},cur:'neg',tab:'learn'});
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
+S.enabled=S.enabled.filter(k=>TOPICS[k]);if(!S.enabled.length)S.enabled=Object.keys(TOPICS);
+if(!lessonById(S.cur))S.cur='neg';
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const NEED=3;
+
+/* ---------- tabs ---------- */
+function setTab(t){S.tab=t;save();
+  $('tab-learn').setAttribute('aria-selected',t==='learn');$('tab-prac').setAttribute('aria-selected',t==='prac');
+  $('view-learn').hidden=t!=='learn';$('view-prac').hidden=t!=='prac';
+  $('subline').textContent=t==='learn'?'從頭學第二章「直線與圓」：每一課先看懂，再跟著做，最後自己練。':'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。';}
+$('tab-learn').onclick=()=>setTab('learn');$('tab-prac').onclick=()=>setTab('prac');
+
+/* ---------- lesson path ---------- */
+function renderPath(){
+  $('path-list').innerHTML=LESSONS.map((l,i)=>{const c=Math.min(S.lessons[l.id]||0,NEED),done=c>=NEED;
+    return `<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.title}</span><span class="cnt">${done?'':c+'/'+NEED}</span></button></li>`}).join('');
+  const n=LESSONS.filter(l=>(S.lessons[l.id]||0)>=NEED).length;
+  $('overall').innerHTML=`已完成 ${n} / ${LESSONS.length} 課<div class="bar"><i style="width:${n/LESSONS.length*100}%"></i></div>`;
+}
+$('path-list').addEventListener('click',e=>{const b=e.target.closest('.lesson-link');if(!b)return;openLesson(b.dataset.id,true)});
+
+let lp=null; // current lesson problem
+function openLesson(id,scroll){
+  S.cur=id;save();renderPath();
+  const i=LESSONS.findIndex(l=>l.id===id),l=LESSONS[i];
+  const ex=l.example;
+  $('lesson').innerHTML=`
+   <section>
+     <p class="eyebrow">第二章 直線與圓・第 ${i+1} 課 / 共 ${LESSONS.length} 課</p>
+     <h2>${l.title}</h2>
+     <p class="goal"><b>學完你會：</b>${l.goal}</p>
+   </section>
+   <section><h3><span class="kicker">看懂</span>觀念</h3>${l.concept()}</section>
+   <section class="example"><h3><span class="kicker">跟著做</span>例題</h3>
+     <div class="pq-wrap"><div class="qbox">${ex.q}</div>${ex.fig?ex.fig():''}</div>
+     <ol class="steps" id="ex-steps"></ol>
+     <div><button class="btn btn-ghost" type="button" id="ex-next">看下一步</button></div>
+   </section>
+   <section class="practice" aria-live="polite"><h3><span class="kicker">自己練</span>小練習</h3>
+     <div class="dots" id="dots"></div>
+     <div id="lp"></div>
+   </section>
+   <section style="flex-direction:row;justify-content:space-between;flex-wrap:wrap;gap:10px">
+     <button class="btn btn-ghost" type="button" id="prev-l" ${i===0?'disabled':''}>← 上一課</button>
+     <button class="btn btn-ghost" type="button" id="next-l" ${i===LESSONS.length-1?'disabled':''}>下一課 →</button>
+   </section>`;
+  let shown=1;const exs=$('ex-steps');
+  const drawEx=()=>{exs.innerHTML=ex.steps.slice(0,shown).map(s=>`<li><div>${s}</div></li>`).join('');
+    $('ex-next').textContent=shown<ex.steps.length?`看下一步（${shown}/${ex.steps.length}）`:'例題看完了，往下自己練練看';$('ex-next').disabled=shown>=ex.steps.length};
+  drawEx();$('ex-next').onclick=()=>{shown++;drawEx()};
+  $('prev-l').onclick=()=>openLesson(LESSONS[i-1].id,true);
+  $('next-l').onclick=()=>openLesson(LESSONS[i+1].id,true);
+  if(l.lab)LABS[l.lab]($('lab-'+l.lab));
+  newLessonProblem();
+  if(scroll)$('lesson').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderDots(){const c=Math.min(S.lessons[S.cur]||0,NEED);
+  $('dots').innerHTML=Array.from({length:NEED},(_,k)=>`<i class="${k<c?'on':''}"></i>`).join('')+`<span>答對 ${c} / ${NEED} 題${c>=NEED?'，這課過關了！可以繼續練或前往下一課':'就過關'}</span>`}
+function newLessonProblem(){
+  const l=lessonById(S.cur);lp=l.gen();lp.revealed=0;lp.done=false;renderDots();
+  $('lp').innerHTML=`
+    <div class="pq-wrap"><div class="qbox">${lp.q}</div>${lp.fig||''}</div>
+    <form class="answer-row" id="lform" autocomplete="off" style="margin-top:12px">
+      <label for="lans">答：</label><input id="lans" class="ansin" spellcheck="false" aria-describedby="lfmt">
+      <button class="btn btn-primary" type="submit" id="lsubmit">對答案</button>
+      <button class="btn btn-ghost" type="button" id="lhint">不會，教我一步</button>
+    </form>
+    <p class="fmt" id="lfmt" style="margin-top:6px">可填整數、分數（如 -3/4）或小數。</p>
+    <ol class="steps" id="lsteps" style="margin-top:10px"></ol>
+    <div class="result" id="lres" hidden></div>
+    <div id="lmark"></div>`;
+  $('lform').addEventListener('submit',gradeLesson);
+  $('lhint').onclick=()=>{if(lp.revealed<lp.steps.length-1){lp.revealed++;drawSteps()}
+    if(lp.revealed>=lp.steps.length-1){$('lhint').disabled=true;$('lhint').textContent='最後一步請自己算算看'}};
+}
+function drawSteps(){$('lsteps').innerHTML=lp.steps.slice(0,lp.revealed).map(s=>`<li><div>${s}</div></li>`).join('')}
+function gradeLesson(e){e.preventDefault();if(lp.done){newLessonProblem();$('lans').focus();return}
+  const v=parseAns($('lans').value);
+  if(!v){$('lfmt').textContent='看不懂這個答案，請填整數、分數（如 -3/4）或小數。';$('lfmt').classList.add('err');return}
+  lp.done=true;const ok=same(v,lp.ans);
+  if(ok){S.lessons[S.cur]=(S.lessons[S.cur]||0)+1;save();renderPath();renderDots()}
+  const c=S.lessons[S.cur]||0,i=LESSONS.findIndex(l=>l.id===S.cur),justDone=ok&&c===NEED;
+  $('lmark').innerHTML=ok?'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10 C 80 9, 93 32, 90 54 C 87 80, 62 93, 42 89 C 18 85, 7 62, 12 40 C 16 22, 34 12, 56 13"/></svg>'
+    :'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><path d="M20 18 L 82 84"/><path d="M82 16 L 22 86"/></svg>';
+  lp.revealed=lp.steps.length;drawSteps();
+  $('lres').hidden=false;
+  $('lres').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'答對了！':'差一點'}<small>${ok?(lp.revealed&&false?'':'上面是完整算法，可以對照看看'):`正確答案是 ${M(rFmt(lp.ans))}。對照上面的步驟，找出哪一步不一樣`}</small></div>
+    ${lp.fig2?`<div class="sol-fig">${lp.fig2}</div>`:''}
+    ${justDone?`<div class="done-box"><b>第 ${i+1} 課過關！</b>${i<LESSONS.length-1?`<button class="btn btn-primary" type="button" id="go-next">前往第 ${i+2} 課：${LESSONS[i+1].title}</button>`:'<span>整個第二章都完成了，去「隨機練習」選「只練第二章」複習吧。</span>'}</div>`:''}
+    <div><button class="btn ${justDone?'btn-ghost':'btn-primary'}" type="button" id="lnext">再一題 →</button></div>`;
+  $('lans').disabled=true;$('lsubmit').disabled=true;$('lhint').disabled=true;
+  $('lnext').onclick=()=>{newLessonProblem();$('lans').focus()};
+  if($('go-next'))$('go-next').onclick=()=>openLesson(LESSONS[i+1].id,true);
+  ($('go-next')||$('lnext')).focus({preventScroll:true});
+}
+
+/* ---------- interactive labs ---------- */
+const mF=v=>{const r=R(Math.round(v*2),2);return rFmt(r)};
+const LABS={
+ slope(el){el.innerHTML=`<div class="lab"><div class="lab-ctrl">
+   <label for="ls-rise">上升 <output id="ls-ro"></output></label><input type="range" id="ls-rise" min="-4" max="4" step="1" value="2">
+   <label for="ls-run">往右走 <output id="ls-uo"></output></label><input type="range" id="ls-run" min="1" max="4" step="1" value="4">
+   <p class="lab-eq" id="ls-eq"></p><p class="lab-say" id="ls-say"></p></div><div id="ls-fig"></div></div>`;
+  const up=()=>{const a=+$('ls-rise').value,b=+$('ls-run').value,m=R(a,b);$('ls-ro').textContent=a;$('ls-uo').textContent=b;
+   $('ls-eq').innerHTML=`<i>m</i> = ${fr(num(a),b)} = ${rFmt(m)}`;
+   $('ls-say').innerHTML=a>0?'<b>正斜率</b>：往右上爬。上升越多，線越陡。':a<0?'<b>負斜率</b>：往右下走。':'<b>斜率 0</b>：水平線。';
+   $('ls-fig').innerHTML=plane({R:6,lines:[{a:a,b:-b,c:0}],pts:[{x:0,y:0,label:''},{x:b,y:a,label:'',c:'pen'}],segs:[{p:[0,0],q:[b,0],c:'blue',dash:true},{p:[b,0],q:[b,a],c:'pen',dash:true}]})};
+  ['ls-rise','ls-run'].forEach(id=>$(id).addEventListener('input',up));up()},
+ line(el){el.innerHTML=`<div class="lab"><div class="lab-ctrl">
+   <label for="ll-m">斜率 m <output id="ll-mo"></output></label><input type="range" id="ll-m" min="-3" max="3" step="0.5" value="1">
+   <label for="ll-b">y 截距 b <output id="ll-bo"></output></label><input type="range" id="ll-b" min="-5" max="5" step="1" value="2">
+   <p class="lab-eq" id="ll-eq"></p><p class="lab-say">紅點是直線和 y 軸的交點 ${M('(0, <i>b</i>)')}。改 ${M('<i>m</i>')} 線會轉，改 ${M('<i>b</i>')} 線會上下平移。</p></div><div id="ll-fig"></div></div>`;
+  const up=()=>{const m=+$('ll-m').value,b=+$('ll-b').value;$('ll-mo').innerHTML=mF(m);$('ll-bo').textContent=num(b);
+   $('ll-eq').innerHTML=lineEq(R(Math.round(m*2),2),b);
+   $('ll-fig').innerHTML=plane({lines:[L(m,b)],pts:[{x:0,y:b,label:`(0, ${num(b)})`,c:'pen'}]})};
+  ['ll-m','ll-b'].forEach(id=>$(id).addEventListener('input',up));up()},
+ circle(el){el.innerHTML=`<div class="lab"><div class="lab-ctrl">
+   <label for="lc-h">圓心 x：h <output id="lc-ho"></output></label><input type="range" id="lc-h" min="-4" max="4" step="1" value="2">
+   <label for="lc-k">圓心 y：k <output id="lc-ko"></output></label><input type="range" id="lc-k" min="-4" max="4" step="1" value="-1">
+   <label for="lc-r">半徑 r <output id="lc-ro"></output></label><input type="range" id="lc-r" min="1" max="5" step="1" value="3">
+   <p class="lab-eq" id="lc-eq"></p><p class="lab-say" id="lc-say"></p></div><div id="lc-fig"></div></div>`;
+  const up=()=>{const h=+$('lc-h').value,k=+$('lc-k').value,r=+$('lc-r').value;$('lc-ho').textContent=num(h);$('lc-ko').textContent=num(k);$('lc-ro').textContent=r;
+   $('lc-eq').innerHTML=`${sq(X,h)} + ${sq(Y,k)} = ${r*r}`;
+   $('lc-say').innerHTML=`圓心 <b>${P(h,k)}</b>。注意括號裡的符號和圓心${h||k?'<b>相反</b>':'一樣是 0'}，右邊是 ${r} 的平方 ${r*r}。`;
+   $('lc-fig').innerHTML=plane({circles:[{x:h,y:k,r}],pts:[{x:h,y:k,label:P(h,k),c:'pen'}],segs:[{p:[h,k],q:[h+r,k],c:'pen',dash:true,label:'r = '+r,dy:-6}]})};
+  ['lc-h','lc-k','lc-r'].forEach(id=>$(id).addEventListener('input',up));up()},
+ cline(el){el.innerHTML=`<div class="lab"><div class="lab-ctrl">
+   <p class="lab-say">圓：${M('<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> = 9')}（圓心原點、半徑 3）</p>
+   <label for="lt-t">直線 y = t，t = <output id="lt-to"></output></label><input type="range" id="lt-t" min="-5" max="5" step="0.5" value="1">
+   <p class="lab-eq" id="lt-eq"></p><p class="lab-say" id="lt-say"></p></div><div id="lt-fig"></div></div>`;
+  const up=()=>{const t=+$('lt-t').value,d=Math.abs(t),n=d<3?2:d===3?1:0;$('lt-to').innerHTML=mF(t);
+   $('lt-eq').innerHTML=`<i>d</i> = ${mF(d)} ${d<3?'&lt;':d===3?'=':'&gt;'} 3 = <i>r</i>`;
+   $('lt-say').innerHTML=`<b>${n===2?'相交，2 個交點':n===1?'相切，1 個交點':'相離，沒有交點'}</b>`;
+   const pts=[{x:0,y:0,label:''}];if(n===2){const w=Math.sqrt(9-t*t);pts.push({x:-w,y:t,label:'',c:'ok'},{x:w,y:t,label:'',c:'ok'})}else if(n===1)pts.push({x:0,y:t,label:'',c:'ok'});
+   $('lt-fig').innerHTML=plane({R:6,circles:[{x:0,y:0,r:3}],lines:[{a:0,b:1,c:-t,col:'pen'}],segs:d?[{p:[0,0],q:[0,t],c:'amber',dash:true,label:'d',dx:10}]:[],pts})};
+  $('lt-t').addEventListener('input',up);up()}
+};
+
+/* ---------- random practice ---------- */
+let cur=null,answered=false,qn=1;
+function weight(k){const st=S.stats[k];if(!st||st.t<3)return 1.5;return 1+2*(1-st.r/st.t)}
+function chooseTopic(){const ks=S.enabled;let x=Math.random()*ks.reduce((a,k)=>a+weight(k),0);
+  for(const k of ks){x-=weight(k);if(x<=0)return k}return ks[ks.length-1]}
+function show(p,retryIdx=null){cur=p;cur.retryIdx=retryIdx;answered=false;
+  $('qno').textContent=`第 ${qn} 題`;$('qtag').textContent=(retryIdx!==null?'錯題重做・':'')+TOPICS[p.topic].name;
+  $('qtag').className='tag'+(retryIdx!==null?' retry':'');$('question').innerHTML=p.q;
+  $('phint').hidden=true;$('presult').hidden=true;$('pmark').innerHTML='';
+  $('pans').value='';$('pans').disabled=false;$('psubmit').disabled=false;$('phint-btn').disabled=false}
+function newProblem(){const k=chooseTopic();const p=genTopic(k);p.topic=k;show(p)}
+function grade(e){e.preventDefault();if(answered){next();return}
+  const v=parseAns($('pans').value);
+  if(!v){$('pfmt').textContent='看不懂這個答案，請填整數、分數（如 -3/4）或小數。';$('pfmt').classList.add('err');return}
+  $('pfmt').textContent='可填整數、分數（如 -3/4）或小數。按 Enter 送出。';$('pfmt').classList.remove('err');
+  answered=true;const ok=same(v,cur.ans);
+  const st=S.stats[cur.topic]||(S.stats[cur.topic]={r:0,t:0});st.t++;S.total++;
+  if(ok){st.r++;S.right++;S.streak++;S.best=Math.max(S.best,S.streak);if(cur.retryIdx!==null)S.wrong.splice(cur.retryIdx,1)}
+  else{S.streak=0;if(cur.retryIdx===null){S.wrong.unshift({topic:cur.topic,q:cur.q,ans:cur.ans,hint:cur.hint,sol:cur.sol});S.wrong=S.wrong.slice(0,40)}}
+  save();
+  $('pmark').innerHTML=ok?'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true" style="top:56px"><path d="M50 10 C 80 9, 93 32, 90 54 C 87 80, 62 93, 42 89 C 18 85, 7 62, 12 40 C 16 22, 34 12, 56 13"/></svg>'
+    :'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true" style="top:56px"><path d="M20 18 L 82 84"/><path d="M82 16 L 22 86"/></svg>';
+  $('pverdict').className='verdict '+(ok?'ok':'no');
+  $('pverdict').innerHTML=ok?`答對了！${S.streak>=3?`<small>已經連續答對 ${S.streak} 題</small>`:''}`:`再想想看<small>正確答案是 ${M(rFmt(cur.ans))}${cur.retryIdx===null?'，已加入錯題本':''}</small>`;
+  $('psol').innerHTML='<h4>詳解</h4>'+cur.sol;$('presult').hidden=false;
+  $('pans').disabled=true;$('psubmit').disabled=true;$('phint-btn').disabled=true;$('pnext').focus({preventScroll:true});renderPrac()}
+function next(){qn++;newProblem();$('pans').focus()}
+function renderChips(){$('chapters').innerHTML=CHAPTERS.map((c,i)=>`<div class="chapter"><h3>${c}</h3><div class="chips">`+
+  Object.entries(TOPICS).filter(([,t])=>t.ch===i).map(([k,t])=>`<button type="button" class="chip" data-k="${k}" aria-pressed="${S.enabled.includes(k)}">${t.name}</button>`).join('')+`</div></div>`).join('')}
+function renderPrac(){
+  $('s-total').textContent=S.total;$('s-acc').textContent=S.total?Math.round(100*S.right/S.total)+'%':'—';
+  $('s-streak').textContent=S.streak;$('s-best').textContent=S.best;
+  $('mastery').innerHTML=Object.entries(TOPICS).map(([k,t])=>{const st=S.stats[k]||{r:0,t:0},p=st.t?st.r/st.t:0;
+    return `<li><span>${t.name}</span><span class="bar"><i class="${st.t>=3&&p<.6?'weak':''}" style="width:${st.t?Math.max(4,p*100):0}%"></i></span><span class="pct">${st.r} / ${st.t}</span></li>`}).join('');
+  const tried=Object.entries(S.stats).filter(([k,s])=>TOPICS[k]&&s.t>=3).sort((a,b)=>a[1].r/a[1].t-b[1].r/b[1].t);
+  $('advice').innerHTML=!tried.length?'每個單元做滿 3 題後，這裡會告訴你哪裡要加強。'
+    :tried[0][1].r/tried[0][1].t<.8?`建議加強：<b>${TOPICS[tried[0][0]].name}</b>（正確率 ${Math.round(100*tried[0][1].r/tried[0][1].t)}%）。`:'目前每個單元都在 80% 以上。';
+  $('wcount').textContent=S.wrong.length+' 題';
+  $('wrong').innerHTML=S.wrong.length?S.wrong.map((w,i)=>`<li><span class="wq"><b>${TOPICS[w.topic]?.name||''}</b>${w.q.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<[^>]+>/g,'').slice(0,40)}</span><button class="linkbtn" type="button" data-retry="${i}">重做</button></li>`).join('')
+    :'<li class="empty">目前沒有錯題。答錯的題目會自動收進來，重做答對就會移除。</li>'}
+$('pform').addEventListener('submit',grade);$('pnext').onclick=next;
+$('phint-btn').onclick=()=>{$('phint').innerHTML='<b>提示：</b>'+cur.hint;$('phint').hidden=false};
+$('chapters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;const k=b.dataset.k;
+  if(S.enabled.includes(k)){if(S.enabled.length===1)return;S.enabled=S.enabled.filter(x=>x!==k)}else S.enabled.push(k);
+  save();renderChips();if(!answered&&!S.enabled.includes(cur.topic)&&cur.retryIdx===null)newProblem()});
+$('all-on').onclick=()=>{S.enabled=Object.keys(TOPICS);save();renderChips()};
+$('ch2-only').onclick=()=>{S.enabled=Object.keys(TOPICS).filter(k=>TOPICS[k].ch===1);save();renderChips();next()};
+$('weak-only').onclick=()=>{const weak=Object.entries(S.stats).filter(([k,s])=>TOPICS[k]&&s.t>=3&&s.r/s.t<.8).map(([k])=>k);
+  if(!weak.length){$('advice').innerHTML='還沒有找到弱項：單元做滿 3 題、正確率低於 80% 才會列入。';return}
+  S.enabled=weak;save();renderChips();next()};
+$('wrong').addEventListener('click',e=>{const b=e.target.closest('[data-retry]');if(!b)return;const i=+b.dataset.retry;
+  qn++;show(Object.assign({},S.wrong[i]),i);$('pans').focus()});
+$('reset-area').addEventListener('click',e=>{
+  if(e.target.id==='reset')$('reset-area').innerHTML='確定要清除所有作答紀錄、課程進度和錯題本？<button class="linkbtn" id="reset-yes" type="button" style="color:var(--pen)">清除</button><button class="linkbtn" id="reset-no" type="button">取消</button>';
+  else if(e.target.id==='reset-yes'){S=fresh();save();renderChips();renderPrac();openLesson('neg');restoreReset()}
+  else if(e.target.id==='reset-no')restoreReset()});
+function restoreReset(){$('reset-area').innerHTML='<button class="linkbtn" id="reset" type="button">清除所有紀錄</button>'}
+
+renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
+}
+</script>
+
+</body>
+</html>
