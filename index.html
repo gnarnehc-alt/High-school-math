@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="高一數學第二章「直線與圓」從頭學：白話教學、互動圖形、逐步例題與隨機練習。">
+<meta name="description" content="高一數學第二章「直線與圓」從頭學：白話教學、互動圖形、三級難度練習。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317233A'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23CF3127' stroke-width='3'/%3E%3C/svg%3E">
 <title>高一數學練功房</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,6 +155,15 @@ h1 em{font-style:normal;color:var(--pen)}
 .done-box b{font-family:var(--f-hand);font-size:19px;color:var(--ok)}
 .sol-fig .plane{max-width:260px}
 
+.lvtabs{display:flex;gap:6px;flex-wrap:wrap}
+.lvtab{font:inherit;font-size:14px;border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:5px 14px;cursor:pointer}
+.lvtab[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:500}
+.lvtab:disabled{color:var(--muted);cursor:not-allowed;opacity:.7}
+.lvtab:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.lvbadge{font-family:var(--f-body);font-size:11.5px;font-weight:500;border-radius:3px;padding:1px 6px;vertical-align:middle;border:1px solid currentColor}
+.lvbadge.lv1{color:var(--ok)}.lvbadge.lv2{color:var(--blue)}.lvbadge.lv3{color:var(--pen)}
+.diffrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:10px}
+.diffrow>span:first-child{font-family:var(--f-hand);font-size:17px;font-weight:700}
 /* ---- random practice (tab 2) ---- */
 .stats{display:flex;gap:10px;flex-wrap:wrap}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 14px;min-width:84px}
@@ -186,7 +195,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
 .panel h2{margin:0 0 10px;font-family:var(--f-hand);font-size:19px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .panel h2 span{font-family:var(--f-body);font-size:12px;font-weight:400;color:var(--muted)}
 .mastery{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
-.mastery li{display:grid;grid-template-columns:96px 1fr 52px;gap:8px;align-items:center;font-size:13px}
+.mastery li{display:grid;grid-template-columns:118px 1fr 52px;gap:8px;align-items:center;font-size:13px}
 .mastery .bar{height:8px;border-radius:4px;background:var(--grid);overflow:hidden}
 .mastery .bar i{display:block;height:100%;border-radius:4px;background:var(--blue)}
 .mastery .bar i.weak{background:var(--pen)}
@@ -220,7 +229,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
     <div class="learn">
       <nav class="path" aria-label="課程路線">
         <h2>學習路線</h2>
-        <p>建議照順序學。每課小練習答對 3 題就算過關。</p>
+        <p>建議照順序學。每課有三個難度，答對 3 題解鎖下一級，三級都完成就拿到三顆星。</p>
         <ol id="path-list"></ol>
         <div class="overall" id="overall"></div>
       </nav>
@@ -243,6 +252,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
           <div><button class="linkbtn" id="all-on" type="button">全選</button> <button class="linkbtn" id="ch2-only" type="button">只練第二章</button> <button class="linkbtn" id="weak-only" type="button">只練弱項</button></div>
         </div>
         <div class="chapters" id="chapters"></div>
+        <div class="diffrow"><span>難度</span><div class="chips" id="diff" role="group" aria-label="難度"></div><span class="fmt" id="diffnote"></span></div>
       </section>
       <div class="pmain">
         <section class="sheet" aria-live="polite">
@@ -604,6 +614,216 @@ const LESSONS=[
    fig2:plane({circles:[{x:h,y:k,r}],lines:[{a,b,c,col:'pen'}],pts:[{x:h,y:k,label:''}]})}}}
 ];
 
+/* ================= levels 2 & 3 for every lesson ================= */
+const sgn=v=>v>0?'+':'−';
+const opn=v=>v<0?' − '+(-v):' + '+v;           // " + 3" / " − 3"
+const LV={
+neg:{
+ n2:'這一級會連續加減好幾個數：先把「減掉負數」都改成「加」，再從左算到右。也會出現「兩數相減再平方」，這就是距離公式裡的算法。',
+ g2(){if(Math.random()<.5){const t=[rnd(-9,9),-nz(-9,9),nz(-9,9),-nz(-9,9)];
+   const show=`${num(t[0])} − ${par(-t[1])} + ${par(t[2])} − ${par(-t[3])}`;
+   const re=num(t[0])+t.slice(1).map(opn).join('');let run=t[0];const seq=t.slice(1).map(v=>(run+=v,num(run)));
+   return{q:`計算 ${M(show)}`,ans:[run,1],steps:[
+    `「減掉負數」改成「加」、「加上負數」改成「減」：${M(show+' = '+re)}`,
+    `從左算到右：${seq.join(' → ')}`,`答案是 <b>${num(run)}</b>。`]}}
+  const a=rnd(-6,6),b=rnd(-6,6),c=rnd(-6,6),d=rnd(-6,6),u=a-b,v=c-d;
+  return{q:`計算 ${M(`(${num(a)} − ${par(b)})<sup>2</sup> + (${num(c)} − ${par(d)})<sup>2</sup>`)}`,ans:[u*u+v*v,1],steps:[
+   `先算括號：${M(`${num(a)} − ${par(b)} = ${num(u)}`)}，${M(`${num(c)} − ${par(d)} = ${num(v)}`)}`,
+   `再平方（負的平方會變正）：${M(`${par(u)}<sup>2</sup> = ${u*u}`)}，${M(`${par(v)}<sup>2</sup> = ${v*v}`)}`,
+   `${M(`${u*u} + ${v*v} = ${u*u+v*v}`)}，答案是 <b>${u*u+v*v}</b>。`]}},
+ n3:`這一級混合三種容易錯的寫法：${M('−3<sup>2</sup> = −9')}（沒有括號，只有 3 平方）、${M('(−3)<sup>2</sup> = 9')}、以及絕對值 ${M('|−5| = 5')}（裡面先算完，再把負號拿掉）。`,
+ g3(){if(Math.random()<.5){const a=rnd(2,5),b=rnd(2,5),c=rnd(-6,6),d=rnd(-6,6),v=-a*a+b*b-(c-d);
+   return{q:`計算 ${M(`−${a}<sup>2</sup> + (−${b})<sup>2</sup> − (${num(c)} − ${par(d)})`)}`,ans:[v,1],steps:[
+    `${M(`−${a}<sup>2</sup>`)} 沒有括號，只有 ${a} 平方：${M(`−${a}<sup>2</sup> = −${a*a}`)}；${M(`(−${b})<sup>2</sup> = ${b*b}`)}`,
+    `括號：${M(`${num(c)} − ${par(d)} = ${num(c-d)}`)}，前面還有一個減號：${M(`− ${par(c-d)} = ${num(-(c-d))}`)}`,
+    `${M(`−${a*a} + ${b*b}${opn(-(c-d))} = ${num(v)}`)}，答案是 <b>${num(v)}</b>。`]}}
+  const a=rnd(-8,8),b=rnd(-8,8),c=rnd(-8,8),d=rnd(-8,8),u=Math.abs(a-b),w=Math.abs(c-d);
+  return{q:`計算 ${M(`|${num(a)} − ${par(b)}| − |${num(c)} − ${par(d)}|`)}`,ans:[u-w,1],steps:[
+   `絕對值裡面先算：${M(`${num(a)} − ${par(b)} = ${num(a-b)}`)}，${M(`${num(c)} − ${par(d)} = ${num(c-d)}`)}`,
+   `去掉負號：${M(`|${num(a-b)}| = ${u}`)}，${M(`|${num(c-d)}| = ${w}`)}`,
+   `${M(`${u} − ${w} = ${num(u-w)}`)}，答案是 <b>${num(u-w)}</b>。`]}}},
+coord:{
+ n2:`題目用字母代替數字時，只要知道它是正是負就能判斷象限。例如已知 ${M('<i>a</i> &gt; 0')}，那 ${M('−<i>a</i>')} 就是負的；兩個負數相乘是正的；任何不是 0 的數平方都是正的。`,
+ g2(){const sa=pick([1,-1]),sb=pick([1,-1]);
+  const ex=[{t:'<i>a</i>',s:sa,w:`已知 ${M('<i>a</i>')} ${sa>0?'&gt;':'&lt;'} 0`},{t:'−<i>a</i>',s:-sa,w:`${M('<i>a</i>')} ${sa>0?'是正的，加負號變負的':'是負的，加負號變正的'}`},
+   {t:'<i>b</i>',s:sb,w:`已知 ${M('<i>b</i>')} ${sb>0?'&gt;':'&lt;'} 0`},{t:'−<i>b</i>',s:-sb,w:`${M('<i>b</i>')} ${sb>0?'是正的，加負號變負的':'是負的，加負號變正的'}`},
+   {t:'<i>a</i><i>b</i>',s:sa*sb,w:`${sa>0?'正':'負'} × ${sb>0?'正':'負'} = ${sa*sb>0?'正':'負'}`},{t:'<i>a</i><sup>2</sup>',s:1,w:'平方一定是正的'},{t:'<i>b</i> − <i>a</i>',s:sb>0&&sa<0?1:sb<0&&sa>0?-1:0}].filter(e=>e.s!==0);
+  let e1=pick(ex),e2;do{e2=pick(ex)}while(e2===e1);const q=quadOf(e1.s,e2.s);
+  if(e1.t==='<i>b</i> − <i>a</i>'||e2.t==='<i>b</i> − <i>a</i>'){const e=e1.t==='<i>b</i> − <i>a</i>'?e1:e2;e.w=`${e.s>0?'正的減負的，一定是正的':'負的減正的，一定是負的'}`}
+  return{q:`已知 ${M(`<i>a</i> ${sa>0?'&gt;':'&lt;'} 0`)}、${M(`<i>b</i> ${sb>0?'&gt;':'&lt;'} 0`)}，點 ${M(`P(${e1.t}, ${e2.t})`)} 在第幾象限？（填 1～4）`,ans:[q,1],steps:[
+   `${M(X)} 坐標 ${M(e1.t)}：${e1.w}，所以是<b>${e1.s>0?'正':'負'}</b>的。`,
+   `${M(Y)} 坐標 ${M(e2.t)}：${e2.w}，所以是<b>${e2.s>0?'正':'負'}</b>的。`,
+   `${M(`(${sgn(e1.s)}, ${sgn(e2.s)})`)} → 第${QN[q]}象限，答案是 <b>${q}</b>。`]}},
+ n3:`<b>對稱點：</b>對 x 軸對稱 → ${M(Y)} 變號；對 y 軸對稱 → ${M(X)} 變號；對原點對稱 → 兩個都變號。<br><b>點在軸上：</b>在 y 軸上代表 ${M('<i>x</i> = 0')}，在 x 軸上代表 ${M('<i>y</i> = 0')}。`,
+ g3(){if(Math.random()<.5){const a=nz(-6,6),b=nz(-6,6),ax=pick(['x','y','o']),askX=Math.random()<.5;
+   const [na,nb]=ax==='x'?[a,-b]:ax==='y'?[-a,b]:[-a,-b],nm=ax==='x'?'x 軸':ax==='y'?'y 軸':'原點';
+   return{q:`點 ${M(`P${P(a,b)}`)} 對<b>${nm}</b>的對稱點是 Q，Q 的 ${M(askX?X:Y)} 坐標是多少？`,ans:[askX?na:nb,1],steps:[
+    ax==='x'?`對 x 軸對稱：像照鏡子一樣上下翻，${M(X)} 不變、${M(Y)} 變號。`:ax==='y'?`對 y 軸對稱：左右翻，${M(Y)} 不變、${M(X)} 變號。`:`對原點對稱：上下左右都翻，${M(X)}、${M(Y)} 都變號。`,
+    `${M(`Q${P(na,nb)}`)}，${M(askX?X:Y)} 坐標是 <b>${num(askX?na:nb)}</b>。`],
+    fig2:plane({pts:[{x:a,y:b,label:'P'},{x:na,y:nb,label:'Q',c:'pen'}],segs:[{p:[a,b],q:[na,nb],c:'pen',dash:true}]})}}
+  const p=rnd(1,3),a0=nz(-4,4),q0=-p*a0,r=nz(-3,3),s=rnd(-5,5),onY=Math.random()<.5,askA=Math.random()<.5,other=r*a0+s;
+  const ex1=poly([[p,'<i>a</i>'],[q0,'']]),ex2=poly([[r,'<i>a</i>'],[s,'']]),pt=onY?`(${ex1}, ${ex2})`:`(${ex2}, ${ex1})`;
+  return{q:`點 ${M('P'+pt)} 在 <b>${onY?'y':'x'} 軸</b>上，${askA?`求 ${M('<i>a</i>')}`:`P 的 ${M(onY?Y:X)} 坐標是多少`}？`,ans:[askA?a0:other,1],steps:[
+   `在 ${onY?'y':'x'} 軸上的點，${M(onY?X:Y)} 坐標一定是 0：${M(`${ex1} = 0`)}`,
+   `解方程式：${M(`${p===1?'':p}<i>a</i> = ${num(-q0)}`)} ⇒ ${M(`<i>a</i> = ${num(a0)}`)}`,
+   askA?`答案是 <b>${num(a0)}</b>。`:`代回另一個坐標：${M(`${num(r)} × ${par(a0)}${opn(s).replace(' + 0','')} = ${num(other)}`)}，答案是 <b>${num(other)}</b>。`]}}},
+dist:{
+ n2:`距離不一定是整數。像 ${M(rt(20))} 這種開不盡的，題目會請你寫成 ${M(rt('<i>n</i>'))}，求 ${M('<i>n</i>')}：其實就是「橫差平方 + 直差平方」，不用開根號。`,
+ g2(){let x1,y1,x2,y2;do{x1=rnd(-6,6);y1=rnd(-6,6);x2=rnd(-6,6);y2=rnd(-6,6)}while(x1===x2||y1===y2);
+  const dx=x2-x1,dy=y2-y1,n=dx*dx+dy*dy;
+  return{q:`${M(`A${P(x1,y1)}`)}、${M(`B${P(x2,y2)}`)}，${M(`AB = ${rt('<i>n</i>')}`)}，求 ${M('<i>n</i>')}。`,ans:[n,1],steps:[
+   `橫差 ${M(`${num(x2)} − ${par(x1)} = ${num(dx)}`)}，直差 ${M(`${num(y2)} − ${par(y1)} = ${num(dy)}`)}`,
+   `${M(`AB<sup>2</sup> = ${par(dx)}<sup>2</sup> + ${par(dy)}<sup>2</sup> = ${dx*dx} + ${dy*dy} = ${n}`)}`,
+   `${M(`AB = ${rt(n)}`)}，答案是 <b>${n}</b>。`],
+   fig2:plane({pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B',c:'pen'}],segs:[{p:[x1,y1],q:[x2,y1],c:'blue',dash:true},{p:[x2,y1],q:[x2,y2],c:'pen',dash:true},{p:[x1,y1],q:[x2,y2],c:'ink'}]})}},
+ n3:`距離公式可以倒過來用：已知距離，求未知坐標。把距離公式兩邊平方，就變成方程式。<br>「x 軸上的點」可以設成 ${M('P(<i>x</i>, 0)')}；「到 A、B 等距離」就是 ${M('PA<sup>2</sup> = PB<sup>2</sup>')}，展開後 ${M(X2)} 會消掉。`,
+ g3(){if(Math.random()<.5){let [dx,dy,d]=pick([[3,4,5],[4,3,5],[6,8,10],[8,6,10],[5,12,13]]);dx*=pick([1,-1]);
+   const x1=rnd(-4,4),y1=rnd(-4,4),up=Math.random()<.5,k=up?y1+dy:y1-dy;
+   return{q:`${M(`A${P(x1,y1)}`)}、${M(`B(${num(x1+dx)}, <i>k</i>)`)}，${M(`AB = ${d}`)}，且 ${M(`<i>k</i> ${up?'&gt;':'&lt;'} ${num(y1)}`)}，求 ${M('<i>k</i>')}。`,ans:[k,1],steps:[
+    `平方後列式：${M(`(${num(x1+dx)} − ${par(x1)})<sup>2</sup> + (<i>k</i> − ${par(y1)})<sup>2</sup> = ${d}<sup>2</sup>`)}`,
+    `${M(`${dx*dx} + (<i>k</i> − ${par(y1)})<sup>2</sup> = ${d*d}`)} ⇒ ${M(`(<i>k</i> − ${par(y1)})<sup>2</sup> = ${d*d-dx*dx}`)} ⇒ ${M(`<i>k</i> − ${par(y1)} = ±${dy}`)}`,
+    `${M(`<i>k</i> = ${num(y1+dy)}`)} 或 ${M(`${num(y1-dy)}`)}，題目要 ${M(`<i>k</i> ${up?'&gt;':'&lt;'} ${num(y1)}`)}，答案是 <b>${num(k)}</b>。`]}}
+  let a1,a2,b1,b2;do{a1=rnd(-5,5);a2=nz(-5,5);b1=rnd(-5,5);b2=nz(-5,5)}while(a1===b1);
+  const A=a1*a1+a2*a2,B=b1*b1+b2*b2,x=R(B-A,2*(b1-a1));
+  return{q:`x 軸上有一點 P 到 ${M(`A${P(a1,a2)}`)} 和 ${M(`B${P(b1,b2)}`)} 的距離相等，P 的 ${M(X)} 坐標是多少？`,ans:x,steps:[
+   `設 ${M('P(<i>x</i>, 0)')}，列 ${M('PA<sup>2</sup> = PB<sup>2</sup>')}：${M(`(<i>x</i> − ${par(a1)})<sup>2</sup> + ${a2*a2} = (<i>x</i> − ${par(b1)})<sup>2</sup> + ${b2*b2}`)}`,
+   `展開：${M(`${poly([[1,X2],[-2*a1,X],[A,'']])} = ${poly([[1,X2],[-2*b1,X],[B,'']])}`)}，兩邊的 ${M(X2)} 消掉`,
+   `${M(`${poly([[2*(b1-a1),X]])} = ${B} − ${A} = ${num(B-A)}`)} ⇒ ${M(`<i>x</i> = ${fr(num(B-A),num(2*(b1-a1)))} = ${rFmt(x)}`)}，答案是 <b>${M(rFmt(x))}</b>。`]}}},
+mid:{
+ n2:`中點公式倒過來用：已知中點 M 和一端 A，求另一端 B。因為 ${M(`${fr('<i>A</i> + <i>B</i>',2)} = <i>M</i>`)}，所以 ${M('<i>B</i> = 2<i>M</i> − <i>A</i>')}（${M(X)}、${M(Y)} 各算一次）。`,
+ g2(){const ax=rnd(-6,6),ay=rnd(-6,6),mx=rnd(-4,4),my=rnd(-4,4),askX=Math.random()<.5,bx=2*mx-ax,by=2*my-ay,[m,a,b]=askX?[mx,ax,bx]:[my,ay,by],v=askX?X:Y;
+  return{q:`線段 AB 的中點是 ${M(`M${P(mx,my)}`)}，${M(`A${P(ax,ay)}`)}，B 的 ${M(v)} 坐標是多少？`,ans:[b,1],steps:[
+   `設 B 的 ${M(v)} 坐標為 ${M('<i>t</i>')}：${M(`${fr(`${num(a)} + <i>t</i>`,2)} = ${num(m)}`)}`,
+   `兩邊乘 2：${M(`${num(a)} + <i>t</i> = ${num(2*m)}`)} ⇒ ${M(`<i>t</i> = ${num(2*m)} − ${par(a)} = ${num(b)}`)}，答案是 <b>${num(b)}</b>。`],
+   fig2:plane({R:9,pts:[{x:ax,y:ay,label:'A'},{x:mx,y:my,label:'M',c:'pen'},{x:bx,y:by,label:'B'}],segs:[{p:[ax,ay],q:[bx,by],c:'blue'}]})}},
+ n3:`<b>重心：</b>三角形三個頂點坐標的平均（加起來除以 3）。<br><b>平行四邊形：</b>對角線互相平分，ABCD 中 AC 和 BD 的中點相同，所以 ${M('<i>A</i> + <i>C</i> = <i>B</i> + <i>D</i>')}，得 ${M('<i>D</i> = <i>A</i> + <i>C</i> − <i>B</i>')}。`,
+ g3(){const pts=[[rnd(-6,6),rnd(-6,6)],[rnd(-6,6),rnd(-6,6)],[rnd(-6,6),rnd(-6,6)]],askX=Math.random()<.5,i=askX?0:1,v=askX?X:Y,[A,B,C]=pts;
+  if(Math.random()<.5){const s=A[i]+B[i]+C[i],g=R(s,3);
+   return{q:`三角形 ABC 中，${M(`A${P(...A)}`)}、${M(`B${P(...B)}`)}、${M(`C${P(...C)}`)}，重心 G 的 ${M(v)} 坐標是多少？`,ans:g,steps:[
+    `重心是三個頂點的平均，只看 ${M(v)}：${num(A[i])}、${num(B[i])}、${num(C[i])}`,
+    `${M(`${fr(`${num(A[i])} + ${par(B[i])} + ${par(C[i])}`,3)} = ${fr(num(s),3)} = ${rFmt(g)}`)}，答案是 <b>${M(rFmt(g))}</b>。`]}}
+  const D=[A[0]+C[0]-B[0],A[1]+C[1]-B[1]];
+  return{q:`ABCD 是平行四邊形（頂點依序排列），${M(`A${P(...A)}`)}、${M(`B${P(...B)}`)}、${M(`C${P(...C)}`)}，D 的 ${M(v)} 坐標是多少？`,ans:[D[i],1],steps:[
+   `對角線 AC 和 BD 互相平分，所以 ${M('<i>A</i> + <i>C</i> = <i>B</i> + <i>D</i>')}，${M('<i>D</i> = <i>A</i> + <i>C</i> − <i>B</i>')}`,
+   `只看 ${M(v)}：${M(`${num(A[i])} + ${par(C[i])} − ${par(B[i])} = ${num(D[i])}`)}，答案是 <b>${num(D[i])}</b>。`],
+   fig2:plane({R:Math.max(7,...D.map(Math.abs),...pts.flat().map(Math.abs))+1,pts:[{x:A[0],y:A[1],label:'A'},{x:B[0],y:B[1],label:'B'},{x:C[0],y:C[1],label:'C'},{x:D[0],y:D[1],label:'D',c:'pen'}],
+    segs:[{p:A,q:B,c:'blue'},{p:B,q:C,c:'blue'},{p:C,q:D,c:'pen',dash:true},{p:D,q:A,c:'pen',dash:true}]})}}},
+slope:{
+ n2:'三點共線（三個點在同一條直線上），代表任選兩點算出來的斜率都一樣。先用兩個已知的點算出斜率，再用它求未知數。',
+ g2(){const p=nz(-3,3),q=pick([1,1,2,3]),m=R(p,q),[pp,qq]=m,x1=rnd(-4,3),y1=rnd(-4,4);
+  let s1=pick([1,-1,2]),s2;do{s2=nz(-2,2)}while(s2===s1);const x2=x1+qq*s1,y2=y1+pp*s1,x3=x1+qq*s2,k=y1+pp*s2;
+  return{q:`${M(`A${P(x1,y1)}`)}、${M(`B${P(x2,y2)}`)}、${M(`C(${num(x3)}, <i>k</i>)`)} 三點在同一條直線上，求 ${M('<i>k</i>')}。`,ans:[k,1],steps:[
+   `AB 的斜率：${M(`${fr(`${num(y2)} − ${par(y1)}`,`${num(x2)} − ${par(x1)}`)} = ${fr(num(y2-y1),num(x2-x1))} = ${rFmt(m)}`)}`,
+   `AC 的斜率也要相同：${M(`${fr(`<i>k</i> − ${par(y1)}`,`${num(x3)} − ${par(x1)}`)} = ${rFmt(m)}`)}`,
+   `${M(`<i>k</i> − ${par(y1)} = ${rFmt(m)} × ${par(x3-x1)} = ${num(k-y1)}`)} ⇒ ${M(`<i>k</i> = ${num(k)}`)}，答案是 <b>${num(k)}</b>。`],
+   fig2:plane({R:8,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B'},{x:x3,y:k,label:'C',c:'pen'}],lines:[{a:pp,b:-qq,c:qq*y1-pp*x1}]})}},
+ n3:'未知數同時出現在兩個點時，把斜率公式寫出來，兩邊乘上分母（交叉相乘），就會變成一元一次方程式。',
+ g3(){const m=pick([2,3,4,-2,-3]),t0=rnd(-4,5);let a;do{a=rnd(-4,4)}while(a===t0);const c=t0+m*(t0-a);
+  return{q:`${M(`A(${num(a)}, <i>t</i>)`)}、${M(`B(<i>t</i>, ${num(c)})`)} 兩點連線的斜率是 ${num(m)}，求 ${M('<i>t</i>')}。`,ans:[t0,1],steps:[
+   `列式：${M(`${fr(`${num(c)} − <i>t</i>`,`<i>t</i> − ${par(a)}`)} = ${num(m)}`)}`,
+   `交叉相乘：${M(`${num(c)} − <i>t</i> = ${num(m)}(<i>t</i> − ${par(a)}) = ${num(m)}<i>t</i>${opn(-m*a)}`)}`,
+   `移項：${M(`${num(c)}${opn(m*a)} = ${num(m)}<i>t</i> + <i>t</i>`)} ⇒ ${M(`${num(c+m*a)} = ${num(m+1)}<i>t</i>`)} ⇒ ${M(`<i>t</i> = ${num(t0)}`)}，答案是 <b>${num(t0)}</b>。`]}}},
+line:{
+ n2:`已知兩點求直線：① 用兩點算斜率 ${M('<i>m</i>')}；② 把其中一點代入 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')} 求 ${M('<i>b</i>')}。`,
+ g2(){const x1=rnd(-4,4),y1=rnd(-5,5);let x2;do{x2=rnd(-4,4)}while(x2===x1);
+  const y2=Math.random()<.6?y1+nz(-3,3)*(x2-x1):rnd(-5,5),m=R(y2-y1,x2-x1),b=R(y1*m[1]-m[0]*x1,m[1]);
+  return{q:`通過 ${M(`A${P(x1,y1)}`)}、${M(`B${P(x2,y2)}`)} 的直線寫成 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')}，${M('<i>b</i>')} 是多少？`,ans:b,steps:[
+   `斜率：${M(`<i>m</i> = ${fr(`${num(y2)} − ${par(y1)}`,`${num(x2)} − ${par(x1)}`)} = ${rFmt(m)}`)}`,
+   `把 A 代入：${M(`${num(y1)} = ${rFmt(m)} × ${par(x1)} + <i>b</i>`)}`,
+   `${M(`<i>b</i> = ${num(y1)} − ${m[0]*x1<0?'(':''}${rFmt(R(m[0]*x1,m[1]))}${m[0]*x1<0?')':''} = ${rFmt(b)}`)}，答案是 <b>${M(rFmt(b))}</b>。`],
+   fig2:plane({R:8,pts:[{x:x1,y:y1,label:'A'},{x:x2,y:y2,label:'B'},{x:0,y:b[0]/b[1],label:'',c:'pen'}],lines:[L(m[0]/m[1],b[0]/b[1])]})}},
+ n3:`<b>x 截距：</b>直線和 x 軸的交點，令 ${M('<i>y</i> = 0')} 求 ${M(X)}。<b>y 截距：</b>令 ${M('<i>x</i> = 0')} 求 ${M(Y)}。<br>直線和兩軸會圍成一個直角三角形，面積 = ${M('|x 截距| × |y 截距| ÷ 2')}。`,
+ g3(){const p=nz(-6,6),q=nz(-6,6),g=gcd(p,q),A=q/g,B=p/g,C=p*q/g,eq=`${poly([[A,X],[B,Y]])} = ${num(C)}`,askArea=Math.random()<.6,area=R(Math.abs(p*q),2);
+  return{q:`直線 ${M(eq)} ${askArea?'和兩坐標軸圍成的三角形面積是多少？':`的 ${Math.random()<.5?'x':'x'} 截距是多少？`}`,ans:askArea?area:[p,1],steps:[
+   `令 ${M('<i>y</i> = 0')}：${M(`${A===1?'':A===-1?'−':num(A)}<i>x</i> = ${num(C)}`)} ⇒ ${M(`<i>x</i> = ${num(p)}`)}，x 截距 ${num(p)}`,
+   `令 ${M('<i>x</i> = 0')}：${M(`${B===1?'':B===-1?'−':num(B)}<i>y</i> = ${num(C)}`)} ⇒ ${M(`<i>y</i> = ${num(q)}`)}，y 截距 ${num(q)}`,
+   askArea?`面積 = ${M(`${fr(`|${num(p)}| × |${num(q)}|`,2)} = ${fr(Math.abs(p*q),2)} = ${rFmt(area)}`)}，答案是 <b>${M(rFmt(area))}</b>。`:`答案是 <b>${num(p)}</b>。`],
+   fig2:plane({lines:[{a:A,b:B,c:-C}],pts:[{x:p,y:0,label:`(${num(p)}, 0)`,c:'pen'},{x:0,y:q,label:`(0, ${num(q)})`,c:'pen'}],segs:[{p:[0,0],q:[p,0],c:'amber'},{p:[0,0],q:[0,q],c:'amber'}]})}}},
+perp:{
+ n2:`求「垂直於某直線、而且通過某一點」的直線：① 用「倒數再變號」得到新斜率；② 把點代入 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')} 求 ${M('<i>b</i>')}。`,
+ g2(){const m=pick([[2,1],[-3,1],[1,2],[-1,3],[3,2],[-2,3],[1,1],[-1,1],[3,1]]),b0=rnd(-4,4),mp=R(-m[1],m[0]),x0=mp[1]*nz(-2,2),y0=rnd(-5,5),bp=R(y0*mp[1]-mp[0]*x0,mp[1]);
+  return{q:`直線 L 和 ${M(lineEq(m,b0))} 垂直，而且通過點 ${M(P(x0,y0))}。把 L 寫成 ${M('<i>y</i> = <i>m</i><i>x</i> + <i>b</i>')}，${M('<i>b</i>')} 是多少？`,ans:bp,steps:[
+   `原斜率 ${M(rFmt(m))}，倒數再變號，L 的斜率是 ${M(rFmt(mp))}`,
+   `把 ${M(P(x0,y0))} 代入 ${M(`<i>y</i> = ${rFmt(mp)}<i>x</i> + <i>b</i>`)}：${M(`${num(y0)} = ${rFmt(mp)} × ${par(x0)} + <i>b</i> = ${rFmt(R(mp[0]*x0,mp[1]))} + <i>b</i>`)}`,
+   `${M(`<i>b</i> = ${rFmt(bp)}`)}，答案是 <b>${M(rFmt(bp))}</b>。`],
+   fig2:plane({R:8,lines:[{...L(m[0]/m[1],b0),col:'blue'},{...L(mp[0]/mp[1],bp[0]/bp[1]),col:'pen'}],pts:[{x:x0,y:y0,label:P(x0,y0),c:'pen'}]})}},
+ n3:`一般式 ${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i> = 0')} 的斜率是 ${M(`−${fr('<i>a</i>','<i>b</i>')}`)}（把 y 留在左邊就看得出來）。兩條線垂直 → 斜率相乘 −1；平行 → 斜率相等。用這個關係列方程式求 ${M('<i>k</i>')}。`,
+ g3(){const a=nz(-4,4),b=nz(-4,4),c=rnd(-5,5),d=pick([1,2,3,-2]),e=rnd(-5,5),isP=Math.random()<.5,k=isP?R(a*d,b):R(-b*d,a),m1=R(-a,b);
+  return{q:`直線 ${M(poly([[a,X],[b,Y],[c,'']])+' = 0')} 和 ${M(`<i>k</i><i>x</i>${opn(d).replace(' + 1',' + ').replace(' − 1',' − ')}<i>y</i>${e?opn(e):''} = 0`)} ${isP?'<b>平行</b>':'<b>垂直</b>'}，求 ${M('<i>k</i>')}。`,ans:k,steps:[
+   `第一條的斜率：${M(`−${fr(par(a),par(b))} = ${rFmt(m1)}`)}；第二條的斜率：${M(`−${fr('<i>k</i>',par(d))}`)}`,
+   isP?`平行 → 斜率相等：${M(`−${fr('<i>k</i>',par(d))} = ${rFmt(m1)}`)}`:`垂直 → 相乘等於 −1：${M(`${rFmt(m1)} × (−${fr('<i>k</i>',par(d))}) = −1`)}`,
+   isP?`${M(`<i>k</i> = −${par(d)} × ${m1[0]<0||m1[1]!==1?'('+rFmt(m1)+')':rFmt(m1)} = ${rFmt(k)}`)}，答案是 <b>${M(rFmt(k))}</b>。`
+      :`第二條斜率要是 ${M(rFmt(R(-m1[1],m1[0])))}（倒數再變號），${M(`−${fr('<i>k</i>',par(d))} = ${rFmt(R(-m1[1],m1[0]))}`)} ⇒ ${M(`<i>k</i> = ${rFmt(k)}`)}，答案是 <b>${M(rFmt(k))}</b>。`]}}},
+pdist:{
+ n2:`直線不是「= 0」的樣子時，先移項整理成 ${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i> = 0')} 再代公式。這一級也會出現 5、12、13 這組畢氏數（${M(`${rt('5<sup>2</sup> + 12<sup>2</sup>')} = 13`)}）。`,
+ g2(){let [a,b,h]=pick([[5,12,13],[12,5,13],[3,4,5],[4,3,5],[6,8,10],[8,6,10]]);a*=pick([1,-1]);b*=pick([1,-1]);
+  const x0=rnd(-5,5),y0=rnd(-5,5),d=rnd(1,4),s=pick([1,-1]);let c=s*d*h-a*x0-b*y0;if(a<0){a=-a;b=-b;c=-c}const v=a*x0+b*y0+c;
+  return{q:`求點 ${M(`P${P(x0,y0)}`)} 到直線 ${M(`${poly([[a,X],[b,Y]])} = ${num(-c)}`)} 的距離。`,ans:[d,1],steps:[
+   `先移項：${M(poly([[a,X],[b,Y],[c,'']])+' = 0')}，${M(`<i>a</i> = ${a}, <i>b</i> = ${num(b)}, <i>c</i> = ${num(c)}`)}`,
+   `分子：${M(`|${a} × ${par(x0)} + ${par(b)} × ${par(y0)} + ${par(c)}| = |${num(v)}| = ${Math.abs(v)}`)}；分母：${M(`${rt(`${a*a} + ${b*b}`)} = ${h}`)}`,
+   `${M(`<i>d</i> = ${fr(Math.abs(v),h)} = ${d}`)}，答案是 <b>${d}</b>。`]}},
+ n3:`<b>兩平行線的距離：</b>${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i><sub>1</sub> = 0')} 和 ${M('<i>a</i><i>x</i> + <i>b</i><i>y</i> + <i>c</i><sub>2</sub> = 0')} 的距離是 ${M(fr('|<i>c</i><sub>1</sub> − <i>c</i><sub>2</sub>|',rt('<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup>')))}。注意兩條線的 ${M(X)}、${M(Y)} 係數要先調成一樣！<br><b>距離已知求未知數：</b>絕對值方程式 ${M('|<i>A</i>| = <i>B</i>')} 會拆成 ${M('<i>A</i> = <i>B</i>')} 或 ${M('<i>A</i> = −<i>B</i>')} 兩種。`,
+ g3(){let [a,b]=pick([[3,4],[4,3]]);b*=pick([1,-1]);
+  if(Math.random()<.5){const c1=rnd(-8,8),d=rnd(1,3),c2=c1+pick([1,-1])*5*d,dbl=Math.random()<.5;
+   const l2=dbl?`${poly([[2*a,X],[2*b,Y],[2*c2,'']])} = 0`:`${poly([[a,X],[b,Y],[c2,'']])} = 0`;
+   return{q:`求兩平行線 ${M(poly([[a,X],[b,Y],[c1,'']])+' = 0')} 和 ${M(l2)} 的距離。`,ans:[d,1],steps:[
+    dbl?`第二條的係數是第一條的 2 倍，先全部除以 2：${M(poly([[a,X],[b,Y],[c2,'']])+' = 0')}`:`兩條線的 ${M(X)}、${M(Y)} 係數已經一樣，可以直接用公式。`,
+    `${M(`<i>d</i> = ${fr(`|${num(c1)} − ${par(c2)}|`,rt(`${a}<sup>2</sup> + ${par(b)}<sup>2</sup>`))} = ${fr(Math.abs(c1-c2),5)} = ${d}`)}，答案是 <b>${d}</b>。`],
+    fig2:plane({R:8,lines:[{a,b,c:c1},{a,b,c:c2,col:'pen'}]})}}
+  const d=rnd(1,3),k0=a===3?rnd(1,3):rnd(1,2),y0=rnd(-3,3),c=5*d-a*k0-b*y0,k1=R(-5*d-b*y0-c,a),inner=b*y0+c;
+  return{q:`點 ${M(`P(<i>k</i>, ${num(y0)})`)} 到直線 ${M(poly([[a,X],[b,Y],[c,'']])+' = 0')} 的距離是 ${d}，且 ${M('<i>k</i> &gt; 0')}，求 ${M('<i>k</i>')}。`,ans:[k0,1],steps:[
+   `代公式：${M(`${fr(`|${a}<i>k</i> + ${par(b)} × ${par(y0)} + ${par(c)}|`,5)} = ${d}`)} ⇒ ${M(`|${a}<i>k</i>${opn(inner).replace(' + 0','')}| = ${5*d}`)}`,
+   `拆成兩種：${M(`${a}<i>k</i>${opn(inner).replace(' + 0','')} = ${5*d}`)} 或 ${M(`${a}<i>k</i>${opn(inner).replace(' + 0','')} = −${5*d}`)}`,
+   `解得 ${M(`<i>k</i> = ${k0}`)} 或 ${M(`<i>k</i> = ${rFmt(k1)}`)}；題目要 ${M('<i>k</i> &gt; 0')}，答案是 <b>${k0}</b>。`]}}},
+circle:{
+ n2:'已知圓心和圓上一點：半徑就是兩點的距離。已知直徑的兩端點：圓心是中點，半徑是直徑的一半（也就是圓心到任一端點的距離）。圓的方程式要的是 r²，通常不必開根號。',
+ g2(){if(Math.random()<.5){const h=rnd(-3,3),k=rnd(-3,3);let pp,q;do{pp=rnd(-5,5);q=rnd(-5,5)}while(pp===h&&q===k);
+   const R2=(pp-h)**2+(q-k)**2;
+   return{q:`以 ${M(P(h,k))} 為圓心、通過點 ${M(P(pp,q))} 的圓，方程式寫成 ${M(`${sq(X,h)} + ${sq(Y,k)} = <i>r</i><sup>2</sup>`)}，${M('<i>r</i><sup>2</sup>')} 是多少？`,ans:[R2,1],steps:[
+    `半徑 = 圓心到圓上一點的距離，${M('<i>r</i><sup>2</sup>')} = 橫差平方 + 直差平方`,
+    `${M(`<i>r</i><sup>2</sup> = (${num(pp)} − ${par(h)})<sup>2</sup> + (${num(q)} − ${par(k)})<sup>2</sup> = ${(pp-h)**2} + ${(q-k)**2} = ${R2}`)}，答案是 <b>${R2}</b>。`],
+    fig2:plane({R:8,circles:[{x:h,y:k,r:Math.sqrt(R2)}],pts:[{x:h,y:k,label:'圓心',c:'pen'},{x:pp,y:q,label:P(pp,q)}],segs:[{p:[h,k],q:[pp,q],c:'pen',dash:true}]})}}
+  const ax=rnd(-4,2),ay=rnd(-4,2),u=rnd(1,3),v=rnd(-3,3),bx=ax+2*u,by=ay+2*v,h=ax+u,k=ay+v,R2=u*u+v*v;
+  return{q:`以 ${M(`A${P(ax,ay)}`)}、${M(`B${P(bx,by)}`)} 為直徑兩端的圓，方程式寫成 ${M('(<i>x</i> − <i>h</i>)<sup>2</sup> + (<i>y</i> − <i>k</i>)<sup>2</sup> = <i>r</i><sup>2</sup>')}，${M('<i>r</i><sup>2</sup>')} 是多少？`,ans:[R2,1],steps:[
+   `圓心是 AB 的中點：${M(`(${fr(`${num(ax)} + ${par(bx)}`,2)}, ${fr(`${num(ay)} + ${par(by)}`,2)}) = ${P(h,k)}`)}`,
+   `${M('<i>r</i><sup>2</sup>')} = 圓心到 A 的距離平方：${M(`(${num(ax)} − ${par(h)})<sup>2</sup> + (${num(ay)} − ${par(k)})<sup>2</sup> = ${u*u} + ${v*v} = ${R2}`)}`,
+   `答案是 <b>${R2}</b>。`],
+   fig2:plane({R:8,circles:[{x:h,y:k,r:Math.sqrt(R2)}],pts:[{x:ax,y:ay,label:'A'},{x:bx,y:by,label:'B'},{x:h,y:k,label:'圓心',c:'pen'}],segs:[{p:[ax,ay],q:[bx,by],c:'blue'}]})}},
+ n3:`一般式 ${M('<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + <i>D</i><i>x</i> + <i>E</i><i>y</i> + <i>F</i> = 0')} 配方後會變成 ${M('(<i>x</i> − <i>h</i>)<sup>2</sup> + (<i>y</i> − <i>k</i>)<sup>2</sup> = <i>h</i><sup>2</sup> + <i>k</i><sup>2</sup> − <i>F</i>')}。右邊必須<b>大於 0</b> 才是一個圓；等於 0 只是一個點，小於 0 則什麼都畫不出來。`,
+ g3(){let h,c;do{h=rnd(-4,4);c=rnd(-4,4)}while(h===0&&c===0);const D=-2*h,E=-2*c,base=h*h+c*c,eq=`${poly([[1,X2],[1,Y2],[D,X],[E,Y]])} + <i>m</i> = 0`;
+  const cfg=`配方：${M(`${sq(X,h)} + ${sq(Y,c)} = ${base} − <i>m</i>`)}（${h?`${M(X)} 項配方多出 ${h*h}`:''}${h&&c?'，':''}${c?`${M(Y)} 項配方多出 ${c*c}`:''}，移到右邊）`;
+  if(Math.random()<.5){const r=rnd(1,5),m=base-r*r;
+   return{q:`方程式 ${M(eq)} 的圖形是半徑為 ${r} 的圓，求 ${M('<i>m</i>')}。`,ans:[m,1],steps:[cfg,
+    `右邊就是 ${M('<i>r</i><sup>2</sup>')}：${M(`${base} − <i>m</i> = ${r}<sup>2</sup> = ${r*r}`)}`,
+    `${M(`<i>m</i> = ${base} − ${r*r} = ${num(m)}`)}，答案是 <b>${num(m)}</b>。`]}}
+  return{q:`方程式 ${M(eq)} 的圖形是一個圓，${M('<i>m</i>')} 最大可以是哪個整數？`,ans:[base-1,1],steps:[cfg,
+   `要是一個圓，右邊必須大於 0：${M(`${base} − <i>m</i> &gt; 0`)} ⇒ ${M(`<i>m</i> &lt; ${base}`)}`,
+   `小於 ${base} 的最大整數是 <b>${base-1}</b>。（${M(`<i>m</i> = ${base}`)} 時右邊是 0，只剩一個點，不算圓）`]}}},
+cline:{
+ n2:'相切代表圓心到直線的距離剛好等於半徑：d = r。把這個等式寫出來會是絕對值方程式，有兩個答案，因為直線可以在圓的兩側各切一次。',
+ g2(){const h=rnd(-3,3),k=rnd(-3,3),r=rnd(1,4);let [a,b]=pick([[3,4],[4,3]]);b*=pick([1,-1]);const base=a*h+b*k,c1=5*r-base,c2=-5*r-base;
+  return{q:`直線 ${M(`${poly([[a,X],[b,Y]])} + <i>c</i> = 0`)} 和圓 ${M(`${sq(X,h)} + ${sq(Y,k)} = ${r*r}`)} 相切，${M('<i>c</i>')} 有兩個可能的值，較大的是多少？`,ans:[c1,1],steps:[
+   `圓心 ${M(P(h,k))}，半徑 ${r}。相切 ⇒ ${M('<i>d</i> = <i>r</i>')}`,
+   `${M(`${fr(`|${a} × ${par(h)} + ${par(b)} × ${par(k)} + <i>c</i>|`,5)} = ${r}`)} ⇒ ${M(`|${num(base)} + <i>c</i>| = ${5*r}`)}`,
+   `${M(`${num(base)} + <i>c</i> = ±${5*r}`)} ⇒ ${M(`<i>c</i> = ${num(c1)}`)} 或 ${M(`${num(c2)}`)}，較大的是 <b>${num(c1)}</b>。`],
+   fig2:plane({R:8,circles:[{x:h,y:k,r}],lines:[{a,b,c:c1,col:'pen'},{a,b,c:c2,col:'ok'}],pts:[{x:h,y:k,label:''}]})}},
+ n3:'弦長：從圓心畫一條垂直線到弦，會把弦平分成兩半。圓心、弦的中點、弦的一端剛好圍成直角三角形，所以 (弦長的一半)² + d² = r²。',
+ g3(){const h=rnd(-2,2),k=rnd(-2,2),half=rnd(1,4);let d,line,fig;const typ=Math.random();
+  if(typ<.5){d=rnd(1,4);const vert=Math.random()<.5,s=pick([1,-1]),t=(vert?h:k)+s*d;
+   line={txt:`${vert?'<i>x</i>':'<i>y</i>'} = ${num(t)}`,how:`${vert?'鉛直線':'水平線'}，${M(`<i>d</i> = |${num(vert?h:k)} − ${par(t)}| = ${d}`)}`,l:vert?{a:1,b:0,c:-t}:{a:0,b:1,c:-t}}}
+  else{d=pick([1,2]);let [a,b]=pick([[3,4],[4,3]]);b*=pick([1,-1]);const c=pick([1,-1])*5*d-a*h-b*k,v=a*h+b*k+c;
+   line={txt:poly([[a,X],[b,Y],[c,'']])+' = 0',how:`${M(`<i>d</i> = ${fr(`|${a} × ${par(h)} + ${par(b)} × ${par(k)} + ${par(c)}|`,5)} = ${fr(Math.abs(v),5)} = ${d}`)}`,l:{a,b,c}}}
+  const r2=d*d+half*half;
+  return{q:`直線 ${M(line.txt)} 被圓 ${M(`${sq(X,h)} + ${sq(Y,k)} = ${r2}`)} 截出的弦，長度是多少？`,ans:[2*half,1],steps:[
+   `圓心 ${M(P(h,k))}，${M(`<i>r</i><sup>2</sup> = ${r2}`)}`,
+   `圓心到直線距離：${line.how}`,
+   `弦長一半 = ${M(`${rt(`<i>r</i><sup>2</sup> − <i>d</i><sup>2</sup>`)} = ${rt(`${r2} − ${d*d}`)} = ${rt(half*half)} = ${half}`)}`,
+   `弦長 = ${M(`2 × ${half} = ${2*half}`)}，答案是 <b>${2*half}</b>。`],
+   fig2:plane({R:7,circles:[{x:h,y:k,r:Math.sqrt(r2)}],lines:[{...line.l,col:'pen'}],pts:[{x:h,y:k,label:''}],segs:[{p:[h,k],q:foot(line.l.a,line.l.b,line.l.c,h,k),c:'amber',dash:true,label:'d',dx:8}]})}}}
+};
+const LVNAME=['','基礎','進階','挑戰'];
+function genLv(l,lv){const p=lv===3?LV[l.id].g3():lv===2?LV[l.id].g2():l.gen();p.lv=lv;return p}
+
 /* ================= random practice topics (all chapters) ================= */
 const TOPICS={
  abs:{ch:0,name:'絕對值不等式',gen(){
@@ -645,10 +865,10 @@ const TOPICS={
 };
 const CHAPTERS=['第一章　數與式','第二章　直線與圓','第三章　多項式函數'];
 const lessonById=id=>LESSONS.find(l=>l.id===id);
-function genTopic(k){const t=TOPICS[k];
-  if(t.fromLesson){const p=lessonById(t.fromLesson).gen();
+function genTopic(k,lv=1){const t=TOPICS[k];
+  if(t.fromLesson){const p=genLv(lessonById(t.fromLesson),lv);
     return{q:p.q+(p.fig?`<div style="margin-top:8px;max-width:220px">${p.fig}</div>`:''),ans:p.ans,
-      hint:p.steps[0],sol:'<ol class="steps">'+p.steps.map(s=>`<li><div>${s}</div></li>`).join('')+'</ol>'+(p.fig2?`<div class="sol-fig" style="margin-top:10px">${p.fig2}</div>`:'')}}
+      lv,hint:p.steps[0],sol:'<ol class="steps">'+p.steps.map(s=>`<li><div>${s}</div></li>`).join('')+'</ol>'+(p.fig2?`<div class="sol-fig" style="margin-top:10px">${p.fig2}</div>`:'')}}
   return t.gen();
 }
 
@@ -666,7 +886,7 @@ const same=(a,b)=>a[0]===b[0]&&a[1]===b[1];
 /* ================= DOM ================= */
 if(typeof document!=='undefined'){
 const KEY='hs-math-dojo-v1';
-const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},cur:'neg',tab:'learn'});
+const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},lv:{},tlv:{},diff:'auto',cur:'neg',tab:'learn'});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
 S.enabled=S.enabled.filter(k=>TOPICS[k]);if(!S.enabled.length)S.enabled=Object.keys(TOPICS);
@@ -683,19 +903,22 @@ function setTab(t){S.tab=t;save();
 $('tab-learn').onclick=()=>setTab('learn');$('tab-prac').onclick=()=>setTab('prac');
 
 /* ---------- lesson path ---------- */
+function lvOf(id){S.lv=S.lv||{};if(!S.lv[id]){const old=(S.lessons&&S.lessons[id])||0;S.lv[id]={c:[Math.min(old,NEED),0,0],cur:1,miss:0}}return S.lv[id]}
+const unlocked=(o,n)=>n===1||o.c[n-2]>=NEED;
+const stars=o=>o.c.filter(v=>v>=NEED).length;
 function renderPath(){
-  $('path-list').innerHTML=LESSONS.map((l,i)=>{const c=Math.min(S.lessons[l.id]||0,NEED),done=c>=NEED;
-    return `<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.title}</span><span class="cnt">${done?'':c+'/'+NEED}</span></button></li>`}).join('');
-  const n=LESSONS.filter(l=>(S.lessons[l.id]||0)>=NEED).length;
-  $('overall').innerHTML=`已完成 ${n} / ${LESSONS.length} 課<div class="bar"><i style="width:${n/LESSONS.length*100}%"></i></div>`;
+  $('path-list').innerHTML=LESSONS.map((l,i)=>{const o=lvOf(l.id),st=stars(o),done=o.c[0]>=NEED;
+    const cnt=st===3?'精通':done?'★'.repeat(st)+'☆'.repeat(3-st):`${o.c[0]}/${NEED}`;
+    return `<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.title}</span><span class="cnt">${cnt}</span></button></li>`}).join('');
+  const n=LESSONS.filter(l=>lvOf(l.id).c[0]>=NEED).length,s=LESSONS.reduce((a,l)=>a+stars(lvOf(l.id)),0);
+  $('overall').innerHTML=`已過關 ${n} / ${LESSONS.length} 課・星星 ${s} / ${LESSONS.length*3}<div class="bar"><i style="width:${s/(LESSONS.length*3)*100}%"></i></div>`;
 }
 $('path-list').addEventListener('click',e=>{const b=e.target.closest('.lesson-link');if(!b)return;openLesson(b.dataset.id,true)});
 
-let lp=null; // current lesson problem
+let lp=null;
 function openLesson(id,scroll){
   S.cur=id;save();renderPath();
-  const i=LESSONS.findIndex(l=>l.id===id),l=LESSONS[i];
-  const ex=l.example;
+  const i=LESSONS.findIndex(l=>l.id===id),l=LESSONS[i],ex=l.example;
   $('lesson').innerHTML=`
    <section>
      <p class="eyebrow">第二章 直線與圓・第 ${i+1} 課 / 共 ${LESSONS.length} 課</p>
@@ -709,6 +932,8 @@ function openLesson(id,scroll){
      <div><button class="btn btn-ghost" type="button" id="ex-next">看下一步</button></div>
    </section>
    <section class="practice" aria-live="polite"><h3><span class="kicker">自己練</span>小練習</h3>
+     <div class="lvtabs" id="lvtabs" role="group" aria-label="難度"></div>
+     <div class="note" id="lvnote" hidden></div>
      <div class="dots" id="dots"></div>
      <div id="lp"></div>
    </section>
@@ -722,16 +947,24 @@ function openLesson(id,scroll){
   drawEx();$('ex-next').onclick=()=>{shown++;drawEx()};
   $('prev-l').onclick=()=>openLesson(LESSONS[i-1].id,true);
   $('next-l').onclick=()=>openLesson(LESSONS[i+1].id,true);
+  $('lvtabs').onclick=e=>{const b=e.target.closest('[data-lv]');if(!b||b.disabled)return;setLevel(+b.dataset.lv)};
   if(l.lab)LABS[l.lab]($('lab-'+l.lab));
-  newLessonProblem();
+  const o=lvOf(id);if(!unlocked(o,o.cur))o.cur=1;
+  setLevel(o.cur);
   if(scroll)$('lesson').scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderDots(){const c=Math.min(S.lessons[S.cur]||0,NEED);
-  $('dots').innerHTML=Array.from({length:NEED},(_,k)=>`<i class="${k<c?'on':''}"></i>`).join('')+`<span>答對 ${c} / ${NEED} 題${c>=NEED?'，這課過關了！可以繼續練或前往下一課':'就過關'}</span>`}
+function setLevel(n){const o=lvOf(S.cur);o.cur=n;o.miss=0;save();
+  $('lvtabs').innerHTML=[1,2,3].map(k=>{const un=unlocked(o,k),full=o.c[k-1]>=NEED;
+    return `<button type="button" class="lvtab" data-lv="${k}" aria-pressed="${k===n}" ${un?'':'disabled'}>${un?'':'🔒 '}Lv${k} ${LVNAME[k]}${full?' ★':''}</button>`}).join('');
+  const note=n===1?'':LV[S.cur]['n'+n];$('lvnote').hidden=!note;$('lvnote').innerHTML=note?`<b>Lv${n} ${LVNAME[n]}・新觀念：</b>${note}`:'';
+  newLessonProblem()}
+function renderDots(){const o=lvOf(S.cur),n=o.cur,c=Math.min(o.c[n-1],NEED);
+  const msg=c<NEED?`Lv${n} 答對 ${c} / ${NEED} 題${n<3?`就解鎖 Lv${n+1}`:'就精通這一課'}`:n<3?`Lv${n} 完成！上面可以切換到 Lv${n+1}`:'這一課已經精通，可以繼續練或前往下一課';
+  $('dots').innerHTML=Array.from({length:NEED},(_,k)=>`<i class="${k<c?'on':''}"></i>`).join('')+`<span>${msg}</span>`}
 function newLessonProblem(){
-  const l=lessonById(S.cur);lp=l.gen();lp.revealed=0;lp.done=false;renderDots();
+  const l=lessonById(S.cur),o=lvOf(S.cur);lp=genLv(l,o.cur);lp.revealed=0;lp.done=false;renderDots();
   $('lp').innerHTML=`
-    <div class="pq-wrap"><div class="qbox">${lp.q}</div>${lp.fig||''}</div>
+    <div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${o.cur}">Lv${o.cur}</span> ${lp.q}</div>${lp.fig||''}</div>
     <form class="answer-row" id="lform" autocomplete="off" style="margin-top:12px">
       <label for="lans">答：</label><input id="lans" class="ansin" spellcheck="false" aria-describedby="lfmt">
       <button class="btn btn-primary" type="submit" id="lsubmit">對答案</button>
@@ -749,21 +982,28 @@ function drawSteps(){$('lsteps').innerHTML=lp.steps.slice(0,lp.revealed).map(s=>
 function gradeLesson(e){e.preventDefault();if(lp.done){newLessonProblem();$('lans').focus();return}
   const v=parseAns($('lans').value);
   if(!v){$('lfmt').textContent='看不懂這個答案，請填整數、分數（如 -3/4）或小數。';$('lfmt').classList.add('err');return}
-  lp.done=true;const ok=same(v,lp.ans);
-  if(ok){S.lessons[S.cur]=(S.lessons[S.cur]||0)+1;save();renderPath();renderDots()}
-  const c=S.lessons[S.cur]||0,i=LESSONS.findIndex(l=>l.id===S.cur),justDone=ok&&c===NEED;
+  lp.done=true;const ok=same(v,lp.ans),o=lvOf(S.cur),n=o.cur,i=LESSONS.findIndex(l=>l.id===S.cur);
+  let justDone=false;
+  if(ok){o.c[n-1]++;o.miss=0;justDone=o.c[n-1]===NEED}else o.miss++;
+  save();renderPath();renderDots();
+  if(justDone)setTimeout(()=>{const t=$('lvtabs');if(t){const keep=o.cur;t.innerHTML=[1,2,3].map(k=>{const un=unlocked(o,k),full=o.c[k-1]>=NEED;return `<button type="button" class="lvtab" data-lv="${k}" aria-pressed="${k===keep}" ${un?'':'disabled'}>${un?'':'🔒 '}Lv${k} ${LVNAME[k]}${full?' ★':''}</button>`}).join('')}},0);
   $('lmark').innerHTML=ok?'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10 C 80 9, 93 32, 90 54 C 87 80, 62 93, 42 89 C 18 85, 7 62, 12 40 C 16 22, 34 12, 56 13"/></svg>'
     :'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true"><path d="M20 18 L 82 84"/><path d="M82 16 L 22 86"/></svg>';
   lp.revealed=lp.steps.length;drawSteps();
+  let box='';
+  if(justDone&&n<3)box=`<div class="done-box"><b>${n===1?`第 ${i+1} 課過關！`:''}Lv${n+1} ${LVNAME[n+1]}解鎖了</b><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" type="button" id="go-up">挑戰 Lv${n+1}</button>${n===1&&i<LESSONS.length-1?`<button class="btn btn-ghost" type="button" id="go-next">先學第 ${i+2} 課</button>`:''}</div></div>`;
+  else if(justDone)box=`<div class="done-box"><b>第 ${i+1} 課精通！三顆星到手</b>${i<LESSONS.length-1?`<button class="btn btn-primary" type="button" id="go-next">前往第 ${i+2} 課：${LESSONS[i+1].title}</button>`:'<span>第二章全部精通，去「隨機練習」用挑戰難度複習吧。</span>'}</div>`;
+  const down=!ok&&n>1&&o.miss>=2?`<p class="fmt">連續錯 2 題了。可以先回 <button class="linkbtn" type="button" id="go-down">Lv${n-1} ${LVNAME[n-1]}</button> 練熟再上來，不丟臉。</p>`:'';
   $('lres').hidden=false;
-  $('lres').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'答對了！':'差一點'}<small>${ok?(lp.revealed&&false?'':'上面是完整算法，可以對照看看'):`正確答案是 ${M(rFmt(lp.ans))}。對照上面的步驟，找出哪一步不一樣`}</small></div>
-    ${lp.fig2?`<div class="sol-fig">${lp.fig2}</div>`:''}
-    ${justDone?`<div class="done-box"><b>第 ${i+1} 課過關！</b>${i<LESSONS.length-1?`<button class="btn btn-primary" type="button" id="go-next">前往第 ${i+2} 課：${LESSONS[i+1].title}</button>`:'<span>整個第二章都完成了，去「隨機練習」選「只練第二章」複習吧。</span>'}</div>`:''}
+  $('lres').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'答對了！':'差一點'}<small>${ok?'上面是完整算法，可以對照看看':`正確答案是 ${M(rFmt(lp.ans))}。對照上面的步驟，找出哪一步不一樣`}</small></div>
+    ${lp.fig2?`<div class="sol-fig">${lp.fig2}</div>`:''}${box}${down}
     <div><button class="btn ${justDone?'btn-ghost':'btn-primary'}" type="button" id="lnext">再一題 →</button></div>`;
   $('lans').disabled=true;$('lsubmit').disabled=true;$('lhint').disabled=true;
   $('lnext').onclick=()=>{newLessonProblem();$('lans').focus()};
+  if($('go-up'))$('go-up').onclick=()=>{setLevel(n+1);$('lvnote').scrollIntoView({behavior:'smooth',block:'center'})};
+  if($('go-down'))$('go-down').onclick=()=>setLevel(n-1);
   if($('go-next'))$('go-next').onclick=()=>openLesson(LESSONS[i+1].id,true);
-  ($('go-next')||$('lnext')).focus({preventScroll:true});
+  ($('go-up')||$('go-next')||$('lnext')).focus({preventScroll:true});
 }
 
 /* ---------- interactive labs ---------- */
@@ -814,34 +1054,43 @@ function weight(k){const st=S.stats[k];if(!st||st.t<3)return 1.5;return 1+2*(1-s
 function chooseTopic(){const ks=S.enabled;let x=Math.random()*ks.reduce((a,k)=>a+weight(k),0);
   for(const k of ks){x-=weight(k);if(x<=0)return k}return ks[ks.length-1]}
 function show(p,retryIdx=null){cur=p;cur.retryIdx=retryIdx;answered=false;
-  $('qno').textContent=`第 ${qn} 題`;$('qtag').textContent=(retryIdx!==null?'錯題重做・':'')+TOPICS[p.topic].name;
+  $('qno').textContent=`第 ${qn} 題`;$('qtag').textContent=(retryIdx!==null?'錯題重做・':'')+TOPICS[p.topic].name+(p.lv&&TOPICS[p.topic].fromLesson?`・Lv${p.lv} ${LVNAME[p.lv]}`:'');
   $('qtag').className='tag'+(retryIdx!==null?' retry':'');$('question').innerHTML=p.q;
   $('phint').hidden=true;$('presult').hidden=true;$('pmark').innerHTML='';
   $('pans').value='';$('pans').disabled=false;$('psubmit').disabled=false;$('phint-btn').disabled=false}
-function newProblem(){const k=chooseTopic();const p=genTopic(k);p.topic=k;show(p)}
+function tl(k){S.tlv=S.tlv||{};return S.tlv[k]||(S.tlv[k]={lv:1,st:0,miss:0})}
+function pickLv(k){if(!TOPICS[k].fromLesson)return 1;if(S.diff==='auto')return tl(k).lv;return +S.diff}
+function newProblem(){const k=chooseTopic();const p=genTopic(k,pickLv(k));p.topic=k;show(p)}
 function grade(e){e.preventDefault();if(answered){next();return}
   const v=parseAns($('pans').value);
   if(!v){$('pfmt').textContent='看不懂這個答案，請填整數、分數（如 -3/4）或小數。';$('pfmt').classList.add('err');return}
   $('pfmt').textContent='可填整數、分數（如 -3/4）或小數。按 Enter 送出。';$('pfmt').classList.remove('err');
   answered=true;const ok=same(v,cur.ans);
   const st=S.stats[cur.topic]||(S.stats[cur.topic]={r:0,t:0});st.t++;S.total++;
+  let lvMsg='';
+  if(cur.retryIdx===null&&TOPICS[cur.topic].fromLesson&&S.diff==='auto'){const t=tl(cur.topic);
+    if(ok){t.st++;t.miss=0;if(t.st>=3&&t.lv<3){t.lv++;t.st=0;lvMsg=`「${TOPICS[cur.topic].name}」升到 Lv${t.lv} ${LVNAME[t.lv]}`}}
+    else{t.miss++;t.st=0;if(t.miss>=2&&t.lv>1){t.lv--;t.miss=0;lvMsg=`「${TOPICS[cur.topic].name}」先降回 Lv${t.lv} ${LVNAME[t.lv]}練熟`}}}
   if(ok){st.r++;S.right++;S.streak++;S.best=Math.max(S.best,S.streak);if(cur.retryIdx!==null)S.wrong.splice(cur.retryIdx,1)}
-  else{S.streak=0;if(cur.retryIdx===null){S.wrong.unshift({topic:cur.topic,q:cur.q,ans:cur.ans,hint:cur.hint,sol:cur.sol});S.wrong=S.wrong.slice(0,40)}}
+  else{S.streak=0;if(cur.retryIdx===null){S.wrong.unshift({topic:cur.topic,q:cur.q,ans:cur.ans,hint:cur.hint,sol:cur.sol,lv:cur.lv});S.wrong=S.wrong.slice(0,40)}}
   save();
   $('pmark').innerHTML=ok?'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true" style="top:56px"><path d="M50 10 C 80 9, 93 32, 90 54 C 87 80, 62 93, 42 89 C 18 85, 7 62, 12 40 C 16 22, 34 12, 56 13"/></svg>'
     :'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true" style="top:56px"><path d="M20 18 L 82 84"/><path d="M82 16 L 22 86"/></svg>';
   $('pverdict').className='verdict '+(ok?'ok':'no');
-  $('pverdict').innerHTML=ok?`答對了！${S.streak>=3?`<small>已經連續答對 ${S.streak} 題</small>`:''}`:`再想想看<small>正確答案是 ${M(rFmt(cur.ans))}${cur.retryIdx===null?'，已加入錯題本':''}</small>`;
+  $('pverdict').innerHTML=(ok?`答對了！${S.streak>=3?`<small>已經連續答對 ${S.streak} 題</small>`:''}`:`再想想看<small>正確答案是 ${M(rFmt(cur.ans))}${cur.retryIdx===null?'，已加入錯題本':''}</small>`)+(lvMsg?`<small style="display:block;margin:4px 0 0;color:var(--blue)">${lvMsg}</small>`:'');
   $('psol').innerHTML='<h4>詳解</h4>'+cur.sol;$('presult').hidden=false;
   $('pans').disabled=true;$('psubmit').disabled=true;$('phint-btn').disabled=true;$('pnext').focus({preventScroll:true});renderPrac()}
 function next(){qn++;newProblem();$('pans').focus()}
+const DIFFS=[['auto','自動調整'],['1','Lv1 基礎'],['2','Lv2 進階'],['3','Lv3 挑戰']];
+function renderDiff(){$('diff').innerHTML=DIFFS.map(([v,t])=>`<button type="button" class="chip" data-d="${v}" aria-pressed="${S.diff===v}">${t}</button>`).join('');
+  $('diffnote').textContent=S.diff==='auto'?'每個單元連對 3 題升一級，連錯 2 題降一級。（第一、三章只有一種難度）':'第一、三章的單元只有一種難度。'}
 function renderChips(){$('chapters').innerHTML=CHAPTERS.map((c,i)=>`<div class="chapter"><h3>${c}</h3><div class="chips">`+
   Object.entries(TOPICS).filter(([,t])=>t.ch===i).map(([k,t])=>`<button type="button" class="chip" data-k="${k}" aria-pressed="${S.enabled.includes(k)}">${t.name}</button>`).join('')+`</div></div>`).join('')}
 function renderPrac(){
   $('s-total').textContent=S.total;$('s-acc').textContent=S.total?Math.round(100*S.right/S.total)+'%':'—';
   $('s-streak').textContent=S.streak;$('s-best').textContent=S.best;
   $('mastery').innerHTML=Object.entries(TOPICS).map(([k,t])=>{const st=S.stats[k]||{r:0,t:0},p=st.t?st.r/st.t:0;
-    return `<li><span>${t.name}</span><span class="bar"><i class="${st.t>=3&&p<.6?'weak':''}" style="width:${st.t?Math.max(4,p*100):0}%"></i></span><span class="pct">${st.r} / ${st.t}</span></li>`}).join('');
+    return `<li><span>${t.name}${t.fromLesson?`<small style="color:var(--muted)"> Lv${tl(k).lv}</small>`:''}</span><span class="bar"><i class="${st.t>=3&&p<.6?'weak':''}" style="width:${st.t?Math.max(4,p*100):0}%"></i></span><span class="pct">${st.r} / ${st.t}</span></li>`}).join('');
   const tried=Object.entries(S.stats).filter(([k,s])=>TOPICS[k]&&s.t>=3).sort((a,b)=>a[1].r/a[1].t-b[1].r/b[1].t);
   $('advice').innerHTML=!tried.length?'每個單元做滿 3 題後，這裡會告訴你哪裡要加強。'
     :tried[0][1].r/tried[0][1].t<.8?`建議加強：<b>${TOPICS[tried[0][0]].name}</b>（正確率 ${Math.round(100*tried[0][1].r/tried[0][1].t)}%）。`:'目前每個單元都在 80% 以上。';
@@ -862,11 +1111,12 @@ $('wrong').addEventListener('click',e=>{const b=e.target.closest('[data-retry]')
   qn++;show(Object.assign({},S.wrong[i]),i);$('pans').focus()});
 $('reset-area').addEventListener('click',e=>{
   if(e.target.id==='reset')$('reset-area').innerHTML='確定要清除所有作答紀錄、課程進度和錯題本？<button class="linkbtn" id="reset-yes" type="button" style="color:var(--pen)">清除</button><button class="linkbtn" id="reset-no" type="button">取消</button>';
-  else if(e.target.id==='reset-yes'){S=fresh();save();renderChips();renderPrac();openLesson('neg');restoreReset()}
+  else if(e.target.id==='reset-yes'){S=fresh();save();renderDiff();renderChips();renderPrac();openLesson('neg');restoreReset()}
   else if(e.target.id==='reset-no')restoreReset()});
 function restoreReset(){$('reset-area').innerHTML='<button class="linkbtn" id="reset" type="button">清除所有紀錄</button>'}
 
-renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
+$('diff').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;S.diff=b.dataset.d;save();renderDiff();if(!answered&&cur.retryIdx===null)newProblem()});
+renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
 }
 </script>
 
