@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="高一數學第二章「直線與圓」從頭學：白話教學、四級難度練習、大考歷屆題與模擬段考。">
+<meta name="description" content="高一數學、化學、生物從頭學：白話教學、深入理解、四級難度練習與模擬段考。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2317233A'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23CF3127' stroke-width='3'/%3E%3C/svg%3E">
-<title>高一數學練功房</title>
+<title>高一練功房</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
@@ -178,6 +178,34 @@ details summary{cursor:pointer;color:var(--blue);font-size:14px}
 .links{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
 .links li{display:flex;flex-direction:column;border-bottom:1px dashed var(--line);padding-bottom:8px}
 .links a{color:var(--blue);font-weight:500}.links span{font-size:13.5px;color:var(--muted)}
+.hright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:0;max-width:100%}
+@media (max-width:640px){.hright{align-items:stretch;width:100%}.tabs{overflow-x:auto}}
+.subjects{display:flex;gap:6px}
+.subj{font:inherit;font-size:15px;font-weight:500;border:1.5px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:4px 16px;cursor:pointer}
+.subj[aria-pressed="true"]{border-color:var(--pen);color:var(--pen);background:var(--pen-soft)}
+.subj:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.choices{flex-basis:100%;display:flex;flex-direction:column;gap:6px;min-width:0}
+.choice{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:6px;padding:8px 12px;cursor:pointer;background:var(--card);line-height:1.7}
+.choice:hover{border-color:var(--blue)}
+.choice:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+.choice input{margin-top:6px;accent-color:var(--blue);flex:none}
+.choice .key{font-family:var(--f-math);font-weight:600;color:var(--muted);flex:none}
+.choice .ct{min-width:0}
+.choice.right,.choice.right:has(input:checked){border-color:var(--ok);background:var(--ok-soft)}
+.choice.wrong,.choice.wrong:has(input:checked){border-color:var(--pen);background:var(--pen-soft)}
+.choice:has(input:disabled){cursor:default}
+.ans-slot{display:contents}
+.okc{color:var(--ok);font-weight:700}.noc{color:var(--pen);font-weight:700}
+.why{color:var(--muted);font-size:.93em}
+.multi-tag{font-family:var(--f-body);font-size:11.5px;font-weight:500;color:var(--card);background:var(--amber);border-radius:3px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.iso{display:inline-flex;align-items:center;font-family:var(--f-math);white-space:nowrap}
+.nuc{display:inline-flex;flex-direction:column;font-size:.66em;line-height:1.05;text-align:right;margin-right:1px}
+.tblw{overflow-x:auto;max-width:100%}
+.tbl{border-collapse:collapse;font-size:14px;width:100%;min-width:420px}
+.tbl th,.tbl td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}
+.tbl th{background:var(--paper);font-weight:500;white-space:nowrap}
+.lesson section.deep{background:linear-gradient(var(--blue-soft),var(--blue-soft)) left/3px 100% no-repeat}
+.qbox .tblw,.question .tblw{margin:8px 0}
 /* ---- random practice (tab 2) ---- */
 .stats{display:flex;gap:10px;flex-wrap:wrap}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 14px;min-width:84px}
@@ -229,13 +257,20 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
 <div class="wrap">
   <header>
     <div>
-      <h1>高一數學<em>練功房</em></h1>
-      <p class="sub" id="subline">從頭學第二章「直線與圓」：每一課先看懂，再跟著做，最後自己練。</p>
+      <h1>高一<em>練功房</em></h1>
+      <p class="sub" id="subline">從頭學第二章「直線與圓」：每一課先看懂，再深入理解，跟著做，最後自己練。</p>
+    </div>
+    <div class="hright">
+    <div class="subjects" role="group" aria-label="科目">
+      <button class="subj" type="button" data-s="math" aria-pressed="true">數學</button>
+      <button class="subj" type="button" data-s="chem" aria-pressed="false">化學</button>
+      <button class="subj" type="button" data-s="bio" aria-pressed="false">生物</button>
     </div>
     <div class="tabs" role="tablist" aria-label="模式">
       <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="view-learn" type="button">從頭學・第二章</button>
       <button class="tab" role="tab" id="tab-prac" aria-selected="false" aria-controls="view-prac" type="button">隨機練習</button>
       <button class="tab" role="tab" id="tab-past" aria-selected="false" aria-controls="view-past" type="button">考古題・模擬考</button>
+    </div>
     </div>
   </header>
 
@@ -275,8 +310,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
           <div class="sheet-body">
             <div class="question" id="question"></div>
             <form class="answer-row" id="pform" autocomplete="off">
-              <label for="pans">答：</label>
-              <input id="pans" class="ansin" spellcheck="false" aria-describedby="pfmt">
+              <div class="ans-slot" id="pans-slot"></div>
               <button class="btn btn-primary" id="psubmit" type="submit">交卷批改</button>
               <button class="btn btn-ghost" id="phint-btn" type="button">看提示</button>
             </form>
@@ -302,11 +336,11 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   <div id="view-past" role="tabpanel" aria-labelledby="tab-past" hidden>
     <div class="past">
       <section class="pcard"><h2>模擬段考</h2><div id="mock"></div></section>
-      <section class="pcard"><h2>大考歷屆題・直線與圓</h2>
+      <section class="pcard" id="past-math"><h2>大考歷屆題・直線與圓</h2>
         <p class="fmt">以下是大考中心官方試卷中屬於高一「直線與圓」範圍的題目。題目是用我的話重新敘述，數字和原題相同；原題的選項和官方答案請點來源連結。</p>
         <div id="pastlist"></div></section>
-      <section class="pcard"><h2>各校段考原卷</h2>
-        <p class="fmt">段考試題的著作權屬於各校，這裡不轉載，請到學校官方網站下載原卷練習。</p>
+      <section class="pcard"><h2 id="links-title">各校段考原卷</h2>
+        <p class="fmt" id="links-note">段考試題的著作權屬於各校，這裡不轉載，請到學校官方網站下載原卷練習。</p>
         <ul class="links" id="official"></ul></section>
     </div>
   </div>
@@ -374,7 +408,7 @@ const P=(x,y)=>`(${num(x)}, ${num(y)})`;
 const foot=(a,b,c,x0,y0)=>{const t=(a*x0+b*y0+c)/(a*a+b*b);return [x0-a*t,y0-b*t]};
 
 /* ================= lessons (chapter 2) ================= */
-const LESSONS=[
+const MATH_LESSONS=[
 {id:'neg',title:'暖身：正負數加減',
  goal:'這一章的每個公式都會把兩個坐標相減。先把「減掉負數」和「平方」算熟，後面就不會卡。',
  concept:()=>`<div class="prose">
@@ -948,10 +982,10 @@ cline:{n4:`<b>圓上的點到直線的距離：</b>直線和圓不相交時（${
 for(const k in LV4)Object.assign(LV[k],LV4[k]);
 const LVNAME=['','基礎','進階','挑戰','段考壓軸'];
 const MAXLV=4;
-function genLv(l,lv){const g=LV[l.id];const p=lv===4?g.g4():lv===3?g.g3():lv===2?g.g2():l.gen();p.lv=lv;return p}
+function genLv(l,lv){if(l.levels){const p=l.levels[lv-1]();p.lv=lv;return p}const g=LV[l.id];const p=lv===4?g.g4():lv===3?g.g3():lv===2?g.g2():l.gen();p.lv=lv;return p}
 
 /* ================= random practice topics (all chapters) ================= */
-const TOPICS={
+const MATH_TOPICS={
  abs:{ch:0,name:'絕對值不等式',gen(){
    const a=rnd(-6,6),b=rnd(1,7),strict=Math.random()<.4,op=strict?'&lt;':'≤';
    const inner=poly([[1,X],[-a,'']]),lo=a-b,hi=a+b,cnt=strict?2*b-1:2*b+1;
@@ -989,11 +1023,838 @@ const TOPICS={
     hint:`配方成 ${M('<i>a</i>(<i>x</i> − <i>h</i>)<sup>2</sup> + <i>k</i>')}。`,
     sol:`${M(`<i>y</i> = ${lead}${sq(X,h)}${k===0?'':(k<0?' − ':' + ')+Math.abs(k)}`)}，開口${up?'向上':'向下'}，${up?'最小':'最大'}值 <b>${num(k)}</b>。`}}}
 };
-const CHAPTERS=['第一章　數與式','第二章　直線與圓','第三章　多項式函數'];
-const lessonById=id=>LESSONS.find(l=>l.id===id);
+const MATH_CHAPTERS=['第一章　數與式','第二章　直線與圓','第三章　多項式函數'];
+/* ================= science helpers: multiple choice, banks, formulas ================= */
+const ABC='ABCDE';
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+/* single choice: right answer + wrong pool (3 are drawn) */
+function mc(q,right,wrongs,why,extra){
+  const pool=[...new Set(wrongs.map(String))].filter(w=>w!==String(right));
+  const opts=shuffle([String(right),...shuffle(pool).slice(0,3)]);const k=opts.indexOf(String(right));
+  const steps=[].concat(why||[]).concat([`答案是 <b>(${ABC[k]})</b>　${right}`]);
+  return Object.assign({q,choices:opts,ans:[k],steps},extra||{});
+}
+/* multiple choice (段考多選): opts = [[text, isTrue, note], ...] */
+function mcm(q,opts,extra){
+  const o=shuffle(opts);const ans=o.map((x,i)=>x[1]?i:-1).filter(i=>i>=0);
+  const steps=o.map((x,i)=>`(${ABC[i]}) ${x[1]?'<span class="okc">○ 正確</span>':'<span class="noc">✗ 錯誤</span>'}　${x[0]}${x[2]?`<br><span class="why">${x[2]}</span>`:''}`);
+  steps.push(`答案是 <b>${ans.map(i=>'('+ABC[i]+')').join('')}</b>`);
+  return Object.assign({q:q+'<span class="multi-tag">多選</span>',choices:o.map(x=>x[0]),ans,multi:true,steps},extra||{});
+}
+/* a bank of items; avoids repeating the previous one */
+function bank(list){let last=-1;return ()=>{let i;do{i=Math.floor(Math.random()*list.length)}while(list.length>1&&i===last);last=i;const it=list[i];
+  if(typeof it==='function')return it();if(it.m)return mcm(it.q,it.o);return mc(it[0],it[1],it[2],it[3])}}
+const mix=(...g)=>()=>pick(g)();
+/* chemical formula: digits → subscript, ^2- → superscript */
+const F=s=>s.replace(/\^(\d*[+−-])/g,(m,c)=>`<sup>${c.replace('-','−')}</sup>`).replace(/([A-Za-z\)\]])(\d+)/g,'$1<sub>$2</sub>');
+const dec=v=>{const r=Math.round(v*1e6)/1e6;return (r<0?'−':'')+String(Math.abs(r))};      // display decimal
+const RD=v=>{const k=1e6;return R(Math.round(v*k),k)};                                       // decimal → rational
+const exact2=v=>Math.abs(Math.round(v*100)-v*100)<1e-9;                                      // terminates within 2 dp
+const tbl=(head,rows)=>`<div class="tblw"><table class="tbl"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+const near=(v,k=3)=>{const s=new Set();const opts=[v*2,v/2,v+1,v-1,v*10,v/10,v*3,v+2];for(const o of shuffle(opts)){if(o>0&&Math.abs(o-v)>1e-9)s.add(dec(o));if(s.size>=k)break}return [...s]};
+/* ================= CHEMISTRY (高一上 基礎化學) ================= */
+const EL=[null,['H','氫'],['He','氦'],['Li','鋰'],['Be','鈹'],['B','硼'],['C','碳'],['N','氮'],['O','氧'],['F','氟'],['Ne','氖'],['Na','鈉'],['Mg','鎂'],['Al','鋁'],['Si','矽'],['P','磷'],['S','硫'],['Cl','氯'],['Ar','氬'],['K','鉀'],['Ca','鈣']];
+const ELX={26:['Fe','鐵'],29:['Cu','銅'],30:['Zn','鋅'],35:['Br','溴'],47:['Ag','銀'],92:['U','鈾']};
+const sym=z=>(EL[z]||ELX[z])[0],ename=z=>(EL[z]||ELX[z])[1];
+const shells=z=>{const s=[];let r=z;for(const c of [2,8,8,2]){const t=Math.min(c,r);if(t>0)s.push(t);r-=t}return s};
+const NOBLE=[2,10,18];
+const valence=z=>z===2?2:shells(z).slice(-1)[0];
+const groupOf=z=>NOBLE.includes(z)?8:valence(z);              // A 族
+const iso=(A,Z,s,q)=>`<span class="iso"><span class="nuc"><span>${A}</span><span>${Z}</span></span>${s}${q?`<sup>${Math.abs(q)===1?'':Math.abs(q)}${q>0?'+':'−'}</sup>`:''}</span>`;
+const MASS={H:1,C:12,N:14,O:16,Na:23,Mg:24,Al:27,S:32,Cl:35.5,K:39,Ca:40,Fe:56,Cu:64,Zn:65};
+const massLine=els=>`（原子量：${els.map(e=>`${e} = ${MASS[e]}`).join('，')}）`;
+function mw(atoms){return atoms.reduce((a,[e,n])=>a+MASS[e]*n,0)}
+
+const CHEM_LESSONS=[
+/* ---------- 1 物質的分類與分離 ---------- */
+{id:'c_mat',unit:'第一章　物質的組成與原子構造',title:'物質的分類與分離',
+ goal:'能分辨純物質、混合物、元素、化合物，並依照「成分哪裡不一樣」選出正確的分離方法。',
+ concept:()=>`<div class="prose"><p>所有物質先問一個問題：<b>組成固定嗎？</b></p>
+  <ul><li><b>純物質</b>：組成固定，有固定的熔點、沸點、密度。再分成<b>元素</b>（只有一種原子，如 ${F('O2')}、Fe）和<b>化合物</b>（兩種以上元素以固定比例結合，如 ${F('H2O')}、NaCl）。</li>
+  <li><b>混合物</b>：組成可以改變，沒有固定沸點。<b>均勻</b>混合物（溶液、合金、空氣）看不出界線；<b>不均勻</b>混合物（泥水、牛奶、花崗岩）看得出不同部分。</li></ul></div>
+  ${tbl(['分離方法','利用的差異','典型例子'],[['過濾','顆粒大小（固體不溶於液體）','泥水、咖啡渣'],['蒸餾','沸點不同','海水製蒸餾水、酒精與水'],['分餾','多種沸點接近的成分','石油分餾'],['萃取','在兩種互不相溶溶劑中的溶解度','用正己烷從碘水萃取碘'],['再結晶','溶解度隨溫度變化的程度不同','硝酸鉀中混有少量食鹽'],['層析','對固定相（濾紙）的吸附力、在流動相的溶解度','分離色素、墨水'],['昇華','能直接由固體變氣體','碘、萘（樟腦丸）與沙']])}
+  <div class="tip"><b>常見錯誤：</b>「冰水混合物」名字有混合，但只有 ${F('H2O')} 一種物質，是<b>純物質</b>。反過來，鹽酸（HCl 的水溶液）、18K 金、空氣、礦泉水都是<b>混合物</b>。</div>`,
+ deep:()=>`<div class="prose"><p><b>為什麼純物質有固定沸點、混合物沒有？</b>純物質的粒子都一樣，要拉開它們所需的能量相同，所以溫度到了就一起沸騰，溫度在沸騰期間保持不變。混合物裡有不同的粒子，容易汽化的先跑掉，剩下的液體組成一直改變，所以沸騰時溫度會一路上升。這就是段考「加熱曲線」題的判斷依據：<b>有水平線（溫度不變的平台）＝純物質</b>。</p>
+  <p><b>同素異形體</b>：同一種元素組成、結構不同的物質，例如氧氣 ${F('O2')} 與臭氧 ${F('O3')}、石墨與鑽石與 ${F('C60')}、紅磷與白磷。它們各自都是元素（純物質），但把氧氣和臭氧混在一起就成了混合物。</p>
+  <p><b>層析的 R<sub>f</sub> 值</b>：R<sub>f</sub> ＝ 成分移動的距離 ÷ 溶劑前緣移動的距離，一定介於 0 和 1 之間。在相同濾紙和溶劑下，同一種物質的 R<sub>f</sub> 固定，可以用來辨認成分。R<sub>f</sub> 越大，代表它越容易被溶劑帶著走（對濾紙吸附力小）。</p></div>`,
+ example:{q:'加熱一杯液體，溫度在 78 °C 停留一段時間後繼續上升，到 100 °C 又停留一段時間。這杯液體是什麼？應該用什麼方法分離？',steps:[
+  '出現兩段溫度不變的平台，代表有兩種成分在不同溫度沸騰，所以它是<b>混合物</b>，不是純物質。',
+  '78 °C 接近乙醇的沸點，100 °C 是水的沸點，所以大概是酒精和水的混合溶液。',
+  '兩者都是液體、互溶，但沸點不同，用<b>蒸餾</b>（或分餾）分離。']},
+ notes:{2:'分離方法的關鍵是先找出「兩種成分哪一個性質不一樣」，再對應到方法。',3:'這一級會計算層析的 R<sub>f</sub> 值，也會出現加熱曲線的判讀。',4:'段考多選題：每個選項都要獨立判斷，常見陷阱是名稱含「混合」或「純」的物質。'},
+ levels:[
+  bank([
+   ['下列何者是<b>純物質</b>？','冰水混合物',['鹽酸','空氣','18K 金','礦泉水'],'冰和水都是 H₂O，只是狀態不同，組成固定。'],
+   ['下列何者是<b>化合物</b>？','二氧化碳 '+F('CO2'),['氧氣 '+F('O2'),'臭氧 '+F('O3'),'鑽石','糖水'],'化合物由兩種以上元素以固定比例組成。CO₂ 含碳和氧。氧氣、臭氧、鑽石都只有一種元素。'],
+   ['下列何者是<b>元素</b>？','臭氧 '+F('O3'),['水 '+F('H2O'),'食鹽 NaCl','酒精','黃銅'],'臭氧只含氧原子，是元素（氧的同素異形體）。'],
+   ['下列何者是<b>均勻混合物</b>？','不鏽鋼',['泥水','花崗岩','乾冰','蒸餾水'],'合金是金屬均勻混合，看不出界線。乾冰、蒸餾水是純物質；泥水、花崗岩看得出不同部分。'],
+   ['下列哪一組互為<b>同素異形體</b>？','石墨與鑽石',['水與過氧化氫','氕與氘','一氧化碳與二氧化碳','冰與水'],'同素異形體：同一種元素、不同結構的單質。氕與氘是同位素（原子層次）；水與過氧化氫是不同化合物。']]),
+  bank([
+   ['從海水中取得飲用的淡水，最適合用哪一種方法？','蒸餾',['過濾','萃取','層析','昇華'],'鹽溶在水裡，過濾濾不掉。水的沸點遠低於鹽，加熱讓水汽化再冷凝即可。'],
+   ['沙子裡混了碘粉，最簡便的分離方法是？','昇華',['過濾','蒸餾','再結晶','層析'],'碘加熱會直接昇華成氣體，冷卻後在冷的表面凝華回固體，沙子留在原處。'],
+   ['硝酸鉀中混有少量氯化鈉，要得到純的硝酸鉀，最適合的方法是？','再結晶',['蒸餾','過濾','昇華','萃取'],'硝酸鉀的溶解度隨溫度變化很大，氯化鈉幾乎不變。熱水溶解後冷卻，析出的大多是硝酸鉀。'],
+   ['要分析黑色簽字筆墨水含有哪些色素，應該用？','層析',['蒸餾','過濾','昇華','再結晶'],'不同色素對濾紙的吸附力不同，被溶劑帶動的距離不同，就會分開成不同色帶。'],
+   ['用正己烷把碘從碘水中取出來，利用的是？','萃取',['蒸餾','過濾','層析','昇華'],'碘在正己烷中的溶解度比在水中大，而正己烷和水互不相溶，可以用分液漏斗分層取出。'],
+   ['石油中有許多沸點相近的碳氫化合物，工業上用什麼方法分開？','分餾',['過濾','萃取','再結晶','昇華'],'分餾是多次的蒸餾，在分餾塔中依沸點範圍分出汽油、煤油、柴油等。']]),
+  mix(()=>{const ds=pick([8,10,12,15,16,20]);let d;do{d=rnd(1,ds-1)}while(false);const r=R(d,ds);
+    return{q:`紙層析實驗中，溶劑前緣距離原點 ${ds} 公分，某色素斑點距離原點 ${d} 公分。這個色素的 R<sub>f</sub> 值是多少？（分數或小數皆可）`,ans:r,steps:[
+     `R<sub>f</sub> ＝ 色素移動距離 ÷ 溶劑前緣移動距離。注意兩個都從<b>原點</b>量起。`,
+     `${M(`R<sub>f</sub> = ${fr(d,ds)} = ${rFmt(r)}`)}，答案是 <b>${M(rFmt(r))}</b>。`]}},
+   ()=>{const ds=pick([10,12,15,20]),r=pick([[1,4],[1,2],[3,4],[2,5],[3,5],[1,5],[4,5],[2,3],[1,3]]);if(ds*r[0]%r[1])return LEVELS_RETRY();const d=ds*r[0]/r[1];
+    return{q:`在相同的濾紙與溶劑下，物質 X 的 R<sub>f</sub> 值固定為 ${fr(r[0],r[1])}。若這次溶劑前緣移動了 ${ds} 公分，X 的斑點離原點幾公分？`,ans:[d,1],steps:[
+     `R<sub>f</sub> ＝ 移動距離 ÷ 溶劑前緣距離，所以移動距離 ＝ R<sub>f</sub> × 溶劑前緣距離。`,
+     `${M(`${fr(r[0],r[1])} × ${ds} = ${d}`)}，答案是 <b>${d}</b> 公分。`]}},
+   bank([['加熱某液體並記錄溫度，結果溫度一路上升，沒有出現任何溫度不變的平台。這液體最可能是？','混合物',['純物質','元素','化合物'],'純物質沸騰時溫度固定，會出現平台；一路上升代表組成在改變，是混合物。']])),
+  bank([
+   {m:1,q:'下列關於物質分類的敘述，哪些正確？',o:[['冰水混合物是純物質',true,'只有 H₂O 一種物質'],['鹽酸是化合物',false,'鹽酸是 HCl 溶在水中的溶液，屬於混合物；HCl 本身才是化合物'],['臭氧和氧氣混合後仍是純物質',false,'兩種不同的物質混在一起就是混合物'],['純物質一定有固定的熔點和沸點',true,'組成固定，熔沸點固定'],['合金是均勻混合物',true,'金屬原子均勻分布']]},
+   {m:1,q:'下列分離方法與其利用的性質，哪些配對正確？',o:[['蒸餾－沸點不同',true,''],['過濾－溶解度隨溫度的變化',false,'過濾利用顆粒大小；溶解度隨溫度變化是再結晶'],['層析－對固定相吸附力不同',true,''],['萃取－密度不同',false,'萃取利用在兩種互不相溶溶劑中的溶解度差異；分液漏斗會分層是因為密度不同，但分離依據是溶解度'],['昇華－能直接由固態變氣態',true,'']]},
+   {m:1,q:'某生做紙層析，溶劑前緣移動 10 cm，A、B 兩斑點分別移動 3 cm、7 cm。下列哪些正確？',o:[['A 的 R<sub>f</sub> 值為 0.3',true,'3 ÷ 10'],['B 對濾紙的吸附力比 A 大',false,'B 跑得遠，代表較不被濾紙吸住，吸附力較小'],['B 的 R<sub>f</sub> 值為 0.7',true,'7 ÷ 10'],['換一種溶劑，A、B 的 R<sub>f</sub> 值不會改變',false,'R<sub>f</sub> 只有在相同濾紙與溶劑條件下才固定'],['原點的墨水點應該浸在溶劑液面以下',false,'原點要高於液面，否則色素會直接溶進溶劑裡']]}])]},
+
+/* ---------- 2 原子說與基本定律 ---------- */
+{id:'c_law',unit:'第一章　物質的組成與原子構造',title:'原子說與化學基本定律',
+ goal:'會用質量守恆、定比定律、倍比定律、氣體化合體積定律解計算題，並知道道耳頓原子說哪些地方被修正。',
+ concept:()=>`${tbl(['定律','提出者','內容'],[['質量守恆定律','拉瓦節','化學反應前後，物質的總質量不變'],['定比定律','普魯斯特','同一種化合物，組成元素的質量比固定（水中 H : O ＝ 1 : 8）'],['倍比定律','道耳頓','兩元素形成多種化合物時，與固定質量甲元素結合的乙元素質量成簡單整數比'],['氣體化合體積定律','給呂薩克','同溫同壓下，參與反應的各氣體體積成簡單整數比'],['亞佛加厥定律','亞佛加厥','同溫同壓下，同體積的氣體含有相同數目的分子']])}
+  <div class="prose"><p><b>道耳頓原子說</b>（1803）的重點：物質由不可分割的原子組成；同元素原子質量、性質相同；化學反應是原子重新排列，原子不會產生或消失；化合物由不同原子以簡單整數比結合。</p>
+  <p>後來被修正的地方：原子<b>可以再分</b>（有電子、質子、中子）；同元素原子質量<b>不一定相同</b>（同位素）；核反應中原子<b>會轉變</b>成別的元素。</p></div>
+  <div class="tip"><b>常見錯誤：</b>道耳頓的原子說<b>無法解釋</b>氣體化合體積定律（例如 2 體積氫＋1 體積氧 → 2 體積水蒸氣），因為他以為氣體元素是單一原子。亞佛加厥提出「分子」的概念（${F('H2')}、${F('O2')} 是雙原子分子）才解決。</div>`,
+ deep:()=>`<div class="prose"><p><b>定比定律怎麼用來算題目？</b>以 MgO 為例，Mg : O ＝ 24 : 16 ＝ 3 : 2。如果把 6 g Mg 和 6 g O 放在一起反應，6 g Mg 只需要 4 g O，所以 O 會剩 2 g，生成 MgO 10 g。這就是「限量」的觀念：<b>按比例先用完的那個決定產量</b>。</p>
+  <p><b>倍比定律的計算步驟</b>：① 把每個化合物都換算成「1 g（或相同質量）甲元素配多少 g 乙元素」；② 把這些乙元素的質量相比，化成最簡整數比。例如 CO 中 C : O ＝ 12 : 16，${F('CO2')} 中 C : O ＝ 12 : 32，固定 C 為 12 g 時 O 為 16 : 32 ＝ 1 : 2。</p>
+  <p><b>亞佛加厥定律的威力</b>：同溫同壓下「體積比 ＝ 分子數比 ＝ 反應式係數比」。所以 1 體積 ${F('N2')} ＋ 3 體積 ${F('H2')} → 2 體積氣體 X，代表 1 個 ${F('N2')} ＋ 3 個 ${F('H2')} → 2 個 X，數原子：每個 X 有 1 個 N、3 個 H，X 是 ${F('NH3')}。</p></div>`,
+ example:{q:'碳的兩種氧化物：甲含碳 3 g、氧 4 g；乙含碳 6 g、氧 16 g。與等質量碳結合的氧，甲 : 乙是多少？',steps:[
+  '把碳統一成 3 g：甲是 3 g 碳配 4 g 氧；乙是 6 g 碳配 16 g 氧，除以 2 變成 3 g 碳配 8 g 氧。',
+  '等質量碳時，氧的質量比 ＝ 4 : 8 ＝ <b>1 : 2</b>。這符合倍比定律，甲是 CO、乙是 CO₂。']},
+ notes:{2:'定比定律計算：先寫出化合物中兩元素的固定質量比，再看誰先用完。',3:'倍比定律：把甲元素的質量調成一樣，再比較乙元素的質量。',4:'由氣體體積比推分子式，用的是亞佛加厥定律：體積比 ＝ 分子數比。'},
+ levels:[
+  mix(()=>{const a=rnd(2,9)*2,b=rnd(1,8)*2,c=rnd(1,a+b-1);
+    return{q:`在密閉容器中，${a} g 的甲與 ${b} g 的乙完全反應，生成丙和 ${c} g 的丁。依質量守恆定律，丙有幾克？`,ans:[a+b-c,1],steps:[
+     `質量守恆：反應物總質量 ＝ 生成物總質量。`,`${M(`${a} + ${b} = 丙 + ${c}`)} ⇒ 丙 ＝ <b>${a+b-c}</b> g。`]}},
+   bank([
+    ['「同一種化合物，組成元素的質量比固定」是哪一個定律？','定比定律',['質量守恆定律','倍比定律','氣體化合體積定律','亞佛加厥定律'],'這是普魯斯特的定比定律。'],
+    ['道耳頓原子說中，下列哪一項後來被證明是錯的？','原子不可再分割',['化學反應是原子的重新排列','化合物由不同原子以簡單整數比組成','化學反應中原子不會憑空消失'],'原子內有電子、質子、中子，可以再分。'],
+    ['哪一個概念的提出，解決了道耳頓原子說無法解釋氣體化合體積定律的問題？','分子',['同位素','原子核','電子'],'亞佛加厥提出氣體元素以分子（如 H₂、O₂）存在，才能解釋體積比。']])),
+  ()=>{const C=pick([['Mg','O','MgO',3,2],['C','O','CO₂',3,8],['H','O','H₂O',1,8],['Fe','S','FeS',7,4],['Cu','O','CuO',4,1],['Ca','O','CaO',5,2]]),[x,y,nm,a,b]=C;
+    let kx,ky;do{kx=rnd(1,6);ky=rnd(1,6)}while(kx===ky);const mx=a*kx,my=b*ky,k=Math.min(kx,ky),prod=(a+b)*k,left=kx>ky?[x,(kx-ky)*a]:[y,(ky-kx)*b];
+    const askLeft=Math.random()<.4;
+    return{q:`${nm} 中 ${x} 與 ${y} 的質量比固定為 ${a} : ${b}。取 ${mx} g 的 ${x} 與 ${my} g 的 ${y} 充分反應，${askLeft?`剩下的反應物有幾克？`:`最多可生成 ${nm} 幾克？`}`,ans:[askLeft?left[1]:prod,1],steps:[
+     `${mx} g 的 ${x} 需要 ${y}：${M(`${mx} × ${fr(b,a)} = ${b*kx}`)} g；手上有 ${my} g。`,
+     kx>ky?`${y} 不夠，所以 ${y} 先用完（限量），${x} 會剩下。`:`${y} 足夠（${b*kx} ≤ ${my}），所以 ${x} 先用完（限量），${y} 會剩下。`,
+     askLeft?`剩下的是 ${left[0]}：${left[0]===x?M(`${mx} − ${a*k}`):M(`${my} − ${b*k}`)} = <b>${left[1]}</b> g。`:`生成 ${nm}：${x} ${a*k} g ＋ ${y} ${b*k} g ＝ <b>${prod}</b> g。`]}},
+  ()=>{const P=pick([[['N₂O',28,16],['NO₂',14,32]],[['NO',14,16],['N₂O₅',28,80]],[['FeO',56,16],['Fe₂O₃',112,48]],[['Cu₂O',128,16],['CuO',64,16]],[['SO₂',32,32],['SO₃',32,48]],[['CO',12,16],['CO₂',12,32]],[['N₂O₃',28,48],['NO₂',14,32]]]);
+    const s1=pick([.5,1,2,3]),s2=pick([.5,1,2,1.5]),[n1,a1,b1]=P[0],[n2,a2,b2]=P[1];const A1=a1*s1,B1=b1*s1,A2=a2*s2,B2=b2*s2;const r=R(b1*a2,a1*b2);
+    return{q:`兩種化合物都由元素 X 和氧組成：甲含 X ${dec(A1)} g、氧 ${dec(B1)} g；乙含 X ${dec(A2)} g、氧 ${dec(B2)} g。與等質量 X 結合的氧，質量比 甲 : 乙 ＝ ? （請填成分數，例如 1:2 填 1/2）`,ans:r,steps:[
+     `換算成「每 1 g X 配多少 g 氧」：甲 ${M(fr(dec(B1),dec(A1)))}、乙 ${M(fr(dec(B2),dec(A2)))}。`,
+     `相比：${M(`${fr(dec(B1),dec(A1))} : ${fr(dec(B2),dec(A2))} = ${r[0]} : ${r[1]}`)}（甲、乙其實是 ${n1} 和 ${n2}）。`,
+     `答案是 <b>${M(rFmt(r))}</b>，即 ${r[0]} : ${r[1]}，符合倍比定律。`]}},
+  mix(()=>{const RX=pick([[1,'A₂',3,'B₂',2,'AB₃',1,3],[2,'A₂',1,'B₂',2,'A₂B',2,1],[1,'A₂',1,'B₂',2,'AB',1,1],[1,'A₂',2,'B₂',2,'AB₂',1,2],[2,'A₂',3,'B₂',2,'A₂B₃',2,3],[2,'A₂',5,'B₂',2,'A₂B₅',2,5],[3,'A₂',1,'B₂',2,'A₃B',3,1]]);
+    const [p,,q,,r,,m,n]=RX,k=pick([10,20,5]);
+    return{q:`同溫同壓下，${p*k} mL 的 ${F('A2')} 氣體與 ${q*k} mL 的 ${F('B2')} 氣體恰好完全反應，生成 ${r*k} mL 的氣體 C。若 C 的分子式為 A<sub><i>m</i></sub>B<sub><i>n</i></sub>，求 ${M('<i>m</i> + <i>n</i>')}。`,ans:[m+n,1],steps:[
+     `亞佛加厥定律：同溫同壓下體積比 ＝ 分子數比，所以 ${p} A₂ ＋ ${q} B₂ → ${r} C。`,
+     `原子守恆：A 原子 ${2*p} 個、B 原子 ${2*q} 個，平均分到 ${r} 個 C，每個 C 有 A ${2*p/r} 個、B ${2*q/r} 個。`,
+     `C 為 A<sub>${m}</sub>B<sub>${n}</sub>，${M(`<i>m</i> + <i>n</i> = ${m+n}`)}，答案是 <b>${m+n}</b>。`]}},
+   bank([{m:1,q:'關於化學基本定律與原子說，下列哪些正確？',o:[['倍比定律是道耳頓為支持原子說而提出的',true,''],['同位素的發現修正了「同元素原子質量都相同」',true,''],['道耳頓原子說可以完整解釋氣體化合體積定律',false,'他把氣體元素當成單原子，無法解釋；要靠亞佛加厥的分子說'],['化學反應前後分子總數一定不變',false,'例如 N₂ + 3H₂ → 2NH₃，分子數由 4 變 2；不變的是原子數與總質量'],['核反應中原子會轉變成其他元素，修正了原子說',true,'']]}]))]},
+
+/* ---------- 3 原子量、分子量與莫耳 ---------- */
+{id:'c_mol',unit:'第一章　物質的組成與原子構造',title:'原子量、分子量與莫耳',
+ goal:'熟練「質量 ⇄ 莫耳 ⇄ 粒子數」的換算，並能處理結晶水這類多步驟題。',
+ concept:()=>`<div class="prose"><p>原子太小，一個一個數不實際。化學家用「一打」的概念，定義 <b>1 莫耳（mol）＝ 6.02 × 10<sup>23</sup> 個</b>粒子，這個數叫<b>亞佛加厥數</b>。</p>
+  <p><b>原子量</b>是相對質量：規定 <sup>12</sup>C 原子的質量為 12，其他原子和它比較。原子量沒有單位，但 <b>1 莫耳原子的質量（克）＝ 原子量</b>，這就是莫耳好用的原因。分子量 ＝ 分子中所有原子的原子量總和；離子化合物（如 NaCl）沒有分子，改叫<b>式量</b>。</p></div>
+  <div class="formula">${M('莫耳數 = <span class="frac"><span>質量（g）</span><span>莫耳質量（g/mol）</span></span> = <span class="frac"><span>粒子數</span><span>6.02 × 10<sup>23</sup></span></span>')}<small>莫耳是中間站：質量和粒子數都要先換成莫耳</small></div>
+  <div class="tip"><b>常見錯誤：</b>題目問「原子數」還是「分子數」要看清楚。1 mol ${F('H2O')} 有 1 mol 分子，但有 3 mol 原子（2 mol H ＋ 1 mol O）。</div>`,
+ deep:()=>`<div class="prose"><p><b>為什麼 1 莫耳原子的質量剛好等於原子量克？</b>因為莫耳的數目就是這樣挑出來的：12 g 的 <sup>12</sup>C 裡剛好有 6.02 × 10<sup>23</sup> 個原子。其他原子的原子量都是「跟 <sup>12</sup>C 比」，所以同樣數目的原子，質量就是原子量克。</p>
+  <p><b>一個分子有多重？</b>${F('H2O')} 的莫耳質量 18 g/mol，一個分子質量 ＝ 18 ÷ (6 × 10<sup>23</sup>) ＝ 3 × 10<sup>−23</sup> g。段考常考這種「單一粒子質量」。</p>
+  <p><b>結晶水</b>：像 ${F('CuSO4')}·5${F('H2O')}（膽礬，藍色）加熱會失去結晶水變成白色 ${F('CuSO4')}。失去的質量就是水，用「無水物的莫耳數 : 水的莫耳數 ＝ 1 : <i>n</i>」就能求出結晶水數。</p>
+  <p class="fmt">本網站計算題的亞佛加厥數一律用 6 × 10<sup>23</sup>，讓答案是整數。</p></div>`,
+ example:{q:'9 g 的水（H₂O）有幾莫耳分子？共有幾個原子？（H = 1，O = 16，亞佛加厥數用 6 × 10²³）',steps:[
+  'H₂O 的分子量 ＝ 1 × 2 ＋ 16 ＝ 18，莫耳質量 18 g/mol。',
+  '莫耳數 ＝ 9 ÷ 18 ＝ 0.5 mol（分子）。',
+  '每個水分子有 3 個原子，原子共 0.5 × 3 ＝ 1.5 mol。',
+  '原子數 ＝ 1.5 × 6 × 10²³ ＝ <b>9 × 10²³</b> 個。']},
+ notes:{2:'這一級要從莫耳數算出粒子數。注意題目問的是分子數還是原子數。',3:'比較不同物質的原子數，或計算單一分子的質量。',4:'結晶水題：失去的質量就是水，用莫耳數比求 n。'},
+ levels:[
+  ()=>{const C=pick([['H₂O',[['H',2],['O',1]]],['CO₂',[['C',1],['O',2]]],['CH₄',[['C',1],['H',4]]],['NH₃',[['N',1],['H',3]]],['NaOH',[['Na',1],['O',1],['H',1]]],['CaCO₃',[['Ca',1],['C',1],['O',3]]],['O₂',[['O',2]]],['MgO',[['Mg',1],['O',1]]],['C₆H₁₂O₆',[['C',6],['H',12],['O',6]]],['SO₂',[['S',1],['O',2]]]]);
+    const M_=mw(C[1]),n=pick([0.1,0.2,0.25,0.5,1,1.5,2,3,0.05]),m=M_*n,askM=Math.random()<.4;
+    return{q:askM?`${dec(n)} 莫耳的 ${C[0]} 重幾克？${massLine(C[1].map(x=>x[0]))}`:`${dec(m)} g 的 ${C[0]} 是幾莫耳？${massLine(C[1].map(x=>x[0]))}`,ans:RD(askM?m:n),steps:[
+     `${C[0]} 的分子量（式量）＝ ${C[1].map(([e,k])=>`${MASS[e]}${k>1?' × '+k:''}`).join(' ＋ ')} ＝ ${M_}`,
+     askM?`質量 ＝ 莫耳數 × 莫耳質量 ＝ ${dec(n)} × ${M_} ＝ <b>${dec(m)}</b> g`:`莫耳數 ＝ ${dec(m)} ÷ ${M_} ＝ <b>${dec(n)}</b> mol`]}},
+  ()=>{const C=pick([['H₂O',[['H',2],['O',1]],3],['CO₂',[['C',1],['O',2]],3],['CH₄',[['C',1],['H',4]],5],['NH₃',[['N',1],['H',3]],4],['O₃',[['O',3]],3],['C₂H₆',[['C',2],['H',6]],8],['SO₃',[['S',1],['O',3]],4]]);
+    const M_=mw(C[1]),n=pick([0.5,1,1.5,2,0.25,0.1]),m=M_*n,askAtoms=Math.random()<.6,val=n*6*(askAtoms?C[2]:1);
+    return{q:`${dec(m)} g 的 ${C[0]} 含有多少個${askAtoms?'<b>原子</b>':'<b>分子</b>'}？請以「× 10<sup>23</sup> 個」為單位作答（亞佛加厥數用 6 × 10<sup>23</sup>）。${massLine(C[1].map(x=>x[0]))}`,ans:RD(val),steps:[
+     `分子量 ${M_}，莫耳數 ＝ ${dec(m)} ÷ ${M_} ＝ ${dec(n)} mol（分子）`,
+     askAtoms?`每個 ${C[0]} 分子有 ${C[2]} 個原子：原子 ${dec(n)} × ${C[2]} ＝ ${dec(n*C[2])} mol`:`分子就是 ${dec(n)} mol`,
+     `個數 ＝ ${dec(askAtoms?n*C[2]:n)} × 6 × 10<sup>23</sup> ＝ <b>${dec(val)}</b> × 10<sup>23</sup> 個`]}},
+  mix(()=>{const L=[['H₂O',18,3],['CO₂',44,3],['CH₄',16,5],['NH₃',17,4],['O₂',32,2],['He',4,1],['N₂',28,2],['C₂H₆',30,8]];const ch=shuffle(L).slice(0,4).map(x=>{const g=pick([1,2,4,8])*x[1]/4;return [...x,g,g/x[1]*x[2]]});
+    const best=ch.reduce((a,b)=>b[4]>a[4]?b:a);if(ch.filter(x=>Math.abs(x[4]-best[4])<1e-9).length>1)return LEVELS_RETRY();
+    return mc(`下列各物質中，哪一個所含的<b>原子總數最多</b>？（H = 1，He = 4，C = 12，N = 14，O = 16）`,`${dec(best[3])} g ${best[0]}`,ch.filter(x=>x!==best).map(x=>`${dec(x[3])} g ${x[0]}`),
+     ch.map(x=>`${dec(x[3])} g ${x[0]}：${dec(x[3])} ÷ ${x[1]} ＝ ${dec(x[3]/x[1])} mol 分子，× ${x[2]} ＝ <b>${dec(x[4])}</b> mol 原子`))},
+   ()=>{const C=pick([['H₂O',18],['NO',30],['C₂H₆',30],['O₃',48],['C₃H₆',42],['CH₃COOH',60],['C₆H₁₂O₆',180]]);const v=C[1]/6;
+    return{q:`一個 ${C[0]} 分子的質量是多少克？請以「× 10<sup>−23</sup> g」為單位作答（分子量 ${C[1]}，亞佛加厥數用 6 × 10<sup>23</sup>）。`,ans:RD(v),steps:[
+     `1 mol（6 × 10<sup>23</sup> 個）${C[0]} 重 ${C[1]} g。`,`一個分子 ＝ ${C[1]} ÷ (6 × 10<sup>23</sup>) ＝ ${dec(v)} × 10<sup>−23</sup> g，答案是 <b>${dec(v)}</b>。`]}}),
+  mix(()=>{const H=pick([['CuSO₄',160,5],['CuSO₄',160,3],['Na₂CO₃',106,10],['MgSO₄',120,7],['CaSO₄',136,2],['BaCl₂',208,2]]);const [nm,Ma,n]=H,mol=pick([0.01,0.02,0.05,0.1]);
+    const anh=Ma*mol,water=18*n*mol,tot=anh+water;
+    return{q:`${nm}·<i>n</i>H₂O 晶體 ${dec(tot)} g 加熱到完全失去結晶水，剩下無水 ${nm} ${dec(anh)} g。求 <i>n</i>。（${nm} 的式量 ${Ma}，H₂O ＝ 18）`,ans:[n,1],steps:[
+     `失去的水 ＝ ${dec(tot)} − ${dec(anh)} ＝ ${dec(water)} g`,
+     `無水物：${dec(anh)} ÷ ${Ma} ＝ ${dec(mol)} mol；水：${dec(water)} ÷ 18 ＝ ${dec(n*mol)} mol`,
+     `莫耳數比 1 : <i>n</i> ＝ ${dec(mol)} : ${dec(n*mol)}，<i>n</i> ＝ <b>${n}</b>`]}},
+   ()=>{const X=pick([[24,'Mg',2],[40,'Ca',2],[56,'Fe',3],[27,'Al',3],[64,'Cu',2]]);const [A,s,v]=X,mol=pick([0.1,0.2,0.05]),g=A*mol*2,oxid=v===2?`${s}O`:`${s}₂O₃`,om=v===2?(A+16)*mol*2:(2*A+48)*mol;
+    return{q:`某金屬 M ${dec(g)} g 完全燃燒，生成氧化物 ${dec(om)} g。若該氧化物的化學式為 ${v===2?'MO':'M₂O₃'}，求 M 的原子量。（O ＝ 16）`,ans:[A,1],steps:[
+     `結合的氧 ＝ ${dec(om)} − ${dec(g)} ＝ ${dec(om-g)} g ＝ ${dec((om-g)/16)} mol O 原子`,
+     v===2?`MO 中 M : O 原子數 ＝ 1 : 1，所以 M 也是 ${dec((om-g)/16)} mol`:`M₂O₃ 中 M : O ＝ 2 : 3，所以 M ＝ ${dec((om-g)/16)} × ${fr(2,3)} ＝ ${dec((om-g)/16*2/3)} mol`,
+     `原子量 ＝ ${dec(g)} ÷ ${dec(v===2?(om-g)/16:(om-g)/16*2/3)} ＝ <b>${A}</b>（這是 ${s}）`]}})]},
+
+/* ---------- 4 原子結構與同位素 ---------- */
+{id:'c_atom',unit:'第一章　物質的組成與原子構造',title:'原子結構與同位素',
+ goal:'看到原子或離子符號就能算出質子、中子、電子數，會算平均原子量，並了解原子模型的演變。',
+ concept:()=>`<div class="prose"><p>原子由<b>原子核</b>（質子＋中子）和核外的<b>電子</b>組成。符號 ${iso('<i>A</i>','<i>Z</i>','X')} 中：</p>
+  <ul><li><b>原子序 Z ＝ 質子數</b>，決定是哪一種元素。</li><li><b>質量數 A ＝ 質子數 ＋ 中子數</b>，所以中子數 ＝ A − Z。</li><li>中性原子：電子數 ＝ 質子數。<b>離子</b>：電子數 ＝ Z − 電荷，例如 ${iso(24,12,'Mg',2)} 有 12 − 2 ＝ 10 個電子。</li></ul>
+  <p><b>同位素</b>：質子數相同、中子數不同的原子，例如 ${iso(1,1,'H')}（氕）、${iso(2,1,'H')}（氘）、${iso(3,1,'H')}（氚）。化學性質幾乎相同（因為電子數一樣），物理性質（質量、密度）不同。</p></div>
+  ${tbl(['科學家','實驗／貢獻','原子模型'],[['湯姆森','陰極射線，發現電子','葡萄乾布丁模型'],['拉塞福','α 粒子散射實驗，發現原子核','行星模型：質量集中在很小的原子核'],['查兌克','發現中子','—'],['波耳','氫原子光譜','電子在特定能階（殼層）運動']])}
+  <div class="formula">平均原子量 ＝ Σ（同位素質量 × 存在比例）<small>週期表上的原子量是平均值，所以常常不是整數</small></div>`,
+ deep:()=>`<div class="prose"><p><b>拉塞福實驗為什麼能推出原子核？</b>他用 α 粒子（帶正電）射向金箔：絕大多數直接穿過 → 原子大部分是空的；極少數大角度反彈 → 有一個質量很大、帶正電、體積極小的核心。這個推理過程是段考實驗題的重點。</p>
+  <p><b>平均原子量的反向計算</b>：氯有 <sup>35</sup>Cl 和 <sup>37</sup>Cl，平均原子量 35.5。設 <sup>37</sup>Cl 佔 <i>x</i>，則 35(1 − <i>x</i>) ＋ 37<i>x</i> ＝ 35.5，<i>x</i> ＝ 0.25，也就是 25%。</p>
+  <p><b>分子的同位素組合</b>：${F('Cl2')} 分子有 <sup>35</sup>Cl–<sup>35</sup>Cl、<sup>35</sup>Cl–<sup>37</sup>Cl、<sup>37</sup>Cl–<sup>37</sup>Cl 三種質量（70、72、74）。比例用機率乘法：(3/4)² : 2 × (3/4)(1/4) : (1/4)² ＝ 9 : 6 : 1。注意中間那種要乘 2，因為兩個位置可以互換。</p></div>`,
+ example:{q:`${iso(32,16,'S',-2)} 有幾個質子、中子、電子？`,steps:['原子序 16 → 質子 16 個。','中子 ＝ 質量數 − 質子 ＝ 32 − 16 ＝ 16 個。','帶 2− 代表多了 2 個電子：16 ＋ 2 ＝ <b>18</b> 個電子。']},
+ notes:{2:'離子題：電子數 ＝ 原子序 − 電荷（負電荷就是加）。也會反過來由電子數推回元素。',3:'平均原子量正算與反算：設比例為 x，列一次方程式。',4:'分子的同位素組合：先數有幾種組合，再用機率乘法算比例。'},
+ levels:[
+  ()=>{const L=[[1,1],[1,2],[1,3],[6,12],[6,13],[6,14],[7,14],[7,15],[8,16],[8,17],[8,18],[11,23],[12,24],[12,26],[13,27],[15,31],[16,32],[16,34],[17,35],[17,37],[19,39],[20,40],[26,56],[29,63],[29,65],[35,79],[35,81],[92,235],[92,238]];const [Z,A]=pick(L),k=pick(['質子','中子','電子']),v=k==='中子'?A-Z:Z;
+    return{q:`${iso(A,Z,sym(Z))} 原子有幾個<b>${k}</b>？`,ans:[v,1],steps:[`左下角 ${Z} 是原子序 ＝ 質子數；左上角 ${A} 是質量數 ＝ 質子 ＋ 中子。`,k==='中子'?`中子 ＝ ${A} − ${Z} ＝ <b>${v}</b>`:k==='質子'?`質子 ＝ <b>${Z}</b>`:`中性原子，電子 ＝ 質子 ＝ <b>${Z}</b>`]}},
+  mix(()=>{const L=[[11,23,1],[12,24,2],[13,27,3],[17,35,-1],[17,37,-1],[8,16,-2],[16,32,-2],[9,19,-1],[19,39,1],[20,40,2],[26,56,2],[26,56,3],[29,63,2],[30,64,2],[7,14,-3],[35,79,-1]];const [Z,A,q]=pick(L),k=pick(['電子','中子','電子']),v=k==='中子'?A-Z:Z-q;
+    return{q:`${iso(A,Z,sym(Z),q)} 有幾個<b>${k}</b>？`,ans:[v,1],steps:[`質子 ＝ ${Z}。帶 ${Math.abs(q)}${q>0?'+':'−'} 代表${q>0?'少了':'多了'} ${Math.abs(q)} 個電子。`,k==='中子'?`中子 ＝ ${A} − ${Z} ＝ <b>${v}</b>（離子的電荷不影響中子數）`:`電子 ＝ ${Z} ${q>0?'−':'＋'} ${Math.abs(q)} ＝ <b>${v}</b>`]}},
+   ()=>{const L=[[11,1],[12,2],[13,3],[9,-1],[8,-2],[7,-3],[19,1],[20,2],[17,-1],[16,-2],[15,-3]];const [Z,q]=pick(L),e=Z-q;
+    return mc(`某離子帶 ${Math.abs(q)===1?'':Math.abs(q)}${q>0?'+':'−'} 電荷，有 ${e} 個電子。它是哪一種元素的離子？`,`${ename(Z)}（${sym(Z)}）`,[Z-1,Z+1,Z-2,Z+2,e,Z+q].filter(x=>x>=1&&x<=20&&x!==Z).map(x=>`${ename(x)}（${sym(x)}）`),
+     [`離子電子數 ＝ 質子數 − 電荷 ⇒ 質子數 ＝ ${e} ${q>0?'＋':'−'} ${Math.abs(q)} ＝ ${Z}`,`原子序 ${Z} 是${ename(Z)}。`])}),
+  mix(()=>{const I=pick([['B',10,11],['Cl',35,37],['Cu',63,65],['Br',79,81],['Li',6,7],['Ga',69,71],['Ag',107,109]]),[s,a,b]=I,p=rnd(1,19)*5,avg=a*(100-p)/100+b*p/100;
+    return{q:`${s} 有兩種同位素：質量 ${a} 佔 ${100-p}%，質量 ${b} 佔 ${p}%。${s} 的平均原子量是多少？`,ans:RD(avg),steps:[`平均原子量 ＝ ${a} × ${dec((100-p)/100)} ＋ ${b} × ${dec(p/100)}`,`＝ ${dec(a*(100-p)/100)} ＋ ${dec(b*p/100)} ＝ <b>${dec(avg)}</b>`]}},
+   ()=>{const I=pick([['B',10,11],['Cl',35,37],['Cu',63,65],['Li',6,7],['Ga',69,71]]),[s,a,b]=I,p=rnd(1,19)*5,avg=a*(100-p)/100+b*p/100;
+    return{q:`${s} 的平均原子量為 ${dec(avg)}，它只有質量 ${a} 和 ${b} 兩種同位素。質量 ${b} 的同位素佔百分之幾？`,ans:[p,1],steps:[`設質量 ${b} 的佔 <i>x</i>（小數），列式 ${M(`${a}(1 − <i>x</i>) + ${b}<i>x</i> = ${dec(avg)}`)}`,`${M(`${a} + ${b-a}<i>x</i> = ${dec(avg)}`)} ⇒ ${M(`<i>x</i> = ${fr(dec(avg-a),b-a)} = ${dec(p/100)}`)}`,`答案是 <b>${p}</b>%`]}}),
+  mix(()=>{const I=pick([[35,37,3,4],[79,81,1,2],[10,11,1,5],[6,7,1,13]]);const [a,b,pn,pd]=I,p=R(pn,pd),q=R(pd-pn,pd);
+    const t=pick(['aa','ab','bb']),val=t==='aa'?R(q[0]*q[0],q[1]*q[1]):t==='bb'?R(p[0]*p[0],p[1]*p[1]):R(2*p[0]*q[0],p[1]*q[1]),mass=t==='aa'?2*a:t==='bb'?2*b:a+b;
+    return{q:`元素 X 有兩種同位素：<sup>${a}</sup>X 佔 ${rFmt(q)}、<sup>${b}</sup>X 佔 ${rFmt(p)}。在 X₂ 分子中，<b>質量為 ${mass}</b> 的分子佔全部 X₂ 分子的比例是多少？（以分數作答）`,ans:val,steps:[
+     `X₂ 由兩個 X 原子隨機組成，每個位置是 <sup>${a}</sup>X 的機率 ${rFmt(q)}、<sup>${b}</sup>X 的機率 ${rFmt(p)}。`,
+     t==='ab'?`質量 ${mass} ＝ ${a} ＋ ${b}，可以是「${a} 在前 ${b} 在後」或反過來，有 2 種排法。`:`質量 ${mass} 需要兩個都是 <sup>${t==='aa'?a:b}</sup>X。`,
+     t==='ab'?`比例 ＝ 2 × ${rFmt(q)} × ${rFmt(p)} ＝ <b>${M(rFmt(val))}</b>`:`比例 ＝ (${rFmt(t==='aa'?q:p)})<sup>2</sup> ＝ <b>${M(rFmt(val))}</b>`]}},
+   ()=>{const C=pick([['HCl',[[1,2,3],[35,37]]],['H₂',[[1,2,3],[1,2,3]]],['CO',[[12,13],[16,17,18]]],['H₂O',[[1,2,3],[1,2,3],[16,18]]],['Cl₂',[[35,37],[35,37]]]]);const [nm,sets]=C;
+    let sums=new Set([0]);for(const s of sets){const n=new Set();for(const x of sums)for(const y of s)n.add(x+y);sums=n}
+    return{q:`氫有 <sup>1</sup>H、<sup>2</sup>H、<sup>3</sup>H 三種同位素，碳有 <sup>12</sup>C、<sup>13</sup>C，氧有 <sup>16</sup>O、<sup>17</sup>O、<sup>18</sup>O，氯有 <sup>35</sup>Cl、<sup>37</sup>Cl。只考慮題目列出的組合，${nm} 分子共有幾種<b>不同的分子量</b>？（${nm==='H₂O'?'此題氧只考慮 <sup>16</sup>O、<sup>18</sup>O':'全部列出的同位素都要考慮'}）`,ans:[sums.size,1],steps:[
+     `每個原子位置可能的質量：${sets.map(s=>'{'+s.join(', ')+'}').join('、')}`,
+     `把所有組合的質量加起來，去掉重複，可能的分子量為：${[...sums].sort((a,b)=>a-b).join('、')}`,`共 <b>${sums.size}</b> 種。注意「不同分子量」比「不同分子種類」少，因為不同組合可能質量相同。`]}},
+   bank([{m:1,q:'關於原子結構與同位素，下列哪些正確？',o:[['同位素的化學性質幾乎相同',true,'化學性質由電子決定，同位素電子數相同'],['拉塞福的 α 粒子散射實驗發現了中子',false,'發現的是原子核；中子由查兌克發現'],['質量數等於質子數與中子數的和',true,''],['¹⁴C 與 ¹⁴N 互為同位素',false,'質子數不同（6 與 7），是不同元素'],['湯姆森由陰極射線實驗發現電子',true,'']]}]))]},
+
+/* ---------- 5 電子排列與週期表 ---------- */
+{id:'c_pt',unit:'第一章　物質的組成與原子構造',title:'電子排列與元素週期表',
+ goal:'寫出前 20 號元素的電子排列，由價電子判斷族與週期，並用週期表比較原子與離子的大小。',
+ concept:()=>`<div class="prose"><p>電子分層排在原子核外，由內而外是 K、L、M、N 殼層，第 <i>n</i> 層最多 2<i>n</i>² 個。前 20 號元素依序填：<b>2、8、8、2</b>。</p>
+  <ul><li>例：Na（11）→ 2, 8, 1；Cl（17）→ 2, 8, 7；Ca（20）→ 2, 8, 8, 2。</li>
+  <li><b>價電子</b>＝最外層電子數，決定化學性質。<b>週期</b>＝電子殼層數；<b>主族（A 族）</b>＝價電子數。</li>
+  <li>鈍氣（He、Ne、Ar）最外層已填滿（He 是 2），很穩定，屬第 18 族（0 族、VIIIA）。</li></ul></div>
+  ${tbl(['族','價電子','名稱','性質'],[['1A','1','鹼金屬（H 除外）','很活潑，容易失去 1 個電子成 +1 離子'],['2A','2','鹼土金屬','失去 2 個電子成 +2 離子'],['7A','7','鹵素','容易得到 1 個電子成 −1 離子'],['8A（18 族）','8（He 為 2）','鈍氣','穩定，幾乎不反應']])}
+  <div class="tip"><b>原子半徑規律：</b>同一族由上往下，殼層變多 → 半徑<b>變大</b>；同一週期由左往右，質子變多、把電子拉得更緊 → 半徑<b>變小</b>。</div>`,
+ deep:()=>`<div class="prose"><p><b>為什麼同週期越往右半徑越小？</b>電子層數相同，但原子核的正電荷（質子數）越來越多，對外層電子的吸引力越強，電子雲被拉近。這叫「有效核電荷」變大。</p>
+  <p><b>等電子離子比大小</b>：${F('O^2-')}、${F('F^-')}、Ne、${F('Na^+')}、${F('Mg^2+')}、${F('Al^3+')} 都有 10 個電子（排列 2, 8）。電子一樣多時，<b>質子越多，半徑越小</b>：${F('O^2-')} &gt; ${F('F^-')} &gt; ${F('Na^+')} &gt; ${F('Mg^2+')} &gt; ${F('Al^3+')}。</p>
+  <p><b>原子和它的離子</b>：陽離子比原子小（失去最外層，甚至少一層，如 Na → ${F('Na^+')}）；陰離子比原子大（多了電子，電子間互相排斥）。</p>
+  <p><b>金屬性與非金屬性</b>：週期表左下方金屬性強（容易失去電子），右上方（鈍氣除外）非金屬性強（容易得到電子）。所以最活潑的金屬在左下、最活潑的非金屬是右上的氟。</p></div>`,
+ example:{q:'硫（S，原子序 16）的電子排列是什麼？在第幾週期、第幾族？',steps:['依序填：K 層 2、L 層 8、剩 16 − 10 ＝ 6 填 M 層 → <b>2, 8, 6</b>。','有 3 層電子 → 第 <b>3</b> 週期。','價電子 6 → 第 <b>6A</b> 族（第 16 族）。']},
+ notes:{2:'由原子序寫出排列，判斷週期與族；也會考離子變成和哪一個鈍氣排列相同。',3:'原子半徑比較：同族看殼層，同週期看質子數。',4:'等電子離子比大小，以及綜合判斷的多選題。'},
+ levels:[
+  ()=>{const z=rnd(1,20),sh=shells(z),k=pick(['價電子數','電子殼層數（週期）']),v=k==='價電子數'?valence(z):sh.length;
+    return{q:`${ename(z)}（${sym(z)}，原子序 ${z}）的<b>${k}</b>是多少？`,ans:[v,1],steps:[`依 2、8、8、2 的順序填：${sym(z)} 的電子排列是 <b>${sh.join(', ')}</b>。`,k==='價電子數'?`最外層有 ${valence(z)} 個電子${z===2?'（He 只有一層，填滿是 2）':''}，答案是 <b>${v}</b>。`:`共有 ${sh.length} 層，答案是 <b>${v}</b>（第 ${v} 週期）。`]}},
+  mix(()=>{let z;do{z=rnd(1,20)}while(z===1);const g=groupOf(z);
+    return{q:`${ename(z)}（原子序 ${z}）屬於第幾 A 族？（鈍氣請填 8）`,ans:[g,1],steps:[`電子排列 ${shells(z).join(', ')}。`,NOBLE.includes(z)?`最外層已填滿，是鈍氣，答案是 <b>8</b>（第 18 族）。`:`價電子 ${g} 個 → 第 <b>${g}</b>A 族。`]}},
+   ()=>{const L=[[11,1],[12,2],[13,3],[19,1],[20,2],[9,-1],[8,-2],[17,-1],[16,-2],[7,-3],[15,-3],[3,1],[4,2]];const [z,q]=pick(L),e=z-q,ng=e===2?2:e===10?10:18;
+    return mc(`${F(sym(z)+'^'+(Math.abs(q)===1?'':Math.abs(q))+(q>0?'+':'-'))} 的電子排列和哪一個鈍氣相同？`,`${ename(ng)}（${sym(ng)}）`,[2,10,18].filter(x=>x!==ng).map(x=>`${ename(x)}（${sym(x)}）`).concat(['不和任何鈍氣相同']),
+     [`${sym(z)} 有 ${z} 個電子，${q>0?`失去 ${q}`:`得到 ${-q}`} 個後剩 ${e} 個，排列為 ${shells(e).join(', ')}。`,`和 ${ename(ng)}（${ng} 個電子）相同。`])}),
+  ()=>{const groups=[[3,11,19],[4,12,20],[9,17],[8,16],[5,13],[6,14],[7,15]],periods=[[3,4,5,6,7,8,9],[11,12,13,14,15,16,17]];
+    let set,why;if(Math.random()<.5){set=shuffle(pick(periods)).slice(0,3);why='三者在同一週期，殼層數相同，原子序越小（質子越少），半徑越大。'}else{const g=pick(groups);set=g.length>=3?g.slice():[...g,...pick(groups.filter(x=>x!==g))].slice(0,3);if(g.length<3){set=g.slice();}why='同一族由上往下，殼層數變多，半徑變大。'}
+    if(set.length<3){const per=pick(periods);set=shuffle(per).slice(0,3);why='三者在同一週期，殼層數相同，原子序越小（質子越少），半徑越大。'}
+    const askBig=Math.random()<.6;const key=z=>shells(z).length*100-z;const ans=set.reduce((a,b)=>askBig?(key(b)>key(a)?b:a):(key(b)<key(a)?b:a));
+    return mc(`下列元素中，原子半徑${askBig?'<b>最大</b>':'<b>最小</b>'}的是？`,`${ename(ans)}（${sym(ans)}）`,set.filter(z=>z!==ans).map(z=>`${ename(z)}（${sym(z)}）`),
+     [set.map(z=>`${sym(z)}：${shells(z).join(', ')}`).join('；'),why])},
+  mix(()=>{const S=shuffle([[8,-2],[9,-1],[11,1],[12,2],[13,3]]).slice(0,4),askBig=Math.random()<.5;const lab=([z,q])=>F(sym(z)+'^'+(Math.abs(q)===1?'':Math.abs(q))+(q>0?'+':'-'));
+    const ans=S.reduce((a,b)=>askBig?(b[0]<a[0]?b:a):(b[0]>a[0]?b:a));
+    return mc(`下列離子中，半徑${askBig?'<b>最大</b>':'<b>最小</b>'}的是？`,lab(ans),S.filter(x=>x!==ans).map(lab),['這些離子都有 10 個電子（等電子），排列都是 2, 8。','電子數相同時，質子越多，對電子吸引越強，半徑越小。'])},
+   bank([{m:1,q:'關於週期表與電子排列，下列哪些正確？',o:[['同一族元素的價電子數相同',true,''],['Na 的原子半徑比 Na⁺ 小',false,'Na⁺ 少了最外層，半徑比 Na 小'],['Cl⁻ 和 Ar 的電子排列相同',true,'都是 2, 8, 8'],['同週期由左到右，原子半徑逐漸變大',false,'質子數增加，半徑變小'],['氦的價電子數為 2，但歸在 18 族',true,'He 只有一層，2 個就填滿']]},
+    {m:1,q:'甲、乙、丙、丁的原子序分別為 9、11、17、19。下列哪些正確？',o:[['甲和丙同族',true,'都是價電子 7 的鹵素'],['乙和丁都容易形成 +1 離子',true,'鹼金屬'],['四者中原子半徑最大的是丁',true,'K 有 4 層電子'],['甲的原子半徑比丙大',false,'同族由上往下變大，F 比 Cl 小'],['乙與丙形成的化合物化學式為 NaCl₂',false,'Na⁺ 和 Cl⁻ 以 1 : 1 結合，化學式 NaCl']]}]))]},
+
+/* ---------- 6 化學鍵 ---------- */
+{id:'c_bond',unit:'第二章　化學鍵與化學反應',title:'化學鍵',
+ goal:'分辨離子鍵、共價鍵、金屬鍵，寫出離子化合物的化學式，數出分子的鍵結電子對與孤對電子。',
+ concept:()=>`<div class="prose"><p>原子會想辦法讓最外層像鈍氣一樣填滿（通常是 8 個，稱為<b>八隅體規則</b>）。方法有三種：</p></div>
+  ${tbl(['化學鍵','怎麼形成','通常發生在','例子'],[['離子鍵','金屬把電子給非金屬，正負離子互相吸引','金屬＋非金屬','NaCl、MgO、CaCl₂'],['共價鍵','兩個非金屬原子共用電子對','非金屬＋非金屬','H₂O、CO₂、CH₄'],['金屬鍵','金屬原子釋出價電子形成「電子海」','金屬','Fe、Cu、Al']])}
+  <div class="prose"><p><b>寫離子化合物的化學式</b>：正負電荷總和要等於 0。${F('Al^3+')} 和 ${F('O^2-')} → 取最小公倍數 6 → 2 個 ${F('Al^3+')}、3 個 ${F('O^2-')} → ${F('Al2O3')}。多原子離子要加括號，如 ${F('Ca3(PO4)2')}。</p>
+  <p><b>路易斯結構</b>：用點表示價電子。共用的一對電子叫<b>鍵結電子對</b>（畫成一條線），沒有參與鍵結的叫<b>孤對電子</b>。例如 ${F('H2O')}：O 和兩個 H 各共用一對（2 對鍵結），O 上還有 2 對孤對電子。</p></div>
+  ${tbl(['性質','離子化合物','共價分子','金屬'],[['熔點','高','低（多為氣體、液體）','多數高'],['固態導電','不導電','不導電','導電'],['熔融或水溶液','導電（離子可移動）','通常不導電','—'],['其他','硬而脆','—','有延展性、金屬光澤']])}`,
+ deep:()=>`<div class="prose"><p><b>離子固體為什麼固態不導電、熔化後卻導電？</b>導電需要「可以移動的帶電粒子」。固態時離子被固定在晶格中，不能移動；熔化或溶於水後，離子可以自由移動，就能導電。金屬導電則是靠可以自由移動的電子。</p>
+  <p><b>雙鍵和參鍵</b>：${F('O2')} 中兩個 O 共用 2 對電子（雙鍵 O＝O），${F('N2')} 共用 3 對（參鍵 N≡N），${F('CO2')} 是 O＝C＝O。數鍵結電子對時，雙鍵算 2 對、參鍵算 3 對。</p>
+  <p><b>網狀共價固體</b>：鑽石、石墨、石英（${F('SiO2')}）裡原子全部用共價鍵連成巨大網狀，沒有獨立的分子，所以熔點極高。這是「共價物質熔點都低」的例外，段考很愛考。石墨還能導電，因為每個碳有一個電子可以在層內移動。</p>
+  <p><b>快速數孤對電子的方法</b>：每個原子的價電子數 − 用於鍵結的電子數，剩下的除以 2。例如 ${F('NH3')} 中 N 有 5 個價電子，3 個拿去和 H 共用，剩 2 個 → 1 對孤對電子。</p></div>`,
+ example:{q:'鎂離子 Mg²⁺ 和磷酸根 PO₄³⁻ 形成的化合物，化學式是什麼？一個化學式單位共有幾個原子？',steps:['電荷 +2 和 −3 的最小公倍數是 6。','需要 3 個 Mg²⁺（+6）和 2 個 PO₄³⁻（−6），化學式 <b>Mg₃(PO₄)₂</b>。','原子數：Mg 3 個 ＋ 2 ×（P 1 ＋ O 4）＝ 3 ＋ 10 ＝ <b>13</b> 個。']},
+ notes:{2:'數分子中的鍵結電子對和孤對電子。雙鍵算 2 對、參鍵算 3 對。',3:'由物質的性質判斷它是哪一類化學鍵，注意網狀共價固體的例外。',4:'綜合多選：化學鍵種類、性質、路易斯結構一起考。'},
+ levels:[
+  ()=>{const C=pick([['Na','鈉離子',1,1],['K','鉀離子',1,1],['Mg','鎂離子',2,1],['Ca','鈣離子',2,1],['Al','鋁離子',3,1],['Fe','鐵(III)離子',3,1],['NH4','銨根離子',1,5]]),A=pick([['Cl','氯離子',1,1],['O','氧離子',2,1],['S','硫離子',2,1],['N','氮離子',3,1],['OH','氫氧根',1,2],['NO3','硝酸根',1,4],['SO4','硫酸根',2,5],['CO3','碳酸根',2,4],['PO4','磷酸根',3,5]]);
+    const l=C[2]*A[2]/gcd(C[2],A[2]),nc=l/C[2],na=l/A[2];const part=(s,n,poly)=>n===1?s:(poly?`(${s})${n}`:`${s}${n}`);const fml=F(part(C[0],nc,C[3]>1)+part(A[0],na,A[3]>1)),atoms=nc*C[3]+na*A[3];
+    return{q:`${C[1]} ${F(C[0]+'^'+(C[2]>1?C[2]:'')+'+')} 和${A[1]} ${F(A[0]+'^'+(A[2]>1?A[2]:'')+'-')} 形成的化合物，一個化學式單位共有幾個原子？`,ans:[atoms,1],steps:[
+     `電荷 +${C[2]} 和 −${A[2]}，最小公倍數 ${l}：需要 ${nc} 個陽離子、${na} 個陰離子。`,`化學式 <b>${fml}</b>${(C[3]>1&&nc>1)||(A[3]>1&&na>1)?'（多原子離子超過 1 個要加括號）':''}`,`原子數 ＝ ${nc} × ${C[3]} ＋ ${na} × ${A[3]} ＝ <b>${atoms}</b>`]}},
+  ()=>{const L=[['H₂O',2,2],['NH₃',3,1],['CH₄',4,0],['CO₂',4,4],['N₂',3,2],['O₂',2,4],['HCN',4,1],['C₂H₄',6,0],['C₂H₂',5,0],['HCl',1,3],['CCl₄',4,12],['H₂O₂',3,4],['PCl₃',3,10],['CH₂O',4,2],['F₂',1,6],['NF₃',3,10]];const [m,b,l]=pick(L),askB=Math.random()<.5;
+    const why={'H₂O':'O 與 2 個 H 各一個單鍵；O 有 6 個價電子，用掉 2 個，剩 4 個 → 2 對孤對。','NH₃':'N 與 3 個 H 各一個單鍵；N 剩 2 個價電子 → 1 對孤對。','CH₄':'C 與 4 個 H 各一個單鍵，C 的 4 個價電子全用完。','CO₂':'O＝C＝O 兩個雙鍵共 4 對；每個 O 還有 2 對孤對，共 4 對。','N₂':'N≡N 參鍵 3 對；每個 N 各 1 對孤對。','O₂':'O＝O 雙鍵 2 對；每個 O 各 2 對孤對。','HCN':'H–C≡N：單鍵 1 ＋ 參鍵 3 ＝ 4 對；N 上 1 對孤對。','C₂H₄':'4 個 C–H 單鍵 ＋ C＝C 雙鍵（2 對）＝ 6 對；沒有孤對。','C₂H₂':'2 個 C–H ＋ C≡C（3 對）＝ 5 對；沒有孤對。','HCl':'H–Cl 一個單鍵；Cl 有 7 個價電子，用掉 1 個，剩 6 → 3 對孤對。','CCl₄':'4 個 C–Cl 單鍵；每個 Cl 3 對孤對，共 12 對。','H₂O₂':'H–O–O–H 共 3 個單鍵；每個 O 2 對孤對，共 4 對。','PCl₃':'3 個 P–Cl 單鍵；P 有 1 對孤對，3 個 Cl 各 3 對，共 1 ＋ 9 ＝ 10 對。','CH₂O':'2 個 C–H ＋ C＝O（2 對）＝ 4 對；O 上 2 對孤對。','F₂':'F–F 一個單鍵；每個 F 3 對孤對，共 6 對。','NF₃':'3 個 N–F 單鍵；N 1 對 ＋ 3 個 F 各 3 對 ＝ 10 對。'}[m];
+    return{q:`${m} 分子中共有幾對<b>${askB?'鍵結電子對':'孤對電子'}</b>？`,ans:[askB?b:l,1],steps:[`畫出路易斯結構：${why}`,`${askB?'鍵結電子對':'孤對電子'}共 <b>${askB?b:l}</b> 對。`]}},
+  bank([
+   ['某物質熔點很高、固態不導電，但熔融狀態可以導電。它最可能含有哪種化學鍵？','離子鍵',['共價鍵（分子物質）','金屬鍵','氫鍵'],'熔融導電代表熔化後出現可移動的離子，是離子化合物。'],
+   ['下列哪一種物質熔點最高？','石英 '+F('SiO2'),['乾冰 '+F('CO2'),'冰 '+F('H2O'),'碘 '+F('I2'),'甲烷 '+F('CH4')],'石英是網狀共價固體，原子全部以共價鍵相連，熔點極高。其他都是分子物質。'],
+   ['下列哪一種物質在固態時就能導電？','石墨',['食鹽','鑽石','蔗糖','乾冰'],'石墨每個碳有一個電子可在層內移動；鑽石的電子全部用於鍵結，不導電。'],
+   ['下列哪一個化合物中<b>同時含有</b>離子鍵與共價鍵？','NaOH',['NaCl','H₂O','CH₄','MgO'],'Na⁺ 和 OH⁻ 之間是離子鍵；OH⁻ 內部 O 與 H 之間是共價鍵。'],
+   ['下列哪一個分子含有參鍵？',F('N2'),[F('O2'),F('CO2'),F('H2O'),F('CH4')],'N≡N，兩個 N 共用 3 對電子。']]),
+  bank([{m:1,q:'關於化學鍵與物質性質，下列哪些正確？',o:[['離子化合物的水溶液可以導電',true,'溶於水後離子可移動'],['所有共價物質的熔點都很低',false,'鑽石、石英是網狀共價固體，熔點極高'],['金屬能導電是因為有可自由移動的電子',true,''],['CO₂ 分子中含有 2 個雙鍵',true,'O＝C＝O'],['NH₃ 分子中有 2 對孤對電子',false,'只有 N 上的 1 對']]},
+   {m:1,q:'甲、乙、丙的原子序分別為 8、11、17。下列哪些正確？',o:[['乙與丙形成的化合物以離子鍵結合',true,'Na 是金屬、Cl 是非金屬'],['甲與丙可形成共價化合物',true,'兩者都是非金屬'],['乙與甲形成的化合物化學式為 NaO',false,'Na⁺ 與 O²⁻ 以 2 : 1 結合，為 Na₂O'],['丙₂ 分子中有 1 對鍵結電子對、6 對孤對電子',true,'Cl–Cl，每個 Cl 3 對孤對'],['乙的單質固態時不導電',false,'鈉是金屬，固態可導電']]}])]},
+
+/* ---------- 7 化學式 ---------- */
+{id:'c_formula',unit:'第二章　化學鍵與化學反應',title:'化學式與組成計算',
+ goal:'會算元素的重量百分組成，由實驗數據求實驗式與分子式，包括燃燒分析。',
+ concept:()=>`${tbl(['化學式','表示什麼','乙酸的例子'],[['實驗式（簡式）','原子數的最簡整數比','CH₂O'],['分子式','一個分子中各原子的實際數目','C₂H₄O₂'],['結構式','原子間的連接方式','畫出每一個鍵'],['示性式','標出官能基','CH₃COOH']])}
+  <div class="prose"><p><b>重量百分組成</b>：某元素的質量 ÷ 化合物式量 × 100%。例如 ${F('CaCO3')}（式量 100）中 Ca 佔 40 ÷ 100 ＝ 40%。</p>
+  <p><b>求實驗式的三步驟</b>：① 各元素的質量（或百分率當作 100 g 中的克數）；② 各除以原子量得到莫耳數；③ 化成最簡整數比。</p>
+  <p><b>求分子式</b>：分子式 ＝（實驗式）<sub><i>n</i></sub>，<i>n</i> ＝ 分子量 ÷ 實驗式量。</p></div>`,
+ deep:()=>`<div class="prose"><p><b>燃燒分析</b>：含 C、H、O 的化合物完全燃燒，C 全部變成 ${F('CO2')}，H 全部變成 ${F('H2O')}。</p>
+  <ul><li>C 的質量 ＝ ${F('CO2')} 質量 × 12/44（或 C 的莫耳數 ＝ ${F('CO2')} 的莫耳數）</li>
+  <li>H 的質量 ＝ ${F('H2O')} 質量 × 2/18（H 的莫耳數 ＝ ${F('H2O')} 莫耳數 × 2）</li>
+  <li>O 的質量 ＝ 樣品質量 − C − H（O 不能直接從產物算，因為燃燒時加了氧氣）</li></ul>
+  <p><b>常見陷阱</b>：H 的莫耳數要乘 2，因為一個水分子有兩個 H。很多人在這裡丟分。</p>
+  <p><b>莫耳比不是整數時</b>：例如算出 C : H ＝ 1 : 2.5，要同乘 2 變成 2 : 5；1 : 1.33 要同乘 3 變成 3 : 4。</p></div>`,
+ example:{q:'某化合物含 C 2.4 g、H 0.6 g，其分子量為 30。求分子式。（C = 12，H = 1）',steps:['C：2.4 ÷ 12 ＝ 0.2 mol；H：0.6 ÷ 1 ＝ 0.6 mol。','C : H ＝ 0.2 : 0.6 ＝ 1 : 3，實驗式 CH₃（式量 15）。','<i>n</i> ＝ 30 ÷ 15 ＝ 2，分子式 <b>C₂H₆</b>。']},
+ notes:{2:'由各元素質量求實驗式：先除以原子量得莫耳數，再化成最簡整數比。',3:'由實驗式和分子量求分子式。',4:'燃燒分析：C 從 CO₂ 來、H 從 H₂O 來（要乘 2）、O 用總質量相減。'},
+ levels:[
+  ()=>{const L=[['CaCO₃',[['Ca',1],['C',1],['O',3]]],['NaOH',[['Na',1],['O',1],['H',1]]],['MgO',[['Mg',1],['O',1]]],['SO₃',[['S',1],['O',3]]],['SO₂',[['S',1],['O',2]]],['Fe₂O₃',[['Fe',2],['O',3]]],['CuO',[['Cu',1],['O',1]]],['CuSO₄',[['Cu',1],['S',1],['O',4]]],['NH₄NO₃',[['N',2],['H',4],['O',3]]],['CH₄',[['C',1],['H',4]]],['C₆H₁₂O₆',[['C',6],['H',12],['O',6]]],['CaO',[['Ca',1],['O',1]]],['Al₂O₃',[['Al',2],['O',3]]],['H₂SO₄',[['H',2],['S',1],['O',4]]],['C₂H₆',[['C',2],['H',6]]]];
+    let tries=0,C,e,pct;do{C=pick(L);e=pick(C[1]);pct=100*MASS[e[0]]*e[1]/mw(C[1]);tries++}while(!exact2(pct)&&tries<50);
+    return{q:`${C[0]} 中 ${e[0]} 的重量百分率是多少？（填百分比的數字）${massLine(C[1].map(x=>x[0]))}`,ans:RD(pct),steps:[`式量 ＝ ${C[1].map(([x,k])=>`${MASS[x]}${k>1?' × '+k:''}`).join(' ＋ ')} ＝ ${mw(C[1])}`,`${e[0]} 的質量 ${MASS[e[0]]}${e[1]>1?' × '+e[1]+' ＝ '+MASS[e[0]]*e[1]:''}，百分率 ＝ ${MASS[e[0]]*e[1]} ÷ ${mw(C[1])} × 100% ＝ <b>${dec(pct)}</b>%`]}},
+  ()=>{const L=[['CH₂O',[1,2,1]],['C₂H₆O',[2,6,1]],['C₃H₈O',[3,8,1]],['CH₄O',[1,4,1]],['C₂H₄O',[2,4,1]],['C₃H₆O',[3,6,1]],['C₄H₁₀O',[4,10,1]],['C₃H₄O₃',[3,4,3]],['CH₂O₂',[1,2,2]]];const [nm,a]=pick(L),f=pick([0.1,0.2,0.05,0.5]);const mC=12*a[0]*f,mH=a[1]*f,mO=16*a[2]*f;
+    return{q:`某化合物只含 C、H、O。取一份樣品分析，含 C ${dec(mC)} g、H ${dec(mH)} g、O ${dec(mO)} g。若實驗式為 C<sub><i>x</i></sub>H<sub><i>y</i></sub>O<sub><i>z</i></sub>（最簡整數比），求 ${M('<i>x</i> + <i>y</i> + <i>z</i>')}。（C = 12，H = 1，O = 16）`,ans:[a[0]+a[1]+a[2],1],steps:[
+     `莫耳數：C ${dec(mC)} ÷ 12 ＝ ${dec(a[0]*f)}；H ${dec(mH)} ÷ 1 ＝ ${dec(a[1]*f)}；O ${dec(mO)} ÷ 16 ＝ ${dec(a[2]*f)}`,
+     `同除以最小的 ${dec(Math.min(...a)*f)}：C : H : O ＝ ${a.join(' : ')}，實驗式 ${nm}`,`${M(`<i>x</i> + <i>y</i> + <i>z</i> = ${a[0]+a[1]+a[2]}`)}，答案是 <b>${a[0]+a[1]+a[2]}</b>`]}},
+  ()=>{const L=[['CH₂O',30,[[60,'C₂H₄O₂'],[90,'C₃H₆O₃'],[180,'C₆H₁₂O₆']],'H',2],['CH₂',14,[[28,'C₂H₄'],[42,'C₃H₆'],[56,'C₄H₈'],[70,'C₅H₁₀']],'H',2],['CH',13,[[26,'C₂H₂'],[78,'C₆H₆']],'H',1],['C₂H₅',29,[[58,'C₄H₁₀']],'H',5],['NO₂',46,[[92,'N₂O₄']],'O',2],['CH₃O',31,[[62,'C₂H₆O₂']],'H',3],['C₂H₄O',44,[[88,'C₄H₈O₂']],'C',2]];
+    const [emp,em,opts,el,cnt]=pick(L),[MW,mol]=pick(opts),n=MW/em;
+    return{q:`某化合物的實驗式為 ${emp}，分子量為 ${MW}。它的分子式中有幾個 ${el} 原子？（H = 1，C = 12，N = 14，O = 16）`,ans:[cnt*n,1],steps:[`實驗式量 ${emp} ＝ ${em}`,`<i>n</i> ＝ ${MW} ÷ ${em} ＝ ${n}，分子式 ＝ (${emp})<sub>${n}</sub> ＝ ${mol}`,`${el} 原子 ＝ ${cnt} × ${n} ＝ <b>${cnt*n}</b> 個`]}},
+  ()=>{const L=[['C₂H₆O',[2,6,1]],['C₃H₈O',[3,8,1]],['C₂H₄O₂',[2,4,2]],['CH₄O',[1,4,1]],['C₃H₆O',[3,6,1]],['C₆H₁₂O₆',[6,12,6]],['C₄H₈O₂',[4,8,2]],['C₃H₈',[3,8,0]],['C₂H₄',[2,4,0]]];const [nm,a]=pick(L),m=pick([0.1,0.05,0.2]),MW=12*a[0]+a[1]+16*a[2];
+    const co2=44*a[0]*m,h2o=18*a[1]/2*m,samp=MW*m,ask=pick(['H','C','O','sum']);const vals={C:a[0],H:a[1],O:a[2],sum:a[0]+a[1]+a[2]};
+    return{q:`某化合物（只含 C、H，可能含 O）${dec(samp)} g 完全燃燒，得到 ${dec(co2)} g ${F('CO2')} 和 ${dec(h2o)} g ${F('H2O')}。已知分子量為 ${MW}，${ask==='sum'?`分子式 C<sub><i>x</i></sub>H<sub><i>y</i></sub>O<sub><i>z</i></sub> 的 ${M('<i>x</i> + <i>y</i> + <i>z</i>')} 是多少`:`一個分子中有幾個 ${ask} 原子`}？（C = 12，H = 1，O = 16）`,ans:[vals[ask],1],steps:[
+     `C：${dec(co2)} ÷ 44 ＝ ${dec(a[0]*m)} mol，質量 ${dec(12*a[0]*m)} g`,
+     `H：${dec(h2o)} ÷ 18 ＝ ${dec(a[1]/2*m)} mol 水，<b>H 原子要乘 2</b> ＝ ${dec(a[1]*m)} mol，質量 ${dec(a[1]*m)} g`,
+     `O：${dec(samp)} − ${dec(12*a[0]*m)} − ${dec(a[1]*m)} ＝ ${dec(16*a[2]*m)} g ＝ ${dec(a[2]*m)} mol${a[2]===0?'（不含氧）':''}`,
+     `樣品 ${dec(samp)} ÷ ${MW} ＝ ${dec(m)} mol，每個分子 C ${a[0]}、H ${a[1]}、O ${a[2]} → ${nm}，答案是 <b>${vals[ask]}</b>`]}}]},
+
+/* ---------- 8 反應式平衡與化學計量 ---------- */
+{id:'c_stoich',unit:'第二章　化學鍵與化學反應',title:'反應式平衡與化學計量',
+ goal:'平衡化學反應式，並用係數比做質量計算、判斷限量試劑、計算產率。',
+ concept:()=>`<div class="prose"><p><b>平衡反應式</b>就是讓箭頭兩邊每種原子的數目相同（原子不會產生或消失）。只能改<b>係數</b>，不能改化學式的下標。</p>
+  <p>平衡技巧：先平衡只出現在一個反應物、一個生成物中的元素（燃燒反應通常先 C、再 H、最後 O）。O 出現奇數時，整個式子乘 2。</p></div>
+  <div class="formula">係數比 ＝ 莫耳數比 ＝ 分子數比 ＝（同溫同壓）氣體體積比<small>係數比 <b>不等於</b> 質量比</small></div>
+  <div class="prose"><p><b>計量四步驟</b>：已知質量 → 除以莫耳質量得莫耳數 → 乘以係數比得到所求物質的莫耳數 → 乘以莫耳質量得質量。</p></div>
+  <div class="tip"><b>限量試劑</b>：兩種反應物都給量時，先算哪一個會先用完。不能直接比質量，也不能直接比莫耳數，要比「莫耳數 ÷ 係數」，比值小的就是限量試劑，產量由它決定。</div>`,
+ deep:()=>`<div class="prose"><p><b>為什麼要「莫耳數 ÷ 係數」？</b>以 2${F('H2')} ＋ ${F('O2')} → 2${F('H2O')} 為例，3 mol ${F('H2')} 和 2 mol ${F('O2')}：3 mol ${F('H2')} 只需要 1.5 mol ${F('O2')}，所以 ${F('O2')} 有剩，${F('H2')} 是限量試劑。用比值看：${F('H2')} 3 ÷ 2 ＝ 1.5，${F('O2')} 2 ÷ 1 ＝ 2，${F('H2')} 比較小，結論一樣。</p>
+  <p><b>產率</b> ＝ 實際產量 ÷ 理論產量 × 100%。理論產量是用限量試劑算出來的「最多可以得到多少」。</p>
+  <p><b>混合物分解題</b>：例如 ${F('CaCO3')} 和不會分解的雜質混在一起加熱，減少的質量全部是跑掉的 ${F('CO2')}。由 ${F('CO2')} 回推 ${F('CaCO3')}，再除以總質量就是純度。</p></div>`,
+ example:{q:'丙烷燃燒：C₃H₈ + O₂ → CO₂ + H₂O，平衡後係數總和是多少（最簡整數）？',steps:['先平衡 C：右邊 CO₂ 前放 3。','再平衡 H：左邊 8 個 H，右邊 H₂O 前放 4。','最後平衡 O：右邊 3 × 2 ＋ 4 ＝ 10 個 O，左邊 O₂ 前放 5。','C₃H₈ ＋ 5O₂ → 3CO₂ ＋ 4H₂O，係數總和 1 ＋ 5 ＋ 3 ＋ 4 ＝ <b>13</b>。']},
+ notes:{2:'由一種物質的質量求另一種物質的質量：質量 → 莫耳 → 係數比 → 莫耳 → 質量。',3:'限量試劑：比較「莫耳數 ÷ 係數」，小的先用完。',4:'產率與混合物純度的計算。'},
+ levels:[
+  ()=>{const L=[[['C₃H₈',1],['O₂',5],['CO₂',3],['H₂O',4]],[['CH₄',1],['O₂',2],['CO₂',1],['H₂O',2]],[['C₂H₆',2],['O₂',7],['CO₂',4],['H₂O',6]],[['C₂H₅OH',1],['O₂',3],['CO₂',2],['H₂O',3]],[['C₆H₁₂O₆',1],['O₂',6],['CO₂',6],['H₂O',6]],[['Fe',4],['O₂',3],['Fe₂O₃',2]],[['Al',2],['HCl',6],['AlCl₃',2],['H₂',3]],[['N₂',1],['H₂',3],['NH₃',2]],[['KClO₃',2],['KCl',2],['O₂',3]],[['Fe₂O₃',1],['CO',3],['Fe',2],['CO₂',3]],[['NH₃',4],['O₂',5],['NO',4],['H₂O',6]],[['C₄H₁₀',2],['O₂',13],['CO₂',8],['H₂O',10]],[['H₂S',2],['O₂',3],['SO₂',2],['H₂O',2]]];
+    const r=pick(L),nR=r.length===3?(r[0][0]==='KClO₃'?1:2):2,lhs=r.slice(0,nR),rhs=r.slice(nR),askSum=Math.random()<.5,t=pick(r),sum=r.reduce((a,x)=>a+x[1],0);
+    const show=s=>s.map(x=>x[0]).join(' ＋ ');const bal=s=>s.map(x=>(x[1]>1?x[1]:'')+x[0]).join(' ＋ ');
+    return{q:`平衡下列反應式（係數為最簡整數）：<br>${show(lhs)} → ${show(rhs)}<br>${askSum?'係數總和是多少？':`${t[0]} 的係數是多少？`}`,ans:[askSum?sum:t[1],1],steps:[`依序平衡只出現在一個反應物、一個生成物中的元素，最後平衡出現在單質中的元素。`,`平衡後：${bal(lhs)} → ${bal(rhs)}`,askSum?`係數總和 ＝ ${r.map(x=>x[1]).join(' ＋ ')} ＝ <b>${sum}</b>`:`${t[0]} 的係數是 <b>${t[1]}</b>`]}},
+  ()=>{const L=[['2Mg ＋ O₂ → 2MgO',['Mg',24,2],['MgO',40,2]],['CaCO₃ → CaO ＋ CO₂',['CaCO₃',100,1],['CO₂',44,1]],['CaCO₃ → CaO ＋ CO₂',['CaCO₃',100,1],['CaO',56,1]],['CH₄ ＋ 2O₂ → CO₂ ＋ 2H₂O',['CH₄',16,1],['H₂O',18,2]],['CH₄ ＋ 2O₂ → CO₂ ＋ 2H₂O',['CH₄',16,1],['O₂',32,2]],['2H₂ ＋ O₂ → 2H₂O',['H₂',2,2],['H₂O',18,2]],['N₂ ＋ 3H₂ → 2NH₃',['H₂',2,3],['NH₃',17,2]],['2KClO₃ → 2KCl ＋ 3O₂',['KClO₃',122.5,2],['O₂',32,3]],['Zn ＋ 2HCl → ZnCl₂ ＋ H₂',['Zn',65,1],['H₂',2,1]],['C ＋ O₂ → CO₂',['C',12,1],['CO₂',44,1]]];
+    const [eq,[a,ma,ca],[b,mb,cb]]=pick(L),n=pick([0.1,0.2,0.5,1,2,0.25,0.3,0.6,1.5,3]),mA=ma*n,nB=n*cb/ca,mB=mb*nB;if(!exact2(mB)||!exact2(mA)||!exact2(nB*100))return LEVELS_RETRY();
+    return{q:`依反應式 ${eq}，${dec(mA)} g 的 ${a} 完全反應，可得（或需要）${b} 幾克？（${a} ＝ ${ma}，${b} ＝ ${mb} g/mol）`,ans:RD(mB),steps:[`${a}：${dec(mA)} ÷ ${ma} ＝ ${dec(n)} mol`,`係數比 ${a} : ${b} ＝ ${ca} : ${cb}，${b} ＝ ${dec(n)} × ${fr(cb,ca)} ＝ ${dec(nB)} mol`,`${b} 質量 ＝ ${dec(nB)} × ${mb} ＝ <b>${dec(mB)}</b> g`]}},
+  ()=>{const L=[['2H₂ ＋ O₂ → 2H₂O',['H₂',2,2],['O₂',32,1],['H₂O',18,2]],['N₂ ＋ 3H₂ → 2NH₃',['N₂',28,1],['H₂',2,3],['NH₃',17,2]],['2Mg ＋ O₂ → 2MgO',['Mg',24,2],['O₂',32,1],['MgO',40,2]],['CH₄ ＋ 2O₂ → CO₂ ＋ 2H₂O',['CH₄',16,1],['O₂',32,2],['CO₂',44,1]],['C ＋ O₂ → CO₂',['C',12,1],['O₂',32,1],['CO₂',44,1]],['2CO ＋ O₂ → 2CO₂',['CO',28,2],['O₂',32,1],['CO₂',44,2]]];
+    const [eq,A,B,P]=pick(L);let nA,nB;do{nA=pick([0.5,1,1.5,2,3,4]);nB=pick([0.5,1,1.5,2,3])}while(Math.abs(nA/A[2]-nB/B[2])<1e-9);
+    const lim=nA/A[2]<nB/B[2]?A:B,ext=lim===A?nA/A[2]:nB/B[2],nP=ext*P[2],askLeft=Math.random()<.4,ex=lim===A?B:A,exN=(lim===A?nB:nA)-ext*ex[2];if(!exact2(askLeft?exN*ex[1]:nP*P[1])||!exact2(ext*1000))return LEVELS_RETRY();
+    return{q:`依反應式 ${eq}，取 ${dec(nA*A[1])} g ${A[0]} 和 ${dec(nB*B[1])} g ${B[0]} 充分反應。${askLeft?`剩下的反應物有幾克？`:`最多生成 ${P[0]} 幾克？`}（${A[0]} ＝ ${A[1]}，${B[0]} ＝ ${B[1]}，${P[0]} ＝ ${P[1]} g/mol）`,ans:RD(askLeft?exN*ex[1]:nP*P[1]),steps:[
+     `莫耳數：${A[0]} ${dec(nA)} mol、${B[0]} ${dec(nB)} mol`,`除以係數：${A[0]} ${dec(nA)} ÷ ${A[2]} ＝ ${dec(nA/A[2])}；${B[0]} ${dec(nB)} ÷ ${B[2]} ＝ ${dec(nB/B[2])}，<b>${lim[0]}</b> 較小，是限量試劑`,
+     askLeft?`${ex[0]} 用掉 ${dec(ext)} × ${ex[2]} ＝ ${dec(ext*ex[2])} mol，剩 ${dec(exN)} mol ＝ <b>${dec(exN*ex[1])}</b> g`:`${P[0]} ＝ ${dec(ext)} × ${P[2]} ＝ ${dec(nP)} mol ＝ <b>${dec(nP*P[1])}</b> g`]}},
+  mix(()=>{const n=pick([0.1,0.2,0.5]),pct=pick([60,75,80,90,50,40]),imp=n*100*(100-pct)/pct,tot=n*100+imp,loss=n*44;
+    if(!exact2(tot))return LEVELS_RETRY();
+    return{q:`含雜質的石灰石 ${dec(tot)} g，高溫加熱使其中的 ${F('CaCO3')} 完全分解（${F('CaCO3')} → CaO ＋ ${F('CO2')}，雜質不反應），質量減少 ${dec(loss)} g。石灰石中 ${F('CaCO3')} 的重量百分率是多少？（CaCO₃ ＝ 100，CO₂ ＝ 44）`,ans:[pct,1],steps:[`減少的質量全是 ${F('CO2')}：${dec(loss)} ÷ 44 ＝ ${dec(n)} mol`,`${F('CaCO3')} : ${F('CO2')} ＝ 1 : 1，${F('CaCO3')} ${dec(n)} mol ＝ ${dec(n*100)} g`,`純度 ＝ ${dec(n*100)} ÷ ${dec(tot)} × 100% ＝ <b>${pct}</b>%`]}},
+   ()=>{const L=[['N₂ ＋ 3H₂ → 2NH₃',['N₂',28,1],['NH₃',17,2]],['2Mg ＋ O₂ → 2MgO',['Mg',24,2],['MgO',40,2]],['CaCO₃ → CaO ＋ CO₂',['CaCO₃',100,1],['CaO',56,1]]];const [eq,A,P]=pick(L),n=pick([1,2,0.5]),y=pick([50,60,75,80,90]),theo=n/A[2]*P[2]*P[1],act=theo*y/100;
+    return{q:`依 ${eq}，${dec(n*A[1])} g ${A[0]} 與足量的另一反應物反應，實際得到 ${dec(act)} g ${P[0]}。產率是多少百分比？（${A[0]} ＝ ${A[1]}，${P[0]} ＝ ${P[1]}）`,ans:[y,1],steps:[`${A[0]} ${dec(n)} mol，理論上 ${P[0]} ＝ ${dec(n)} × ${fr(P[2],A[2])} ＝ ${dec(n/A[2]*P[2])} mol ＝ ${dec(theo)} g`,`產率 ＝ 實際 ÷ 理論 ＝ ${dec(act)} ÷ ${dec(theo)} × 100% ＝ <b>${y}</b>%`]}})]},
+
+/* ---------- 9 化學反應熱 ---------- */
+{id:'c_heat',unit:'第二章　化學鍵與化學反應',title:'化學反應熱',
+ goal:'看懂熱化學反應式與 ΔH 的正負，會依質量計算放出的熱量，並用黑斯定律組合反應式。',
+ concept:()=>`<div class="prose"><p>化學反應會伴隨能量變化。<b>放熱反應</b>：放出熱，周圍變熱，${M('Δ<i>H</i> &lt; 0')}（例如燃燒、中和）。<b>吸熱反應</b>：吸收熱，周圍變冷，${M('Δ<i>H</i> &gt; 0')}（例如電解水、光合作用）。</p>
+  <p><b>熱化學反應式</b>要標出物質狀態和 Δ<i>H</i>，例如：</p></div>
+  <div class="formula">${F('CH4')}(g) ＋ 2${F('O2')}(g) → ${F('CO2')}(g) ＋ 2${F('H2O')}(l)　Δ<i>H</i> ＝ −890 kJ<small>代表每燃燒 1 mol CH₄ 放出 890 kJ</small></div>
+  <div class="prose"><ul><li><b>係數乘幾倍，Δ<i>H</i> 也乘幾倍</b>（反應熱和反應量成正比）。</li><li><b>反應倒過來寫，Δ<i>H</i> 變號</b>。</li><li>狀態不同 Δ<i>H</i> 不同：生成液態水比生成水蒸氣放出更多熱（水蒸氣凝結還會放熱）。</li></ul></div>`,
+ deep:()=>`<div class="prose"><p><b>黑斯定律</b>：反應熱只和起點、終點有關，和走哪一條路無關。所以可以把幾個已知的反應式像方程式一樣加減，得到新反應的 Δ<i>H</i>。</p>
+  <p>例：已知 C ＋ ${F('O2')} → ${F('CO2')}，Δ<i>H</i><sub>1</sub> ＝ −394 kJ；CO ＋ ½${F('O2')} → ${F('CO2')}，Δ<i>H</i><sub>2</sub> ＝ −283 kJ。要求 C ＋ ½${F('O2')} → CO：用第一式減第二式（第二式倒過來加），Δ<i>H</i> ＝ −394 − (−283) ＝ −111 kJ。</p>
+  <p><b>組合技巧</b>：① 看目標式中每個物質在哪個已知式出現；② 決定已知式要正著用還是倒過來（變號）、要乘幾倍；③ 加起來後，中間產物會消掉，Δ<i>H</i> 也照同樣方式加減。</p>
+  <p><b>能量圖</b>：放熱反應的生成物能量比反應物低；活化能是反應物要越過的「山頂」高度。催化劑降低活化能，但<b>不會改變 Δ<i>H</i></b>。</p></div>`,
+ example:{q:'CH₄ 燃燒的 ΔH ＝ −890 kJ/mol。燃燒 4 g CH₄ 放出多少熱量？（CH₄ ＝ 16）',steps:['4 ÷ 16 ＝ 0.25 mol。','放熱 ＝ 0.25 × 890 ＝ <b>222.5</b> kJ。']},
+ notes:{2:'由質量求熱量：先換成莫耳，再乘以每莫耳的反應熱。',3:'反應式乘倍數或倒過來寫時，ΔH 怎麼變。',4:'黑斯定律：把已知反應式加減組合。'},
+ levels:[
+  bank([['下列哪一個過程是<b>吸熱</b>的？','電解水產生氫氣和氧氣',['甲烷燃燒','鹽酸和氫氧化鈉中和','鐵生鏽','水蒸氣凝結成水'],'電解要持續通電供給能量，是吸熱反應。燃燒、中和、生鏽、凝結都放熱。'],
+   ['某反應 ΔH ＝ +50 kJ，下列敘述何者正確？','反應時會從周圍吸熱',['反應時會放熱使周圍變熱','生成物的能量比反應物低','加入催化劑可使 ΔH 變小'],'ΔH 為正是吸熱反應，生成物能量較高；催化劑不改變 ΔH。'],
+   ['催化劑對化學反應的影響，何者正確？','降低活化能，使反應變快',['改變反應熱 ΔH','使吸熱反應變成放熱反應','增加生成物的總量'],'催化劑只改變反應路徑、降低活化能，不改變 ΔH 與平衡產量。']]),
+  ()=>{const L=[['CH₄',16,890],['C₃H₈',44,2220],['H₂',2,286],['C',12,394],['C₂H₅OH',46,1367],['CO',28,283]];const [s,m,h]=pick(L),n=pick([0.1,0.2,0.25,0.5,2,1.5]);
+    return{q:`${s} 燃燒的熱化學反應式中，每燃燒 1 mol ${s}，Δ<i>H</i> ＝ −${h} kJ。燃燒 ${dec(n*m)} g 的 ${s} 放出多少 kJ？（${s} ＝ ${m} g/mol）`,ans:RD(n*h),steps:[`${dec(n*m)} ÷ ${m} ＝ ${dec(n)} mol`,`放熱 ＝ ${dec(n)} × ${h} ＝ <b>${dec(n*h)}</b> kJ`]}},
+  ()=>{const h=rnd(5,60)*10*pick([1,-1]),k=pick([2,3,0.5]),rev=Math.random()<.5;const R_=['N₂(g) ＋ 3H₂(g) → 2NH₃(g)','2SO₂(g) ＋ O₂(g) → 2SO₃(g)','H₂(g) ＋ I₂(g) → 2HI(g)','2NO(g) ＋ O₂(g) → 2NO₂(g)'];const r=pick(R_);const v=(rev?-1:1)*k*h;
+    return{q:`已知 ${r}，Δ<i>H</i> ＝ ${num(h)} kJ。若把反應${rev?'<b>倒過來寫</b>，並':''}將係數乘以 ${k===0.5?'½':k}，新反應的 Δ<i>H</i> 是多少 kJ？`,ans:RD(v),steps:[`係數乘 ${k===0.5?'½':k}，Δ<i>H</i> 也乘 ${k===0.5?'½':k}：${num(h)} × ${dec(k)} ＝ ${dec(k*h)}`,rev?`倒過來寫要變號：<b>${dec(v)}</b> kJ`:`答案是 <b>${dec(v)}</b> kJ`]}},
+  ()=>{const T=pick([
+    ()=>{const a=-rnd(35,45)*10,b=-rnd(20,30)*10;return{q:`已知：<br>① C(s) ＋ O₂(g) → CO₂(g)　Δ<i>H</i><sub>1</sub> ＝ ${num(a)} kJ<br>② CO(g) ＋ ½O₂(g) → CO₂(g)　Δ<i>H</i><sub>2</sub> ＝ ${num(b)} kJ<br>求 C(s) ＋ ½O₂(g) → CO(g) 的 Δ<i>H</i>（kJ）。`,v:a-b,steps:[`目標式的 C 在 ① 的左邊 → ① 正著用；CO 在目標式右邊，但在 ② 的左邊 → ② 倒過來（變號）。`,`① ＋（② 倒過來）：C ＋ O₂ ＋ CO₂ → CO₂ ＋ CO ＋ ½O₂，消去 CO₂ 和 ½O₂ 得到目標式。`,`Δ<i>H</i> ＝ ${num(a)} − (${num(b)}) ＝ <b>${num(a-b)}</b> kJ`]}},
+    ()=>{const a=-rnd(25,30)*10-6,b=rnd(4,5)*10+4;return{q:`已知：<br>① H₂(g) ＋ ½O₂(g) → H₂O(l)　Δ<i>H</i><sub>1</sub> ＝ ${num(a)} kJ<br>② H₂O(l) → H₂O(g)　Δ<i>H</i><sub>2</sub> ＝ +${b} kJ<br>求 2H₂(g) ＋ O₂(g) → 2H₂O(g) 的 Δ<i>H</i>（kJ）。`,v:2*(a+b),steps:[`① ＋ ②：H₂ ＋ ½O₂ → H₂O(g)，Δ<i>H</i> ＝ ${num(a)} ＋ ${b} ＝ ${num(a+b)} kJ`,`目標式係數是它的 2 倍：Δ<i>H</i> ＝ 2 × (${num(a+b)}) ＝ <b>${num(2*(a+b))}</b> kJ`]}},
+    ()=>{const a=rnd(15,20)*10,b=-rnd(10,12)*10;return{q:`已知：<br>① N₂(g) ＋ O₂(g) → 2NO(g)　Δ<i>H</i><sub>1</sub> ＝ +${a} kJ<br>② 2NO(g) ＋ O₂(g) → 2NO₂(g)　Δ<i>H</i><sub>2</sub> ＝ ${num(b)} kJ<br>求 N₂(g) ＋ 2O₂(g) → 2NO₂(g) 的 Δ<i>H</i>（kJ）。`,v:a+b,steps:[`① ＋ ②：N₂ ＋ O₂ ＋ 2NO ＋ O₂ → 2NO ＋ 2NO₂，消去 2NO 得到目標式。`,`Δ<i>H</i> ＝ ${a} ＋ (${num(b)}) ＝ <b>${num(a+b)}</b> kJ`]}}])();
+    return{q:T.q,ans:[T.v,1],steps:T.steps}}]},
+
+/* ---------- 10 溶液與濃度 ---------- */
+{id:'c_conc',unit:'第三章　溶液與水溶液中的反應',title:'溶液與濃度',
+ goal:'熟練重量百分率、ppm、體積莫耳濃度的計算，以及稀釋、混合、濃度換算。',
+ concept:()=>`<div class="prose"><p>溶液 ＝ 溶質 ＋ 溶劑。濃度就是「溶質佔多少」，有幾種表示法：</p></div>
+  ${tbl(['濃度','定義','單位'],[['重量百分率','溶質質量 ÷ <b>溶液</b>質量 × 100%','%'],['ppm（百萬分點）','溶質質量 ÷ 溶液質量 × 10⁶','ppm（水溶液約為 mg/L）'],['體積莫耳濃度','溶質莫耳數 ÷ <b>溶液</b>體積（L）','M（mol/L）']])}
+  <div class="tip"><b>常見錯誤：</b>分母是<b>溶液</b>不是溶劑。10 g 糖溶在 90 g 水中，濃度是 10 ÷ (10 ＋ 90) ＝ 10%，不是 10 ÷ 90。</div>
+  <div class="formula">稀釋：${M('<i>C</i><sub>1</sub><i>V</i><sub>1</sub> = <i>C</i><sub>2</sub><i>V</i><sub>2</sub>')}<small>加水前後，溶質的莫耳數不變</small></div>`,
+ deep:()=>`<div class="prose"><p><b>配製 0.1 M NaOH 溶液 250 mL 的正確步驟</b>：計算需要 0.1 × 0.25 ＝ 0.025 mol ＝ 1 g NaOH → 在燒杯中用少量水溶解 → 倒入 250 mL 容量瓶，燒杯用水沖洗幾次一起倒入 → 加水到刻度線 → 蓋上搖勻。注意不是「把 1 g 加到 250 mL 水中」，因為那樣溶液體積不是 250 mL。</p>
+  <p><b>混合同一種溶質的兩杯溶液</b>：總莫耳數 ÷ 總體積（假設體積可以相加）。例如 0.2 M 100 mL ＋ 0.5 M 200 mL → (0.02 ＋ 0.1) ÷ 0.3 ＝ 0.4 M。</p>
+  <p><b>重量百分率換算成莫耳濃度</b>：取 1 L 溶液來算。質量 ＝ 1000 × 密度；溶質質量 ＝ 溶液質量 × 百分率；再除以莫耳質量。公式：${M(`<i>C</i><sub>M</sub> = ${fr('1000 × <i>d</i> × <i>w</i>%','莫耳質量')}`)}。例如 98% 濃硫酸密度 1.84 g/mL：1000 × 1.84 × 0.98 ÷ 98 ＝ 18.4 M。</p></div>`,
+ example:{q:'將 4 g NaOH 溶於水配成 500 mL 溶液，濃度是多少 M？（NaOH ＝ 40）',steps:['4 ÷ 40 ＝ 0.1 mol。','500 mL ＝ 0.5 L。','濃度 ＝ 0.1 ÷ 0.5 ＝ <b>0.2 M</b>。']},
+ notes:{2:'體積莫耳濃度與 ppm：注意體積要換成公升、ppm 要乘 10⁶。',3:'稀釋與混合：溶質的量不變，總莫耳數 ÷ 總體積。',4:'重量百分率與莫耳濃度的換算，需要密度。'},
+ levels:[
+  ()=>{const s=pick([5,10,15,20,25,30,40,50]),pct=pick([5,10,20,25,40,50,8,12.5]),tot=s*100/pct;if(!exact2(tot))return LEVELS_RETRY();const w=tot-s,ask=pick(['pct','water']);
+    return ask==='pct'?{q:`將 ${s} g 的糖溶於 ${dec(w)} g 水中，糖水的重量百分率濃度是多少 %？`,ans:RD(pct),steps:[`溶液質量 ＝ 溶質 ＋ 溶劑 ＝ ${s} ＋ ${dec(w)} ＝ ${dec(tot)} g`,`濃度 ＝ ${s} ÷ ${dec(tot)} × 100% ＝ <b>${dec(pct)}</b>%`]}
+     :{q:`要用 ${s} g 的食鹽配成 ${dec(pct)}% 的食鹽水，需要加多少克水？`,ans:RD(w),steps:[`溶液質量 ＝ ${s} ÷ ${dec(pct/100)} ＝ ${dec(tot)} g`,`水 ＝ ${dec(tot)} − ${s} ＝ <b>${dec(w)}</b> g`]}},
+  mix(()=>{const L=[['NaOH',40],['NaCl',58.5],['C₆H₁₂O₆',180],['CuSO₄',160],['H₂SO₄',98],['KOH',56]];const [s,m]=pick(L),n=pick([0.01,0.02,0.05,0.1,0.2,0.25]),V=pick([100,200,250,500,1000]),C=n/(V/1000),askC=Math.random()<.6;
+    return askC?{q:`將 ${dec(n*m)} g 的 ${s} 溶於水配成 ${V} mL 溶液，體積莫耳濃度是多少 M？（${s} ＝ ${m}）`,ans:RD(C),steps:[`${dec(n*m)} ÷ ${m} ＝ ${dec(n)} mol`,`${V} mL ＝ ${dec(V/1000)} L，濃度 ＝ ${dec(n)} ÷ ${dec(V/1000)} ＝ <b>${dec(C)}</b> M`]}
+     :{q:`要配製 ${dec(C)} M 的 ${s} 溶液 ${V} mL，需要 ${s} 幾克？（${s} ＝ ${m}）`,ans:RD(n*m),steps:[`莫耳數 ＝ ${dec(C)} × ${dec(V/1000)} ＝ ${dec(n)} mol`,`質量 ＝ ${dec(n)} × ${m} ＝ <b>${dec(n*m)}</b> g`]}},
+   ()=>{const mg=pick([1,2,3,4,5,8,10]),kg=pick([0.5,1,2,4]),ppm=mg/kg;return{q:`${kg*1000} g 的水樣中含有 ${mg} mg 的鉛，鉛的濃度是多少 ppm？`,ans:RD(ppm),steps:[`ppm ＝ 溶質質量 ÷ 溶液質量 × 10<sup>6</sup>`,`${mg} mg ＝ ${dec(mg/1000)} g，${M(`${fr(dec(mg/1000),kg*1000)} × 10<sup>6</sup> = ${dec(ppm)}`)}，答案是 <b>${dec(ppm)}</b> ppm（也就是每公斤 ${dec(ppm)} mg）`]}}),
+  mix(()=>{const C1=pick([1,2,6,12,18,0.5]),V2=pick([100,250,500,1000]),C2=pick([0.1,0.2,0.5,0.25,1]);const V1=C2*V2/C1;if(!exact2(V1)||V1>=V2)return LEVELS_RETRY();
+    return{q:`要用 ${C1} M 的鹽酸配製 ${C2} M 的鹽酸 ${V2} mL，需要取原溶液幾 mL？`,ans:RD(V1),steps:[`稀釋前後溶質莫耳數不變：${M('<i>C</i><sub>1</sub><i>V</i><sub>1</sub> = <i>C</i><sub>2</sub><i>V</i><sub>2</sub>')}`,`${C1} × <i>V</i><sub>1</sub> ＝ ${C2} × ${V2} ⇒ <i>V</i><sub>1</sub> ＝ <b>${dec(V1)}</b> mL`]}},
+   ()=>{const c1=pick([0.1,0.2,0.5,1]),v1=pick([100,200,300]),c2=pick([0.2,0.4,0.5,1,0.8]),v2=pick([100,200,300]);const C=(c1*v1+c2*v2)/(v1+v2);if(!exact2(C*10))return LEVELS_RETRY();
+    return{q:`把 ${c1} M 的 NaCl 溶液 ${v1} mL 和 ${c2} M 的 NaCl 溶液 ${v2} mL 混合（體積可相加），混合後濃度是多少 M？`,ans:RD(C),steps:[`總莫耳數 ＝ ${c1} × ${dec(v1/1000)} ＋ ${c2} × ${dec(v2/1000)} ＝ ${dec((c1*v1+c2*v2)/1000)} mol`,`總體積 ${dec((v1+v2)/1000)} L，濃度 ＝ <b>${dec(C)}</b> M`]}}),
+  ()=>{const L=[['H₂SO₄',98],['HCl',36.5],['NaOH',40],['HNO₃',63]];let tries=0,s,m,d,w,C;do{[s,m]=pick(L);d=pick([1.1,1.2,1.25,1.5,1.84,1.4]);w=pick([10,20,25,30,36.5,40,49,63,98]);C=10*d*w/m;tries++}while((!exact2(C)||C>20)&&tries<200);
+    if(!exact2(C))return LEVELS_RETRY();
+    return{q:`某 ${s} 水溶液的重量百分率為 ${w}%，密度為 ${d} g/mL。它的體積莫耳濃度是多少 M？（${s} ＝ ${m}）`,ans:RD(C),steps:[`取 1 L（1000 mL）溶液：質量 ＝ 1000 × ${d} ＝ ${dec(1000*d)} g`,`溶質 ＝ ${dec(1000*d)} × ${dec(w/100)} ＝ ${dec(10*d*w)} g ＝ ${dec(10*d*w)} ÷ ${m} ＝ ${dec(C)} mol`,`濃度 ＝ ${dec(C)} mol ÷ 1 L ＝ <b>${dec(C)}</b> M`]}}]},
+
+/* ---------- 11 酸鹼與 pH ---------- */
+{id:'c_acid',unit:'第三章　溶液與水溶液中的反應',title:'酸鹼與 pH 值',
+ goal:'會算強酸、強鹼溶液的 pH，並用中和反應計算滴定與混合後的 pH。',
+ concept:()=>`<div class="prose"><p><b>阿瑞尼斯的定義</b>：在水中解離出 ${F('H^+')} 的是酸，解離出 ${F('OH^-')} 的是鹼。強酸（HCl、${F('HNO3')}、${F('H2SO4')}）、強鹼（NaOH、KOH、${F('Ca(OH)2')}）在水中幾乎完全解離；弱酸（醋酸）只有部分解離。</p>
+  <p>25 °C 時，水溶液中永遠有 ${M('[H<sup>+</sup>][OH<sup>−</sup>] = 10<sup>−14</sup>')}。</p></div>
+  <div class="formula">${M('pH = −log[H<sup>+</sup>]')}　　${M('[H<sup>+</sup>] = 10<sup>−pH</sup>')}<small>25 °C：pH ＜ 7 酸性，＝ 7 中性，＞ 7 鹼性；pH ＋ pOH ＝ 14</small></div>
+  <div class="prose"><p>例：0.01 M HCl → [${F('H^+')}] ＝ 10<sup>−2</sup> → pH ＝ 2。0.001 M NaOH → [${F('OH^-')}] ＝ 10<sup>−3</sup> → pOH ＝ 3 → pH ＝ 11。</p></div>
+  <div class="tip"><b>常見錯誤：</b>${F('H2SO4')} 一個分子放出 2 個 ${F('H^+')}，${F('Ca(OH)2')} 放出 2 個 ${F('OH^-')}。0.005 M ${F('H2SO4')} 的 [${F('H^+')}] 是 0.01 M，pH ＝ 2。</div>`,
+ deep:()=>`<div class="prose"><p><b>pH 差 1，濃度差 10 倍</b>：因為 pH 是取對數。pH 3 的溶液比 pH 5 的酸 100 倍。強酸稀釋 10 倍，pH 增加 1；但再怎麼稀釋，酸也不會變成鹼，pH 只會越來越接近 7。</p>
+  <p><b>中和計算</b>：酸和鹼完全中和時，${F('H^+')} 的莫耳數 ＝ ${F('OH^-')} 的莫耳數。記得乘上「一個分子放出幾個 ${F('H^+')} 或 ${F('OH^-')}」。</p>
+  <p><b>酸鹼混合後的 pH</b>：① 分別算 ${F('H^+')} 和 ${F('OH^-')} 的莫耳數；② 互相抵消，看哪個有剩；③ 剩下的除以<b>混合後的總體積</b>，再求 pH。很多人忘了用總體積。</p>
+  <p><b>指示劑</b>：酚酞在酸性和中性無色、鹼性呈粉紅色；石蕊在酸性紅、鹼性藍。</p></div>`,
+ example:{q:'50 mL 的 0.1 M HCl 與 50 mL 的 0.08 M NaOH 混合，混合後 pH 是多少？',steps:['H⁺：0.1 × 0.05 ＝ 0.005 mol；OH⁻：0.08 × 0.05 ＝ 0.004 mol。','中和後 H⁺ 剩 0.001 mol。','總體積 100 mL ＝ 0.1 L，[H⁺] ＝ 0.001 ÷ 0.1 ＝ 0.01 ＝ 10⁻² M。','pH ＝ <b>2</b>。']},
+ notes:{2:'多質子酸、多元鹼要乘上放出的 H⁺ 或 OH⁻ 個數；鹼性溶液先求 pOH。',3:'稀釋後的 pH，以及由 pH 反推濃度。',4:'中和滴定與酸鹼混合：記得除以混合後的總體積。'},
+ levels:[
+  ()=>{const n=rnd(1,5),base=Math.random()<.4;return base?{q:`10<sup>−${n}</sup> M 的 NaOH 溶液，pH 是多少？（25 °C）`,ans:[14-n,1],steps:[`NaOH 是強鹼，[OH<sup>−</sup>] ＝ 10<sup>−${n}</sup> M，pOH ＝ ${n}`,`pH ＝ 14 − ${n} ＝ <b>${14-n}</b>`]}:{q:`10<sup>−${n}</sup> M 的 HCl 溶液，pH 是多少？`,ans:[n,1],steps:[`HCl 是強酸，完全解離：[H<sup>+</sup>] ＝ 10<sup>−${n}</sup> M`,`pH ＝ −log 10<sup>−${n}</sup> ＝ <b>${n}</b>`]}},
+  ()=>{const t=pick(['h2so4','caoh','koh']),n=rnd(1,4),c=dec(5*10**(-(n+1)));
+    if(t==='h2so4')return{q:`${c} M 的 ${F('H2SO4')} 溶液（視為完全解離），pH 是多少？`,ans:[n,1],steps:[`每個 H₂SO₄ 放出 2 個 H<sup>+</sup>：[H<sup>+</sup>] ＝ 2 × ${c} ＝ 10<sup>−${n}</sup> M`,`pH ＝ <b>${n}</b>`]};
+    if(t==='caoh')return{q:`${c} M 的 ${F('Ca(OH)2')} 溶液（視為完全解離），pH 是多少？（25 °C）`,ans:[14-n,1],steps:[`每個 Ca(OH)₂ 放出 2 個 OH<sup>−</sup>：[OH<sup>−</sup>] ＝ 2 × ${c} ＝ 10<sup>−${n}</sup> M，pOH ＝ ${n}`,`pH ＝ 14 − ${n} ＝ <b>${14-n}</b>`]};
+    const p=rnd(9,13);return{q:`某 KOH 溶液的 pH ＝ ${p}（25 °C），它的 [OH<sup>−</sup>] ＝ 10<sup>−<i>k</i></sup> M，求 <i>k</i>。`,ans:[14-p,1],steps:[`pOH ＝ 14 − ${p} ＝ ${14-p}`,`[OH<sup>−</sup>] ＝ 10<sup>−${14-p}</sup> M，<i>k</i> ＝ <b>${14-p}</b>`]}},
+  mix(()=>{const p=rnd(1,3),k=rnd(1,3);return{q:`pH ＝ ${p} 的鹽酸，用水稀釋為原體積的 ${10**k} 倍，pH 變成多少？`,ans:[p+k,1],steps:[`稀釋 ${10**k} 倍，[H<sup>+</sup>] 變成原本的 1/${10**k}：10<sup>−${p}</sup> → 10<sup>−${p+k}</sup>`,`pH ＝ <b>${p+k}</b>（強酸每稀釋 10 倍，pH 增加 1，但不會超過 7）`]}},
+   ()=>{const a=rnd(1,5),b=a+rnd(1,4);return{q:`pH ＝ ${a} 的溶液，[H<sup>+</sup>] 是 pH ＝ ${b} 的溶液的幾倍？`,ans:[10**(b-a),1],steps:[`[H<sup>+</sup>] 分別是 10<sup>−${a}</sup> 和 10<sup>−${b}</sup>`,`10<sup>−${a}</sup> ÷ 10<sup>−${b}</sup> ＝ 10<sup>${b-a}</sup> ＝ <b>${10**(b-a)}</b> 倍`]}},
+   bank([['下列何者是<b>弱酸</b>？','醋酸 '+F('CH3COOH'),['鹽酸 HCl','硝酸 '+F('HNO3'),'硫酸 '+F('H2SO4')],'醋酸在水中只有部分解離，是弱酸。'],['把酚酞滴入下列溶液，哪一個會變成粉紅色？','肥皂水',['檸檬汁','食鹽水','醋','汽水'],'酚酞在鹼性溶液中呈粉紅色。肥皂水呈鹼性。']])),
+  mix(()=>{const cb=pick([0.02,0.04,0.05,0.06,0.08]),m=pick([2,3]),acidEx=Math.random()<.5,ex=10**-m*2,ca=cb+ex;
+    const [cA,cB]=acidEx?[ca,cb]:[cb,ca];
+    return{q:`50 mL 的 ${dec(cA)} M HCl 與 50 mL 的 ${dec(cB)} M NaOH 混合，混合後溶液的 pH 是多少？（25 °C）`,ans:[acidEx?m:14-m,1],steps:[`H<sup>+</sup>：${dec(cA)} × 0.05 ＝ ${dec(cA*0.05)} mol；OH<sup>−</sup>：${dec(cB)} × 0.05 ＝ ${dec(cB*0.05)} mol`,`中和後 ${acidEx?'H<sup>+</sup>':'OH<sup>−</sup>'} 剩 ${dec(ex*0.05)} mol，總體積 0.1 L，濃度 ${dec(ex*0.5)} ＝ 10<sup>−${m}</sup> M`,acidEx?`pH ＝ <b>${m}</b>`:`pOH ＝ ${m}，pH ＝ 14 − ${m} ＝ <b>${14-m}</b>`]}},
+   ()=>{const ca=pick([0.05,0.1,0.2]),va=pick([10,20,25]),cb=pick([0.1,0.2,0.25,0.5]),acid=pick([['HCl',1],['H₂SO₄',2]]);const vb=ca*va*acid[1]/cb;if(!exact2(vb))return LEVELS_RETRY();
+    return{q:`以 ${cb} M 的 NaOH 滴定 ${va} mL 的 ${ca} M ${acid[0]}，達到完全中和需要 NaOH 幾 mL？`,ans:RD(vb),steps:[`H<sup>+</sup> 莫耳數 ＝ ${ca} × ${dec(va/1000)} × ${acid[1]} ＝ ${dec(ca*va*acid[1]/1000)} mol${acid[1]===2?'（每個 H₂SO₄ 放出 2 個 H<sup>+</sup>）':''}`,`需要 OH<sup>−</sup> 同莫耳數：${dec(ca*va*acid[1]/1000)} ÷ ${cb} ＝ ${dec(vb/1000)} L ＝ <b>${dec(vb)}</b> mL`]}})]},
+
+/* ---------- 12 氧化還原 ---------- */
+{id:'c_redox',unit:'第三章　溶液與水溶液中的反應',title:'氧化還原反應',
+ goal:'會求氧化數、判斷氧化劑和還原劑、計算轉移的電子數，並用活性大小判斷金屬置換反應。',
+ concept:()=>`<div class="prose"><p>氧化還原的定義由窄到寬：得到氧是氧化 → <b>失去電子是氧化、得到電子是還原</b> → 氧化數上升是氧化、下降是還原。三者一致時以電子觀點最常用。</p></div>
+  ${tbl(['氧化數規則','例子'],[['單質（元素狀態）為 0','Fe、O₂、Cl₂ 都是 0'],['單原子離子 ＝ 電荷','Na⁺ 為 +1，S²⁻ 為 −2'],['化合物中 O 通常 −2（過氧化物 −1）','H₂O₂ 中 O 為 −1'],['化合物中 H 通常 +1（金屬氫化物 −1）','NaH 中 H 為 −1'],['所有氧化數總和 ＝ 粒子電荷','SO₄²⁻：S ＋ 4(−2) ＝ −2，S ＝ +6']])}
+  <div class="tip"><b>口訣：</b>還原劑被氧化（氧化數上升、失去電子）；氧化劑被還原（氧化數下降、得到電子）。「劑」是對別人做的事，自己的遭遇剛好相反。</div>`,
+ deep:()=>`<div class="prose"><p><b>轉移電子數怎麼算？</b>找一個氧化數有改變的原子，算它每個改變多少，再乘上個數。例如 ${F('Fe2O3')} ＋ 3CO → 2Fe ＋ 3${F('CO2')}：Fe 由 +3 → 0，每個得 3 個電子，2 個 Fe 共得 6 個；C 由 +2 → +4，每個失 2 個，3 個 C 共失 6 個。得失相等，每莫耳反應轉移 6 mol 電子。</p>
+  <p><b>金屬活性序</b>：K &gt; Ca &gt; Na &gt; Mg &gt; Al &gt; Zn &gt; Fe &gt; Ni &gt; Sn &gt; Pb &gt; (H) &gt; Cu &gt; Hg &gt; Ag &gt; Au。活性大的金屬容易失去電子，可以把活性小的金屬從它的鹽溶液中置換出來（例如 Zn ＋ ${F('Cu^2+')} → ${F('Zn^2+')} ＋ Cu），反過來則不會反應。排在 H 前面的金屬可以和稀酸反應產生氫氣。</p>
+  <p><b>同一元素可以同時被氧化和還原</b>：例如 2${F('H2O2')} → 2${F('H2O')} ＋ ${F('O2')}，O 由 −1 變成 −2（還原）和 0（氧化），叫做自身氧化還原。</p></div>`,
+ example:{q:'KMnO₄ 中 Mn 的氧化數是多少？',steps:['K 為 +1，O 為 −2，整個化合物總和為 0。','(+1) ＋ Mn ＋ 4 × (−2) ＝ 0。','Mn ＝ <b>+7</b>。']},
+ notes:{2:'判斷氧化劑、還原劑：先標出氧化數，找出上升和下降的元素。',3:'計算每莫耳反應轉移幾莫耳電子。',4:'金屬活性序與置換反應的綜合判斷。'},
+ levels:[
+  ()=>{const L=[['H₂SO₄','S',6],['SO₂','S',4],['H₂S','S',-2],['KMnO₄','Mn',7],['MnO₂','Mn',4],['NH₃','N',-3],['HNO₃','N',5],['NO₂','N',4],['NO','N',2],['N₂O','N',1],['CO','C',2],['CO₂','C',4],['CH₄','C',-4],['Fe₂O₃','Fe',3],['FeO','Fe',2],['Cl₂','Cl',0],['HClO','Cl',1],['NaH','H',-1],['H₂O₂','O',-1],['SO₄²⁻','S',6],['ClO₃⁻','Cl',5],['ClO₄⁻','Cl',7],['K₂Cr₂O₇','Cr',6],['Cr₂O₇²⁻','Cr',6],['C₂O₄²⁻','C',3],['Na₂S₂O₃','S',2],['NH₄⁺','N',-3],['OF₂','O',2]];const [s,e,v]=pick(L);
+    return{q:`${s} 中 ${e} 的氧化數是多少？`,ans:[v,1],steps:[`依規則：O 通常 −2、H 通常 +1、鹼金屬 +1，總和等於粒子的電荷。${s==='H₂O₂'?'H₂O₂ 是過氧化物，O 為 −1。':s==='NaH'?'NaH 是金屬氫化物，H 為 −1。':s==='OF₂'?'F 永遠是 −1，所以 O 為 +2（特例）。':''}`,`解出 ${e} ＝ <b>${num(v)}</b>`]}},
+  ()=>{const L=[['Zn ＋ CuSO₄ → ZnSO₄ ＋ Cu','CuSO₄','Zn',['ZnSO₄','Cu']],['Fe₂O₃ ＋ 3CO → 2Fe ＋ 3CO₂','Fe₂O₃','CO',['Fe','CO₂']],['2Mg ＋ CO₂ → 2MgO ＋ C','CO₂','Mg',['MgO','C']],['Cl₂ ＋ 2KI → 2KCl ＋ I₂','Cl₂','KI',['KCl','I₂']],['CuO ＋ H₂ → Cu ＋ H₂O','CuO','H₂',['Cu','H₂O']],['2Al ＋ Fe₂O₃ → Al₂O₃ ＋ 2Fe','Fe₂O₃','Al',['Al₂O₃','Fe']],['SO₂ ＋ 2H₂S → 3S ＋ 2H₂O','SO₂','H₂S',['S','H₂O']]];const [eq,ox,red,others]=pick(L),askOx=Math.random()<.5;
+    return mc(`反應 ${eq} 中，<b>${askOx?'氧化劑':'還原劑'}</b>是？`,askOx?ox:red,[askOx?red:ox,...others],[`標出氧化數，找出變化：${askOx?`${ox} 中的元素氧化數下降（被還原），所以 ${ox} 是氧化劑`:`${red} 中的元素氧化數上升（被氧化），所以 ${red} 是還原劑`}。`])},
+  ()=>{const L=[['Zn ＋ Cu²⁺ → Zn²⁺ ＋ Cu','Zn',2,'Zn 由 0 → +2'],['2Al ＋ 3Cu²⁺ → 2Al³⁺ ＋ 3Cu','Al',3,'Al 由 0 → +3'],['Fe₂O₃ ＋ 3CO → 2Fe ＋ 3CO₂','Fe',3,'Fe 由 +3 → 0'],['Fe₂O₃ ＋ 3CO → 2Fe ＋ 3CO₂','CO',2,'C 由 +2 → +4'],['2KClO₃ → 2KCl ＋ 3O₂','O₂',4,'每個 O 由 −2 → 0，一個 O₂ 有 2 個 O'],['2KClO₃ → 2KCl ＋ 3O₂','KClO₃',6,'Cl 由 +5 → −1'],['Cu ＋ 4HNO₃ → Cu(NO₃)₂ ＋ 2NO₂ ＋ 2H₂O','NO₂',1,'N 由 +5 → +4'],['3Cu ＋ 8HNO₃ → 3Cu(NO₃)₂ ＋ 2NO ＋ 4H₂O','NO',3,'N 由 +5 → +2'],['2H₂O₂ → 2H₂O ＋ O₂','O₂',2,'O 由 −1 → 0，一個 O₂ 有 2 個 O'],['MnO₄⁻ ＋ 5Fe²⁺ ＋ 8H⁺ → Mn²⁺ ＋ 5Fe³⁺ ＋ 4H₂O','MnO₄⁻',5,'Mn 由 +7 → +2'],['2Na ＋ Cl₂ → 2NaCl','Cl₂',2,'每個 Cl 由 0 → −1，一個 Cl₂ 有 2 個 Cl']];const [eq,sp,e,why]=pick(L);
+    return{q:`反應 ${eq} 中，每消耗（或生成）1 mol 的 ${sp}，轉移多少 mol 電子？`,ans:[e,1],steps:[`${why}。`,`每 1 mol ${sp} 對應 <b>${e}</b> mol 電子。`]}},
+  mix(()=>{const ser=['K','Ca','Na','Mg','Al','Zn','Fe','Ni','Sn','Pb','Cu','Hg','Ag','Au'],safe=['Mg','Al','Zn','Fe','Ni','Sn','Pb','Cu','Ag'];const ms=shuffle(safe).slice(0,3),ss=shuffle(safe).slice(0,3);let cnt=0;const pairs=[];
+    for(const m of ms)for(const s of ss){if(m!==s&&ser.indexOf(m)<ser.indexOf(s)){cnt++;pairs.push(`${m} 放入 ${s} 鹽`)}}
+    return{q:`活性大小：Mg &gt; Al &gt; Zn &gt; Fe &gt; Ni &gt; Sn &gt; Pb &gt; Cu &gt; Ag。把 ${ms.join('、')} 三種金屬片，分別放入 ${ss.map(s=>s+' 的鹽溶液').join('、')} 中（共 9 種組合），會發生置換反應的有幾種？`,ans:[cnt,1],steps:[`金屬比溶液中的金屬離子活潑，才能把它置換出來；同一種金屬不反應。`,cnt?`會反應的組合：${pairs.join('；')}`:'沒有任何組合會反應。',`共 <b>${cnt}</b> 種`]}},
+   bank([{m:1,q:'關於氧化還原反應，下列哪些正確？',o:[['還原劑在反應中被氧化',true,''],['H₂O₂ 中 O 的氧化數為 −2',false,'過氧化物中 O 為 −1'],['Zn 放入 CuSO₄ 溶液，鋅片表面會析出銅',true,'Zn 比 Cu 活潑'],['Cu 放入稀鹽酸會產生氫氣',false,'Cu 排在 H 之後，不與稀酸反應'],['2H₂O₂ → 2H₂O ＋ O₂ 中，O 同時被氧化又被還原',true,'−1 → 0 與 −1 → −2']]},
+    {m:1,q:'反應 Fe₂O₃ ＋ 3CO → 2Fe ＋ 3CO₂，下列哪些正確？',o:[['CO 是還原劑',true,'C 由 +2 升到 +4'],['Fe₂O₃ 被氧化',false,'Fe 由 +3 降到 0，被還原'],['每生成 1 mol Fe 轉移 3 mol 電子',true,''],['每消耗 1 mol CO 轉移 3 mol 電子',false,'C 升 2，轉移 2 mol'],['反應中氧原子的氧化數不變',true,'都是 −2']]}]))]}
+];
+function LEVELS_RETRY(){throw new Error('retry')}
+for(const l of CHEM_LESSONS)l.levels=l.levels.map(g=>()=>{for(let i=0;i<60;i++){try{return g()}catch(e){if(e.message!=='retry')throw e}}throw new Error('generator failed: '+l.id)});
+/* ================= BIOLOGY (高一上 必修生物) ================= */
+const GT=(a,b)=>a+b;                                  // genotype string helper
+const BIO_LESSONS=[
+/* ---------- 1 細胞學說與顯微鏡 ---------- */
+{id:'b_scope',unit:'第一章　細胞',title:'細胞學說與顯微鏡',
+ goal:'說出細胞學說的內容與發展，並熟練顯微鏡的放大倍率、視野、移動方向與測微器計算。',
+ concept:()=>`${tbl(['科學家','貢獻'],[['虎克','用自製顯微鏡觀察軟木塞，看到許多小格子，命名為 cell（其實是死細胞的細胞壁）'],['雷文霍克','觀察到活的微生物、紅血球、精子'],['許來登、許旺','分別提出植物、動物都由細胞組成'],['菲爾紹','細胞都來自原已存在的細胞']])}
+  <div class="prose"><p><b>細胞學說</b>：① 生物都由細胞（和細胞的產物）組成；② 細胞是生物構造和功能的基本單位；③ 細胞來自原已存在的細胞。</p>
+  <p><b>複式顯微鏡要點</b>：</p><ul><li>總放大倍率 ＝ 目鏡倍率 × 物鏡倍率。</li><li>看到的影像<b>上下左右都顛倒</b>。影像在視野左上方，玻片要往<b>左上方</b>移，才能把它移到中央（往影像所在的方向移）。</li><li>換成高倍物鏡：視野變<b>小</b>、變<b>暗</b>，看到的細胞數變少、每個細胞變大；景深變淺。要用細調節輪對焦，並把光圈開大或改用凹面鏡。</li></ul></div>
+  <div class="tip"><b>常見錯誤：</b>倍率變成 2 倍，視野的<b>直徑</b>變成 1/2，但視野<b>面積</b>變成 1/4。所以排成一列的細胞數變 1/2，布滿視野的細胞數變 1/4。</div>`,
+ deep:()=>`<div class="prose"><p><b>為什麼影像會顛倒？</b>物鏡是凸透鏡，把標本成一個倒立放大的實像；目鏡再把這個實像放大成正立的虛像（相對於實像）。整體看來，相對於原本的標本是上下左右顛倒的。所以玻片上的字母「p」在視野中看起來是「d」。</p>
+  <p><b>測微器</b>：目鏡測微器放在目鏡裡，刻度不隨物鏡改變大小，本身沒有絕對長度，要先用<b>載物臺測微器</b>（每格 10 μm）校正。做法：讓兩者刻度重疊，找到對齊的兩處，算出「<i>x</i> 格目鏡測微器 ＝ <i>y</i> 格載物臺測微器」，則目鏡測微器每格 ＝ 10<i>y</i> ÷ <i>x</i> μm。<b>換物鏡要重新校正</b>：倍率變 4 倍，目鏡每格代表的長度變成 1/4。</p>
+  <p><b>解析度</b>：能分辨兩個點的最小距離。光學顯微鏡大約 0.2 μm，可以看到細胞、細胞核、葉綠體；看不到病毒和核糖體，要用電子顯微鏡。</p></div>`,
+ example:{q:'用 10× 目鏡、10× 物鏡觀察，視野中一列排了 40 個細胞。換成 40× 物鏡，一列可以看到幾個細胞？',steps:['原總倍率 10 × 10 ＝ 100 倍，新倍率 10 × 40 ＝ 400 倍，放大成 4 倍。','排成「一列」看的是視野的直徑，直徑變成 1/4。','40 × 1/4 ＝ <b>10</b> 個。']},
+ notes:{2:'改變倍率後的細胞數：一列看直徑（比例），布滿視野看面積（比例的平方）。',3:'測微器校正：先算目鏡測微器每格多長，再量細胞。',4:'顯微鏡操作與測微器的綜合判斷。'},
+ levels:[
+  mix(()=>{const e=pick([5,10,15,16]),o=pick([4,10,40,100]);return{q:`目鏡 ${e}×、物鏡 ${o}× 時，總放大倍率是多少？`,ans:[e*o,1],steps:[`總倍率 ＝ 目鏡 × 物鏡`,`${e} × ${o} ＝ <b>${e*o}</b> 倍`]}},
+   bank([['顯微鏡下看到的影像位於視野的右下方，要把它移到中央，玻片應往哪個方向移？','右下方',['左上方','右上方','左下方'],'影像上下左右顛倒，移動玻片時影像會往反方向動。影像在右下，玻片往右下推，影像就往左上（中央）移。'],
+    ['由低倍物鏡換成高倍物鏡後，下列何者正確？','視野變暗、看到的細胞數變少',['視野變亮、細胞數變多','視野變大','景深變深'],'倍率越高，進入的光越少，視野越暗、範圍越小。'],
+    ['「細胞都來自原已存在的細胞」是哪一位科學家提出的？','菲爾紹',['虎克','雷文霍克','許旺'],'菲爾紹補上細胞學說的第三點。'],
+    ['虎克在軟木塞中看到的「cell」，實際上是什麼？','死細胞留下的細胞壁',['活的植物細胞','細胞核','葉綠體'],'軟木塞是死的樹皮組織，只剩細胞壁圍成的空格。'],
+    ['將寫有字母「F」的玻片放在顯微鏡下，看到的影像會是？','上下左右都顛倒的 F',['正立的 F','只有左右顛倒的 F','只有上下顛倒的 F'],'複式顯微鏡的影像上下左右都顛倒（相當於轉 180°）。']])),
+  ()=>{const e=10,[o1,o2]=pick([[4,40],[10,40],[10,100],[4,10]]),k0=o2/o1;if(k0!==Math.round(k0))return LEVELS_RETRY();const k=k0,line=Math.random()<.5;const n=line?k*rnd(2,10):k*k*rnd(1,6),v=line?n/k:n/(k*k);
+    return{q:`以目鏡 ${e}×、物鏡 ${o1}× 觀察，${line?'視野直徑上一列排了':'視野中布滿了'} ${n} 個細胞。換成物鏡 ${o2}× 後，${line?'一列':'整個視野'}可以看到幾個細胞？`,ans:[v,1],steps:[`倍率由 ${e*o1} 倍變成 ${e*o2} 倍，放大成 ${k} 倍。`,line?`排成一列看的是直徑，直徑變成 1/${k}。`:`布滿視野看的是面積，面積變成 1/${k}<sup>2</sup> ＝ 1/${k*k}。`,`${n} × 1/${line?k:k*k} ＝ <b>${v}</b> 個`]}},
+  ()=>{const x=pick([10,20,25,40,50]),y=pick([2,4,5,8,10].filter(t=>10*t*100%x===0)),per=10*y/x,cells=rnd(2,12),size=per*cells,ask=pick(['per','size']);
+    return ask==='per'?{q:`校正時，目鏡測微器的 ${x} 格恰好與載物臺測微器的 ${y} 格重疊（載物臺測微器每格 10 μm）。目鏡測微器每格代表多少 μm？`,ans:RD(per),steps:[`${y} 格載物臺測微器 ＝ ${y} × 10 ＝ ${10*y} μm`,`這等於目鏡測微器 ${x} 格，所以每格 ＝ ${10*y} ÷ ${x} ＝ <b>${dec(per)}</b> μm`]}
+     :{q:`校正時，目鏡測微器 ${x} 格與載物臺測微器 ${y} 格重疊（載物臺每格 10 μm）。某細胞長度佔目鏡測微器 ${cells} 格，細胞長幾 μm？`,ans:RD(size),steps:[`目鏡每格 ＝ ${y} × 10 ÷ ${x} ＝ ${dec(per)} μm`,`細胞 ＝ ${cells} × ${dec(per)} ＝ <b>${dec(size)}</b> μm`]}},
+  mix(()=>{const per=pick([2.5,5,10]),k=pick([2,4]),cells=rnd(2,8)*k;return{q:`在物鏡 10× 下，目鏡測微器每格代表 ${per} μm。換成物鏡 ${10*k}×（目鏡不變），某細胞佔目鏡測微器 ${cells} 格，細胞長幾 μm？`,ans:RD(cells*per/k),steps:[`物鏡倍率變 ${k} 倍，同一格目鏡測微器代表的實際長度變成 1/${k}：${per} ÷ ${k} ＝ ${dec(per/k)} μm`,`細胞 ＝ ${cells} × ${dec(per/k)} ＝ <b>${dec(cells*per/k)}</b> μm（目鏡測微器換物鏡必須重新校正）`]}},
+   bank([{m:1,q:'關於顯微鏡的使用，下列哪些正確？',o:[['換高倍物鏡後，應使用細調節輪對焦',true,'用粗調節輪容易壓破玻片'],['目鏡測微器的每格長度不會因為更換物鏡而改變',false,'它代表的實際長度會隨物鏡倍率改變，需重新校正'],['光學顯微鏡無法看到病毒',true,'病毒比解析度極限小'],['影像在視野左方時，應將玻片往右移才能移到中央',false,'應往左移'],['倍率加倍後，布滿視野的細胞數變成原來的 1/4',true,'面積變 1/4']]}]))]},
+
+/* ---------- 2 細胞的構造 ---------- */
+{id:'b_cell',unit:'第一章　細胞',title:'細胞的構造與胞器',
+ goal:'比較原核與真核細胞、動物與植物細胞，說出主要胞器的功能，以及蛋白質分泌的路徑。',
+ concept:()=>`${tbl(['','原核細胞','真核細胞'],[['代表','細菌、藍綠菌','動物、植物、真菌、原生生物'],['細胞核','<b>無</b>核膜（DNA 在擬核區）','有核膜包住的細胞核'],['膜狀胞器','無','有（粒線體、內質網、高基氏體…）'],['核糖體','有（較小）','有'],['細胞壁','多數有（成分不是纖維素）','植物（纖維素）、真菌（幾丁質）有；動物無']])}
+  ${tbl(['胞器','功能'],[['細胞核','含 DNA，控制細胞活動'],['核糖體','合成蛋白質（無膜）'],['粗糙內質網','表面附著核糖體，合成並運送蛋白質'],['平滑內質網','合成脂質、解毒'],['高基氏體','加工、包裝、分送蛋白質'],['溶體','含分解酵素，分解老舊胞器與吞入的物質（主要在動物細胞）'],['粒線體','進行有氧呼吸，產生 ATP（雙層膜，有自己的 DNA）'],['葉綠體','進行光合作用（雙層膜，有自己的 DNA，植物與藻類）'],['液泡','儲存水分與物質，成熟植物細胞有大型中央液泡'],['中心粒','參與動物細胞分裂時紡錘體的形成']])}
+  <div class="tip"><b>常見錯誤：</b>原核細胞<b>也有</b>核糖體、細胞膜、DNA，只是沒有核膜和膜狀胞器。藍綠菌能行光合作用，但<b>沒有</b>葉綠體。</div>`,
+ deep:()=>`<div class="prose"><p><b>分泌性蛋白質的旅程</b>（例如胰臟細胞分泌消化酶）：核糖體（在粗糙內質網上）合成 → 粗糙內質網內腔 → 運輸囊泡 → 高基氏體加工 → 分泌囊泡 → 與細胞膜融合，以<b>胞吐</b>送出細胞。用放射性胺基酸追蹤，放射性會依這個順序出現，這是段考常見的實驗題。</p>
+  <p><b>內共生學說</b>：粒線體和葉綠體可能是很久以前被吞入的細菌，後來和宿主細胞共生。證據：都有雙層膜、自己的環狀 DNA、自己的核糖體，而且能自行分裂增生。</p>
+  <p><b>細胞膜的流體鑲嵌模型</b>：磷脂雙層為基本架構，蛋白質鑲嵌或貫穿其中，兩者都能在膜上移動。磷脂的親水頭朝外、疏水尾朝內。</p>
+  <p><b>細胞越小越好？</b>細胞變大時，體積增加得比表面積快（體積 ∝ 邊長³、表面積 ∝ 邊長²），表面積與體積比變小，物質交換變慢。所以細胞通常很小。</p></div>`,
+ example:{q:'一個細胞有細胞壁、核糖體、DNA，但沒有核膜和粒線體。它最可能是哪一類生物的細胞？',steps:['沒有核膜 → 原核細胞。','原核細胞有細胞壁、核糖體、DNA，但沒有膜狀胞器（如粒線體），完全符合。','答案：<b>細菌（或藍綠菌）</b>。']},
+ notes:{2:'分辨動物、植物、原核細胞的構造差異。',3:'胞器功能與蛋白質分泌路徑的應用。',4:'綜合多選：注意原核細胞有什麼、沒有什麼。'},
+ levels:[
+  bank([['合成蛋白質的胞器是？','核糖體',['高基氏體','溶體','液泡','中心粒'],'核糖體由 RNA 和蛋白質組成，負責把胺基酸接成蛋白質。'],['進行有氧呼吸、產生大量 ATP 的胞器是？','粒線體',['葉綠體','內質網','高基氏體','核糖體'],'粒線體被稱為細胞的發電廠。'],['含有分解酵素、可分解老舊胞器的是？','溶體',['液泡','核糖體','中心粒','內質網'],'溶體內的酵素可分解各種大分子。'],['負責加工、包裝與分送蛋白質的胞器是？','高基氏體',['粗糙內質網','溶體','粒線體','細胞核'],'高基氏體像物流中心，把蛋白質修飾後送到目的地。'],['下列哪一個胞器<b>沒有</b>膜包圍？','核糖體',['粒線體','高基氏體','溶體','內質網'],'核糖體由 RNA 與蛋白質組成，沒有膜。']]),
+  bank([['下列哪一項構造是原核細胞與真核細胞<b>都有</b>的？','核糖體',['細胞核','粒線體','內質網','高基氏體'],'原核細胞沒有膜狀胞器，但有核糖體、細胞膜、DNA。'],['下列何者是植物細胞有、動物細胞沒有的構造？','葉綠體',['粒線體','核糖體','細胞膜','高基氏體'],'葉綠體、細胞壁、大型中央液泡是植物細胞的特徵。'],['藍綠菌可以行光合作用，它的細胞內有？','光合色素，但沒有葉綠體',['葉綠體','粒線體','細胞核','高基氏體'],'藍綠菌是原核生物，光合色素位於膜上，沒有葉綠體這個胞器。'],['下列何者為原核生物？','大腸桿菌',['酵母菌','草履蟲','香菇','水綿'],'細菌是原核生物；酵母菌、香菇是真菌，草履蟲、水綿是真核生物。'],['動物細胞分裂時，參與形成紡錘體的構造是？','中心粒',['高基氏體','溶體','液泡','核糖體'],'中心粒在動物細胞分裂時發出紡錘絲。高等植物細胞沒有中心粒。']]),
+  mix(()=>{const path=['核糖體','粗糙內質網','高基氏體','分泌囊泡','細胞膜'];const right=path.join(' → ');const wrongs=[['核糖體','高基氏體','粗糙內質網','分泌囊泡','細胞膜'],['粗糙內質網','核糖體','高基氏體','分泌囊泡','細胞膜'],['核糖體','粗糙內質網','溶體','分泌囊泡','細胞膜'],['高基氏體','粗糙內質網','核糖體','分泌囊泡','細胞膜']].map(x=>x.join(' → '));
+    return mc('以放射性胺基酸培養胰臟細胞，追蹤消化酶的合成與分泌，放射性依序出現的位置是？',right,wrongs,['蛋白質在附著於粗糙內質網的核糖體上合成，進入內質網，以囊泡送到高基氏體加工，再由分泌囊泡與細胞膜融合，以胞吐送出。'])},
+   bank([['下列哪一組胞器都具有雙層膜，且含有自己的 DNA？','粒線體與葉綠體',['高基氏體與溶體','核糖體與中心粒','內質網與高基氏體'],'這兩種胞器有雙層膜和自己的 DNA，是內共生學說的證據。（細胞核也有雙層膜和 DNA，但不是本題選項的組合）'],['肝臟細胞負責解毒，其中特別發達的胞器是？','平滑內質網',['粗糙內質網','高基氏體','葉綠體'],'平滑內質網可以合成脂質並進行解毒。'],['分泌大量蛋白質的細胞（如胰臟腺細胞），下列哪些胞器會特別發達？','粗糙內質網與高基氏體',['溶體與液泡','葉綠體與粒線體','平滑內質網與中心粒'],'蛋白質在粗糙內質網上合成、在高基氏體加工包裝。']])),
+  bank([{m:1,q:'關於原核細胞與真核細胞，下列哪些正確？',o:[['原核細胞沒有核膜',true,''],['原核細胞沒有核糖體',false,'原核細胞有核糖體'],['真菌的細胞壁成分是纖維素',false,'真菌是幾丁質，植物才是纖維素'],['粒線體與葉綠體有自己的 DNA',true,'支持內共生學說'],['動物細胞沒有細胞壁',true,'']]},
+   {m:1,q:'某細胞含有細胞壁、葉綠體、大型液泡、粒線體。下列推論哪些正確？',o:[['它是真核細胞',true,'有膜狀胞器'],['它可能是藍綠菌',false,'藍綠菌沒有葉綠體與粒線體'],['它可以進行光合作用',true,'有葉綠體'],['它不需要進行呼吸作用',false,'植物細胞也要呼吸作用產生 ATP，粒線體就是證據'],['它的細胞壁主要成分是纖維素',true,'這是植物細胞']]}])]},
+
+/* ---------- 3 物質進出細胞 ---------- */
+{id:'b_trans',unit:'第一章　細胞',title:'物質進出細胞',
+ goal:'分辨擴散、促進性擴散、滲透、主動運輸、胞吞胞吐，預測細胞在不同濃度溶液中的變化。',
+ concept:()=>`${tbl(['方式','方向','耗能','需要膜蛋白','例子'],[['簡單擴散','高濃度 → 低濃度','不耗能','不需要','O₂、CO₂ 進出細胞'],['促進性擴散','高 → 低','不耗能','需要（通道或載體）','葡萄糖進入紅血球'],['滲透','水由<b>溶質濃度低</b>往<b>溶質濃度高</b>','不耗能','可經水通道','植物根吸水'],['主動運輸','低濃度 → 高濃度（逆濃度）','<b>耗能（ATP）</b>','需要（載體、幫浦）','鈉鉀幫浦、根吸收礦物質'],['胞吞／胞吐','大分子或顆粒','耗能','靠膜的變形','白血球吞噬細菌、分泌消化酶']])}
+  ${tbl(['外界溶液','水的移動','動物細胞（紅血球）','植物細胞'],[['低張（比細胞內稀）','水進入細胞','脹大，甚至破裂（溶血）','膨脹，細胞壁撐住，產生膨壓'],['等張','進出相等','形狀不變','不變'],['高張（比細胞內濃）','水離開細胞','皺縮','原生質收縮與細胞壁分離（質壁分離）']])}
+  <div class="tip"><b>常見錯誤：</b>滲透是<b>水</b>在移動，方向是往「溶質多」的那邊跑（水往濃的地方走，好像要去稀釋它）。不要說成溶質往低濃度移動。</div>`,
+ deep:()=>`<div class="prose"><p><b>為什麼植物細胞不會脹破？</b>細胞壁很堅固，水進入後原生質體壓在細胞壁上，產生<b>膨壓</b>，膨壓大到一定程度就擋住水繼續進入。蔬菜放在清水中會變得更脆就是這個原因；用鹽醃會變軟，則是水被拉出來（質壁分離）。</p>
+  <p><b>找出細胞的等張濃度</b>：把馬鈴薯條泡在不同濃度的蔗糖溶液，量質量變化。質量增加代表溶液比細胞稀（水進入），減少代表比細胞濃。質量<b>不變</b>的濃度就是等張濃度，通常用圖形內插法找出變化為 0 的點。</p>
+  <p><b>鈉鉀幫浦</b>：每消耗 1 個 ATP，把 3 個 ${F('Na^+')} 送出細胞、2 個 ${F('K^+')} 送入細胞，都是逆濃度梯度。這讓細胞內鉀多、細胞外鈉多，是神經傳導的基礎。</p>
+  <p><b>判斷主動運輸的實驗線索</b>：加入呼吸作用抑制劑（如氰化物）或缺氧後，運輸速率明顯下降 → 需要 ATP → 主動運輸。</p></div>`,
+ example:{q:'把紅血球放入蒸餾水中，會發生什麼事？為什麼？',steps:['蒸餾水幾乎沒有溶質，比紅血球內部稀，屬於低張溶液。','水由溶質濃度低（外面）往溶質濃度高（細胞內）移動，大量進入紅血球。','動物細胞沒有細胞壁保護，紅血球會<b>脹大破裂</b>（溶血）。']},
+ notes:{2:'判斷運輸方式：看方向（順或逆濃度）、是否耗能、是否需要膜蛋白。',3:'實驗題：由質量變化或形態變化判斷溶液濃度。',4:'等張濃度的內插計算與綜合多選。'},
+ levels:[
+  bank([['O₂ 由肺泡進入微血管，屬於哪一種運輸方式？','簡單擴散',['主動運輸','胞吞','促進性擴散'],'O₂ 是小分子，直接穿過磷脂層，由高濃度往低濃度移動。'],['把紅血球放入高濃度食鹽水中，紅血球會？','皺縮',['脹破','形狀不變','變成圓球形後破裂'],'高張溶液使水離開細胞，紅血球皺縮。'],['白血球吞噬細菌的方式是？','胞吞',['胞吐','主動運輸','擴散'],'細胞膜向內凹陷把細菌包起來，形成囊泡。'],['下列哪一種運輸方式需要消耗 ATP？','主動運輸',['簡單擴散','滲透','促進性擴散'],'主動運輸逆濃度梯度運送，必須消耗能量。'],['植物細胞放入濃鹽水中，會觀察到什麼現象？','原生質與細胞壁分離（質壁分離）',['細胞脹破','細胞壁溶解','液泡變大'],'水離開細胞，原生質體縮小，和細胞壁分開。']]),
+  bank([['某物質由低濃度往高濃度運送進入細胞，且需要膜上載體蛋白。這是？','主動運輸',['促進性擴散','簡單擴散','滲透'],'逆濃度梯度一定是主動運輸。'],['葡萄糖經由載體蛋白，順著濃度梯度進入紅血球，這是？','促進性擴散',['主動運輸','簡單擴散','胞吞'],'順濃度梯度、不耗能，但需要載體蛋白。'],['加入呼吸作用抑制劑後，細胞吸收某離子的速率大幅下降。最可能的運輸方式是？','主動運輸',['簡單擴散','促進性擴散','滲透'],'抑制呼吸作用 → ATP 減少 → 需要能量的主動運輸受影響。'],['鈉鉀幫浦每消耗一個 ATP，會怎樣運送離子？','送出 3 個 Na⁺、送入 2 個 K⁺',['送入 3 個 Na⁺、送出 2 個 K⁺','送出 2 個 Na⁺、送入 3 個 K⁺','送入 Na⁺ 與 K⁺ 各 1 個'],'鈉鉀幫浦維持細胞外 Na⁺ 多、細胞內 K⁺ 多。']]),
+  mix(()=>{const conc=[0,0.1,0.2,0.3,0.4,0.5],iso=pick([0.2,0.3,0.4]);const right=`${dec(iso)} M`;const changes=conc.map(c=>Math.round((iso-c)*50));const tab=tbl(['蔗糖濃度（M）',...conc.map(dec)],[['質量變化（%）',...changes.map(v=>v>0?'+'+v:v===0?'0':'−'+(-v))]]);
+    return mc(`將質量相同的馬鈴薯條泡在不同濃度的蔗糖溶液中 1 小時，質量變化如下：${tab}馬鈴薯細胞的等張濃度最接近？`,right,conc.filter(c=>c!==iso).map(c=>`${dec(c)} M`),[`質量增加代表水進入細胞（溶液較稀）；質量減少代表水離開（溶液較濃）。`,`質量不變的濃度就是細胞內外濃度相等的等張濃度：${dec(iso)} M。`])},
+   bank([['U 形管中間以半透膜隔開，左側裝 10% 蔗糖溶液、右側裝 5% 蔗糖溶液（蔗糖不能通過半透膜）。一段時間後？','左側液面上升',['右側液面上升','兩側液面不變','蔗糖由左側移到右側'],'水由溶質濃度低的右側往溶質濃度高的左側滲透，左側液面上升。'],['把萎軟的芹菜泡在清水中，一段時間後會變得挺直，主要原因是？','水進入細胞，產生膨壓',['細胞吸收清水中的鹽分','細胞壁變厚','細胞分裂變多'],'清水是低張溶液，水進入細胞，細胞膨脹撐住細胞壁。']])),
+  mix(()=>{const a=pick([0.1,0.2]),b=a+0.2,ga=pick([8,10,12,6]),gb=-pick([4,6,8,10,12]);const iso=a+(b-a)*ga/(ga-gb);if(!exact2(iso*10))return LEVELS_RETRY();
+    return{q:`馬鈴薯條在 ${dec(a)} M 蔗糖溶液中質量增加 ${ga}%，在 ${dec(b)} M 中質量減少 ${-gb}%。假設質量變化與濃度成直線關係，馬鈴薯細胞的等張濃度是多少 M？`,ans:RD(iso),steps:[`等張時質量變化為 0，用直線內插。濃度增加 ${dec(b-a)} M，質量變化共減少 ${ga} ＋ ${-gb} ＝ ${ga-gb}%。`,`由 +${ga}% 降到 0 需要 ${M(`${dec(b-a)} × ${fr(ga,ga-gb)} = ${dec(iso-a)}`)} M`,`等張濃度 ＝ ${dec(a)} ＋ ${dec(iso-a)} ＝ <b>${dec(iso)}</b> M`]}},
+   bank([{m:1,q:'關於物質進出細胞，下列哪些正確？',o:[['滲透作用中，水由溶質濃度低處往高處移動',true,''],['主動運輸可將物質由低濃度往高濃度運送',true,''],['促進性擴散需要消耗 ATP',false,'順濃度梯度，不耗能'],['紅血球放入蒸餾水中會發生質壁分離',false,'動物細胞沒有細胞壁；紅血球會脹破（溶血）'],['胞吐作用可將消化酶送出細胞',true,'']]}]))]},
+
+/* ---------- 4 ATP 與酵素 ---------- */
+{id:'b_enz',unit:'第一章　細胞',title:'ATP 與酵素',
+ goal:'了解 ATP 如何儲存與釋放能量，說明酵素的特性，並分析溫度、pH、濃度對酵素反應的影響。',
+ concept:()=>`<div class="prose"><p><b>ATP（腺苷三磷酸）</b>＝ 腺嘌呤 ＋ 核糖 ＋ 3 個磷酸。最後一個磷酸鍵斷開時釋放能量：ATP → ADP ＋ Pi ＋ 能量。呼吸作用把能量存回 ATP。ATP 是細胞的「能量貨幣」，不是用來長期儲存能量（長期儲存靠澱粉、肝醣、脂肪）。</p>
+  <p><b>酵素</b>是生物催化劑，多數是蛋白質。</p><ul><li><b>降低活化能</b>，加快反應速率；不改變反應的最終產物和能量變化。</li><li><b>專一性</b>：一種酵素只催化特定反應（像鑰匙配鎖）。</li><li>反應後酵素本身不變，可以<b>重複使用</b>，所以需要量很少。</li></ul></div>
+  ${tbl(['因素','影響'],[['溫度','有最適溫度（人體約 37 °C）。太低活性降低但可恢復；太高蛋白質<b>變性</b>，無法恢復'],['pH','有最適 pH：胃蛋白酶約 2、唾液澱粉酶約 7、胰蛋白酶約 8'],['受質濃度','濃度增加速率上升，但酵素都忙不過來時速率達到最大值'],['酵素濃度','受質充足時，酵素越多速率越快']])}`,
+ deep:()=>`<div class="prose"><p><b>為什麼高溫會讓酵素失效？</b>酵素的功能取決於它的立體形狀，特別是和受質結合的<b>活化位</b>。高溫破壞維持形狀的弱鍵，形狀改變（變性），受質再也裝不進去。降溫後形狀回不來，所以高溫的傷害是不可逆的。低溫只是分子運動慢、碰撞少，回溫後活性就恢復。</p>
+  <p><b>讀「反應速率－受質濃度」圖</b>：一開始近似直線上升（受質不足，加越多越快）；後來趨於水平（酵素都在工作，達到飽和）。在水平段再增加酵素量，最大速率才會提高。</p>
+  <p><b>誘導契合模型</b>：比鎖鑰模型更精確，受質靠近時酵素的活化位會稍微改變形狀，緊緊包住受質。</p>
+  <p><b>實驗設計題常考</b>：要證明某因素的影響，只能改變那一個變因（操縱變因），其他條件都要相同（控制變因），並設置對照組（例如煮沸過的酵素液）。</p></div>`,
+ example:{q:'把唾液澱粉酶分別放在 0 °C 和 100 °C 處理後，再移到 37 °C，哪一組還能分解澱粉？',steps:['0 °C 時分子運動慢，活性降低，但酵素結構沒有被破壞。','100 °C 會使蛋白質變性，結構永久改變。','移回 37 °C 後，<b>0 °C 那組恢復活性</b>，100 °C 那組不行。']},
+ notes:{2:'溫度、pH 對酵素的影響：分辨「可逆的降低」與「不可逆的變性」。',3:'讀圖與實驗設計：找出操縱變因、控制變因與對照組。',4:'ATP 與酵素的綜合多選。'},
+ levels:[
+  bank([['ATP 分子中，釋放能量時斷開的是？','最末端的磷酸鍵',['腺嘌呤與核糖之間的鍵','核糖內部的鍵','所有磷酸鍵同時斷開'],'ATP → ADP ＋ Pi，斷開最後一個磷酸。'],['酵素加快反應速率的原因是？','降低反應所需的活化能',['提供反應所需的能量','增加生成物的總量','改變反應的熱量變化'],'酵素只改變路徑，降低活化能。'],['大多數酵素的化學本質是？','蛋白質',['醣類','脂質','核酸'],'少數具有催化能力的 RNA 也存在，但絕大多數酵素是蛋白質。'],['下列何者是酵素的特性？','具有專一性',['反應後會被消耗掉','在任何溫度下活性都相同','會改變反應最終的產物'],'一種酵素通常只作用於特定受質。'],['ATP 的組成，下列何者正確？','腺嘌呤＋核糖＋三個磷酸',['腺嘌呤＋去氧核糖＋三個磷酸','腺嘌呤＋核糖＋兩個磷酸','胸腺嘧啶＋核糖＋三個磷酸'],'ATP 是腺苷三磷酸，糖是核糖。']]),
+  bank([['胃蛋白酶的最適 pH 約為多少？','2',['7','8','12'],'胃液含鹽酸，呈強酸性，胃蛋白酶在 pH 約 2 時活性最佳。'],['唾液澱粉酶進入胃後，活性會如何？','因 pH 太低而失去活性',['活性提高','不受影響','開始分解蛋白質'],'唾液澱粉酶最適 pH 約 7，胃中強酸使其失活。'],['將酵素放在 60 °C 一段時間後再降到最適溫度，活性無法恢復，原因是？','高溫使酵素變性',['低溫使酵素凍結','酵素被受質用完','酵素被分解成胺基酸'],'高溫破壞蛋白質的立體結構，不可逆。'],['人體內大多數酵素的最適溫度約為？','37 °C',['0 °C','60 °C','100 °C'],'接近體溫。']]),
+  bank([['探討溫度對酵素活性的實驗中，下列哪一項應該<b>保持相同</b>？','酵素濃度與 pH',['溫度','反應速率','各組的反應溫度'],'溫度是操縱變因；酵素量、受質量、pH 等都是控制變因，要相同。'],['在「反應速率－受質濃度」圖中，受質濃度很高時速率不再上升，若要提高最大速率，應該？','增加酵素濃度',['再增加受質濃度','降低溫度到 0 °C','加入大量 ATP'],'速率不再上升代表酵素已經飽和，只有增加酵素量才能提高最大速率。'],['實驗中以「煮沸過的酵素液」取代酵素液，這一組的目的是？','作為對照組，證明反應是由有活性的酵素造成',['加快反應速率','提供更多受質','測量最適溫度'],'煮沸使酵素變性，若此組不反應，就能證明反應來自酵素的作用。']]),
+  bank([{m:1,q:'關於 ATP 與酵素，下列哪些正確？',o:[['ATP 水解成 ADP 時會釋放能量',true,''],['酵素在反應後會被消耗，所以需要不斷補充大量酵素',false,'酵素可重複使用，需要量很少'],['低溫使酵素活性降低，回溫後可恢復',true,''],['酵素可以改變反應的 ΔH',false,'只降低活化能'],['ATP 是細胞中主要的長期儲能物質',false,'長期儲能是澱粉、肝醣、脂肪；ATP 是短期的能量貨幣']]},
+   {m:1,q:'某生以三支試管探討 pH 對胃蛋白酶的影響：甲 pH 2、乙 pH 7、丙 pH 12，都加入等量蛋白質與胃蛋白酶，置於 37 °C。下列哪些正確？',o:[['pH 是操縱變因',true,''],['溫度是控制變因',true,''],['預期甲管的蛋白質分解最快',true,'胃蛋白酶最適 pH 約 2'],['若改用唾液澱粉酶，預期仍是甲管最快',false,'唾液澱粉酶最適 pH 約 7，且受質應改為澱粉'],['三管加入的蛋白質量不必相同',false,'受質量是控制變因，必須相同']]}])]},
+
+/* ---------- 5 光合作用與呼吸作用 ---------- */
+{id:'b_photo',unit:'第一章　細胞',title:'光合作用與呼吸作用',
+ goal:'說出光合作用與呼吸作用的場所、原料、產物，並能做氣體與葡萄糖的計量。',
+ concept:()=>`${tbl(['','光合作用','有氧呼吸'],[['場所','葉綠體','細胞質（糖解）＋ 粒線體'],['反應式','6CO₂ ＋ 6H₂O → C₆H₁₂O₆ ＋ 6O₂','C₆H₁₂O₆ ＋ 6O₂ → 6CO₂ ＋ 6H₂O'],['能量','光能 → 化學能（儲存在葡萄糖）','葡萄糖的化學能 → ATP'],['誰進行','植物、藻類、藍綠菌（有光時）','幾乎所有生物（日夜都進行）']])}
+  <div class="prose"><p><b>光合作用兩個階段</b>：</p><ul><li><b>光反應</b>（類囊體膜）：葉綠素吸收光能，<b>水分解</b>產生 ${F('O2')}，同時產生 ATP 和 NADPH。</li><li><b>碳反應</b>（基質）：用光反應的 ATP、NADPH，把 ${F('CO2')} 固定成醣類（卡爾文循環）。</li></ul>
+  <p><b>無氧呼吸（發酵）</b>：在細胞質進行，產生的 ATP 很少。酵母菌產生酒精和 ${F('CO2')}；人體肌肉缺氧時產生乳酸。</p></div>
+  <div class="tip"><b>常見錯誤：</b>光合作用釋放的 ${F('O2')} 來自<b>水</b>，不是來自 ${F('CO2')}。用 <sup>18</sup>O 標記水，放出的氧氣會帶 <sup>18</sup>O。</div>`,
+ deep:()=>`<div class="prose"><p><b>植物白天也呼吸</b>：呼吸作用全天進行。白天光合作用速率通常大於呼吸作用，所以整體看起來吸收 ${F('CO2')}、放出 ${F('O2')}；晚上只有呼吸作用。光合作用速率 ＝ 呼吸作用速率時的光強度叫<b>光補償點</b>，此時氣體淨交換為 0。</p>
+  <p><b>淨光合 vs. 總光合</b>：實驗量到的 ${F('O2')} 釋放量是「淨」值 ＝ 總光合作用產生的 − 呼吸作用消耗的。所以總光合 ＝ 淨光合 ＋ 呼吸（在黑暗中量呼吸速率）。這是段考計算題的關鍵。</p>
+  <p><b>能量流動</b>：太陽能 → 光合作用存成葡萄糖 → 呼吸作用轉成 ATP → 細胞活動。每一次轉換都有能量以熱的形式散失，所以能量無法循環使用，只能單向流動；物質（C、O）則可以循環。</p></div>`,
+ example:{q:'植物進行光合作用製造了 0.5 mol 葡萄糖，至少吸收多少 mol CO₂？',steps:['光合作用：6CO₂ ＋ 6H₂O → C₆H₁₂O₆ ＋ 6O₂。','CO₂ : 葡萄糖 ＝ 6 : 1。','0.5 × 6 ＝ <b>3</b> mol CO₂。']},
+ notes:{2:'由反應式做氣體與葡萄糖的計量。',3:'同位素追蹤與場所判斷。',4:'淨光合作用與總光合作用：總 ＝ 淨 ＋ 呼吸。'},
+ levels:[
+  bank([['光合作用的碳反應在葉綠體的哪裡進行？','基質',['類囊體膜','外膜','細胞質'],'光反應在類囊體膜，碳反應（固定 CO₂）在基質。'],['有氧呼吸主要在哪一個胞器進行？','粒線體',['葉綠體','核糖體','高基氏體'],'糖解在細胞質，後續大部分步驟在粒線體。'],['酵母菌在缺氧下進行無氧呼吸，產物是？','酒精與二氧化碳',['乳酸','氧氣與葡萄糖','水與二氧化碳'],'這是釀酒和麵包發酵的原理。'],['人體肌肉劇烈運動、氧氣不足時，會產生？','乳酸',['酒精','二氧化碳與酒精','葡萄糖'],'人體細胞的無氧呼吸產生乳酸。'],['光反應的產物中，<b>不會</b>直接用於碳反應的是？','氧氣',['ATP','NADPH'],'O₂ 是水分解的副產物，釋放到大氣中；ATP 和 NADPH 供碳反應使用。']]),
+  ()=>{const t=pick(['pCO2','pO2','rO2','rCO2']),n=pick([0.1,0.2,0.5,1,1.5,2,0.25]);const map={pCO2:['光合作用製造','需要吸收 CO₂','6CO₂ ＋ 6H₂O → C₆H₁₂O₆ ＋ 6O₂'],pO2:['光合作用製造','會釋放 O₂','6CO₂ ＋ 6H₂O → C₆H₁₂O₆ ＋ 6O₂'],rO2:['有氧呼吸分解','需要消耗 O₂','C₆H₁₂O₆ ＋ 6O₂ → 6CO₂ ＋ 6H₂O'],rCO2:['有氧呼吸分解','會產生 CO₂','C₆H₁₂O₆ ＋ 6O₂ → 6CO₂ ＋ 6H₂O']}[t];
+    return{q:`${map[0]} ${dec(n)} mol 葡萄糖，${map[1]}多少 mol？`,ans:RD(6*n),steps:[`反應式：${map[2]}`,`氣體 : 葡萄糖 ＝ 6 : 1，${dec(n)} × 6 ＝ <b>${dec(6*n)}</b> mol`]}},
+  bank([['以 ¹⁸O 標記的水（H₂¹⁸O）供植物進行光合作用，¹⁸O 會出現在？','釋放出的氧氣',['產生的葡萄糖','吸收的二氧化碳','葉綠素'],'光反應中水被分解，O 原子成為 O₂ 釋出。'],['以 ¹⁸O 標記的 CO₂ 供植物進行光合作用，¹⁸O 最先出現在？','葡萄糖（醣類）',['釋放出的氧氣','類囊體膜','ATP'],'CO₂ 在碳反應中被固定成醣類，O₂ 則來自水。'],['葉綠素主要吸收哪些顏色的光？','藍紫光與紅光',['綠光','黃光','只有紅外線'],'綠光吸收最少、被反射，所以葉子看起來是綠色。'],['光補償點的意義是？','光合作用速率等於呼吸作用速率時的光強度',['光合作用速率達最大時的光強度','植物停止呼吸作用時的光強度','葉綠素開始合成的光強度'],'此時 O₂ 和 CO₂ 的淨交換為 0。']]),
+  mix(()=>{const net=pick([2,3,4,5,6,8]),resp=pick([1,2,3]),gross=net+resp;return{q:`某植物在光照下每小時<b>淨</b>釋放 O₂ ${net} mmol；在黑暗中每小時吸收 O₂ ${resp} mmol。在相同溫度下，它在光照時每小時<b>實際</b>（總）光合作用產生多少 mmol O₂？`,ans:[gross,1],steps:[`光照時量到的釋放量是淨值：淨 ＝ 總光合產生 − 呼吸消耗。`,`黑暗中的吸收量就是呼吸速率（${resp} mmol/h），假設光照時呼吸速率相同。`,`總光合 ＝ ${net} ＋ ${resp} ＝ <b>${gross}</b> mmol/h`]}},
+   ()=>{const net=pick([3,4,6,9]),resp=pick([1,2,3]),hl=pick([12,14,10]),hd=24-hl,glu=R(net*hl-resp*hd,6);if(net*hl-resp*hd<=0)return LEVELS_RETRY();
+    return{q:`某植物光照下每小時淨吸收 CO₂ ${net} mmol，黑暗中每小時釋放 CO₂ ${resp} mmol。一天光照 ${hl} 小時、黑暗 ${hd} 小時，這株植物一天<b>累積</b>的葡萄糖是多少 mmol？（以分數或小數作答）`,ans:glu,steps:[`光照時淨吸收 ${net} × ${hl} ＝ ${net*hl} mmol CO₂；黑暗中釋放 ${resp} × ${hd} ＝ ${resp*hd} mmol`,`一天淨固定的 CO₂ ＝ ${net*hl} − ${resp*hd} ＝ ${net*hl-resp*hd} mmol`,`每 6 個 CO₂ 形成 1 個葡萄糖：${net*hl-resp*hd} ÷ 6 ＝ <b>${M(rFmt(glu))}</b> mmol`]}},
+   bank([{m:1,q:'關於光合作用與呼吸作用，下列哪些正確？',o:[['植物在白天也會進行呼吸作用',true,''],['光合作用釋放的 O₂ 來自 CO₂',false,'來自水'],['碳反應不需要光直接參與，但需要光反應的產物',true,'需要 ATP 與 NADPH'],['無氧呼吸比有氧呼吸產生更多 ATP',false,'無氧呼吸只產生很少 ATP'],['能量在生態系中可以循環利用',false,'能量單向流動，物質才能循環']]}]))]},
+
+/* ---------- 6 細胞分裂 ---------- */
+{id:'b_div',unit:'第一章　細胞',title:'細胞分裂（有絲分裂與減數分裂）',
+ goal:'描述細胞週期與各分裂時期的特徵，並正確算出各時期的染色體數、染色分體數與 DNA 分子數。',
+ concept:()=>`<div class="prose"><p><b>細胞週期</b> ＝ 間期（G1 → S → G2）＋ 分裂期（M 期）。<b>S 期複製 DNA</b>，每條染色體變成由兩條<b>姊妹染色分體</b>組成，連在著絲點。</p></div>
+  ${tbl(['有絲分裂時期','特徵'],[['前期','染色質濃縮成染色體，核膜、核仁消失，紡錘體出現'],['中期','染色體排列在細胞中央（赤道板），最適合觀察與計數'],['後期','著絲點分開，姊妹染色分體分離，移向兩極（染色體數暫時加倍）'],['末期','核膜重新出現，細胞質分裂：動物細胞膜向內凹陷；植物細胞形成細胞板']])}
+  <div class="prose"><p><b>減數分裂</b>產生配子，連續分裂兩次，DNA 只複製一次，染色體數由 2<i>n</i> 變成 <i>n</i>。</p><ul><li><b>減數分裂 I</b>：同源染色體配對（聯會）形成<b>四分體</b>，可能發生<b>互換</b>；後期<b>同源染色體分離</b>。染色體數減半。</li><li><b>減數分裂 II</b>：像有絲分裂，姊妹染色分體分離。</li></ul></div>
+  <div class="tip"><b>計數規則：</b>染色體數 ＝ 著絲點數。複製後到分開前，每條染色體有 2 條染色分體、2 個 DNA 分子；沒有染色分體時，DNA 分子數 ＝ 染色體數。</div>`,
+ deep:()=>`${tbl(['時期（2<i>n</i> ＝ 4 為例）','染色體','染色分體','DNA 分子'],[['G1 期','4','0','4'],['有絲分裂中期','4','8','8'],['有絲分裂後期','8','0','8'],['減數 I 中期','4（2 個四分體）','8','8'],['減數 II 中期','2','4','4'],['減數 II 後期','4','0','4'],['配子','2','0','2']])}
+  <div class="prose"><p><b>為什麼減數分裂 I 就減半？</b>減數 I 分開的是同源染色體（一對中的兩條），每個子細胞只拿到每對中的一條，所以變成 <i>n</i>。減數 II 分開的是姊妹染色分體，染色體數不變（後期短暫變成 2<i>n</i>，末期回到 <i>n</i>）。</p>
+  <p><b>配子的多樣性</b>：<i>n</i> 對同源染色體獨立分配，不考慮互換時可產生 2<sup><i>n</i></sup> 種配子。人類 <i>n</i> ＝ 23，就有 2<sup>23</sup>（約 840 萬）種。加上互換和受精的隨機組合，後代幾乎不會一樣。</p>
+  <p><b>有絲分裂 vs. 減數分裂</b>：有絲分裂產生 2 個和母細胞相同的體細胞（2<i>n</i> → 2<i>n</i>），用於生長和修補；減數分裂產生 4 個配子（2<i>n</i> → <i>n</i>），只在生殖器官進行。</p></div>`,
+ example:{q:'某動物 2n ＝ 8，有絲分裂後期的細胞中有幾條染色體？',steps:['後期著絲點分開，原本每條染色體的 2 條姊妹染色分體各自成為獨立的染色體。','染色體數暫時加倍：8 × 2 ＝ <b>16</b> 條。','（每條都只有一個 DNA，所以 DNA 分子也是 16 個，染色分體數為 0。）']},
+ notes:{2:'有絲分裂各時期的染色分體數與 DNA 分子數。',3:'減數分裂各時期的計數，注意四分體只出現在減數 I。',4:'配子種類數、互換與綜合判斷。'},
+ levels:[
+  mix(()=>{const n=pick([2,3,4,6,8,12,23]),N=2*n,st=pick(['前期','中期','後期','末期分裂完成後的子細胞']),v=st==='後期'?2*N:N;
+    return{q:`某生物體細胞 2<i>n</i> ＝ ${N}，有絲分裂<b>${st}</b>時，一個細胞中有幾條染色體？`,ans:[v,1],steps:[`染色體數 ＝ 著絲點數。`,st==='後期'?`後期姊妹染色分體分開，各自成為一條染色體，數目加倍：${N} × 2 ＝ <b>${v}</b>`:`${st}的染色體數和體細胞相同（${st.includes('子細胞')?'有絲分裂產生和母細胞相同的子細胞':'著絲點尚未分開'}），答案是 <b>${v}</b>`]}},
+   bank([['細胞週期中，DNA 在哪一個時期複製？','S 期',['G1 期','G2 期','分裂期中期'],'S 是 synthesis（合成）的意思。'],['觀察染色體形態與數目，最適合選擇有絲分裂的哪一期？','中期',['前期','後期','末期'],'中期染色體最濃縮，並整齊排列在中央。'],['植物細胞分裂末期，細胞質如何分裂？','在中央形成細胞板',['細胞膜向內凹陷','中心粒分開','核膜消失'],'植物有細胞壁，不能向內凹陷，改由中央形成細胞板，向外擴展成新細胞壁。']])),
+  ()=>{const n=pick([2,3,4,6,10,23]),N=2*n,st=pick(['G1 期','G2 期','前期','中期','後期']),ask=pick(['染色分體','DNA 分子']);const dup=st!=='G1 期'&&st!=='後期';
+    const v=ask==='染色分體'?(dup?2*N:0):(st==='G1 期'?N:2*N);
+    return{q:`某生物 2<i>n</i> ＝ ${N}，細胞在<b>${st==='G1 期'||st==='G2 期'?'間期 '+st:'有絲分裂'+st}</b>時，有幾個<b>${ask}</b>？`,ans:[v,1],steps:[st==='G1 期'?`G1 期 DNA 尚未複製，每條染色體只有一個 DNA，沒有姊妹染色分體。`:st==='後期'?`後期姊妹染色分體已分開，成為 ${2*N} 條獨立染色體，每條一個 DNA，染色分體數為 0。`:`DNA 已在 S 期複製，${N} 條染色體各有 2 條染色分體。`,`${ask}數 ＝ <b>${v}</b>`]}},
+  ()=>{const n=pick([2,3,4,8,23]),N=2*n,rows=[['減數分裂 I 中期',{'染色體':N,'染色分體':2*N,'DNA 分子':2*N,'四分體':n}],['減數分裂 I 後期',{'染色體':N,'染色分體':2*N,'DNA 分子':2*N,'四分體':0}],['減數分裂 II 中期',{'染色體':n,'染色分體':2*n,'DNA 分子':2*n,'四分體':0}],['減數分裂 II 後期',{'染色體':N,'染色分體':0,'DNA 分子':N,'四分體':0}],['配子（精子或卵）',{'染色體':n,'染色分體':0,'DNA 分子':n,'四分體':0}]];const [st,vals]=pick(rows),ask=pick(Object.keys(vals)),v=vals[ask];
+    const why={'減數分裂 I 中期':`同源染色體配對成 ${n} 個四分體排在中央；染色體 ${N} 條，各有 2 條染色分體。`,'減數分裂 I 後期':`同源染色體分離移向兩極，但著絲點未分開；細胞內仍有 ${N} 條染色體、${2*N} 條染色分體。四分體已拆開。`,'減數分裂 II 中期':`減數 I 後染色體減半為 ${n} 條，每條仍有 2 條染色分體。`,'減數分裂 II 後期':`姊妹染色分體分開，染色體暫時變成 ${N} 條，每條一個 DNA。`,'配子（精子或卵）':`染色體數為 ${n}，每條一個 DNA。`}[st];
+    return{q:`某生物 2<i>n</i> ＝ ${N}，${st}時，一個細胞中有幾個<b>${ask}</b>？`,ans:[v,1],steps:[why,`${ask}數 ＝ <b>${v}</b>`]}},
+  mix(()=>{const n=rnd(2,6),pairs=2**n,two=Math.random()<.5;return two?{q:`某生物 2<i>n</i> ＝ ${2*n}，不考慮互換，一個個體可以產生幾種染色體組合不同的配子？`,ans:[pairs,1],steps:[`有 ${n} 對同源染色體，減數分裂 I 時每對的兩條獨立分配到兩極。`,`每對有 2 種選擇：2<sup>${n}</sup> ＝ <b>${pairs}</b> 種`]}:{q:`某生物 2<i>n</i> ＝ ${2*n}，不考慮互換。一個<b>精原細胞</b>經減數分裂，最多產生幾種染色體組合不同的精子？`,ans:[2,1],steps:[`一個精原細胞減數分裂產生 4 個精子。減數 I 時同源染色體分離只有一種分法（已經決定），得到 2 種互補的次級精母細胞。`,`減數 II 分開的是相同的姊妹染色分體，同一個次級精母細胞產生的 2 個精子相同。`,`所以只有 <b>2</b> 種（不是 2<sup>${n}</sup> 種，那是整個個體的總數）。`]}},
+   bank([{m:1,q:'關於有絲分裂與減數分裂，下列哪些正確？',o:[['四分體只出現在減數分裂 I',true,'同源染色體配對才會形成'],['有絲分裂後期同源染色體分離',false,'有絲分裂後期是姊妹染色分體分離；同源染色體分離發生在減數 I 後期'],['減數分裂 II 結束後染色體數為 n',true,''],['互換發生在減數分裂 I 前期',true,'同源染色體聯會時'],['有絲分裂產生的子細胞染色體數為母細胞的一半',false,'和母細胞相同']]}]))]},
+
+/* ---------- 7 孟德爾遺傳 ---------- */
+{id:'b_mendel',unit:'第二章　遺傳',title:'孟德爾遺傳法則（單一性狀）',
+ goal:'會用棋盤方格算子代基因型、表現型比例與機率，並能由子代比例反推親代，處理條件機率。',
+ concept:()=>`<div class="prose"><p><b>名詞</b>：控制同一性狀、位於同源染色體相同位置的基因叫<b>等位基因</b>（如 A 與 a）。<b>基因型</b>是基因組合（AA、Aa、aa），<b>表現型</b>是表現出的性狀。AA、aa 是同型合子（純種），Aa 是異型合子（雜種）。</p>
+  <p><b>分離律</b>：形成配子時，成對的等位基因彼此分離，每個配子只帶一個。Aa 產生 A、a 配子各 1/2。</p></div>
+  ${tbl(['親代','子代基因型','子代表現型（A 顯性）'],[['AA × aa','全 Aa','全顯性'],['Aa × Aa','AA : Aa : aa ＝ 1 : 2 : 1','顯 : 隱 ＝ 3 : 1'],['Aa × aa（試交）','Aa : aa ＝ 1 : 1','顯 : 隱 ＝ 1 : 1']])}
+  <div class="tip"><b>試交</b>：要知道顯性個體是 AA 還是 Aa，就和隱性個體 aa 交配。子代全顯性 → AA；出現隱性 → Aa。</div>`,
+ deep:()=>`<div class="prose"><p><b>機率的兩個規則</b>：「而且」用乘法（兩件獨立事件同時發生）；「或」用加法（互斥事件）。例如 Aa × Aa 生兩個孩子都是隱性：1/4 × 1/4 ＝ 1/16。</p>
+  <p><b>條件機率（段考最愛）</b>：Aa × Aa 的子代中，「已知是顯性」，它是 Aa 的機率是多少？顯性有 AA（1）、Aa（2）三份，所以是 <b>2/3</b>，不是 1/2。</p>
+  <p><b>由隱性子代推親代</b>：兩個正常的父母生出隱性患者，代表父母都帶有隱性基因（都是 Aa）。這是譜系分析的起點：「無中生有為隱性」。</p>
+  <p><b>多個子代的組合</b>：Aa × Aa 生 3 個孩子，恰好 1 個是隱性的機率 ＝ 3 × (1/4) × (3/4)² ＝ 27/64（乘 3 是因為隱性的孩子可以是老大、老二或老三）。</p></div>`,
+ example:{q:'豌豆高莖（T）對矮莖（t）為顯性。Tt × Tt 的子代中，矮莖的比例是多少？高莖中純種佔多少？',steps:['每個親代產生 T、t 配子各 1/2。','子代 TT : Tt : tt ＝ 1 : 2 : 1，矮莖（tt）佔 <b>1/4</b>。','高莖有 TT（1）和 Tt（2）共 3 份，純種 TT 佔 <b>1/3</b>。']},
+ notes:{2:'由子代比例反推親代基因型，以及子代數量的推算。',3:'條件機率：先把條件範圍內的份數找出來再算比例。',4:'多步驟機率：譜系推論、多個子女的組合。'},
+ levels:[
+  ()=>{const P=pick([['Aa','Aa'],['Aa','aa'],['AA','aa'],['AA','Aa']]),ask=pick(['aa','A_','Aa','AA']);const g=(x,y)=>{const r={AA:0,Aa:0,aa:0};for(const a of x)for(const b of y){const k=[a,b].sort().join('');r[k]++}return r};const r=g(P[0],P[1]),tot=4;
+    const v=ask==='A_'?R(r.AA+r.Aa,tot):R(r[ask],tot);const lab={aa:'隱性表現型（aa）',A_:'顯性表現型',Aa:'基因型 Aa',AA:'基因型 AA'}[ask];
+    return{q:`A 對 a 為完全顯性。${P[0]} × ${P[1]} 的子代中，<b>${lab}</b>的機率是多少？（以分數作答）`,ans:v,steps:[`${P[0]} 產生配子 ${[...new Set(P[0])].join('、')}；${P[1]} 產生配子 ${[...new Set(P[1])].join('、')}。`,`棋盤方格得子代：AA ${r.AA}/4、Aa ${r.Aa}/4、aa ${r.aa}/4`,`${lab}的機率 ＝ <b>${M(rFmt(v))}</b>`]}},
+  mix(()=>{const t=pick([['3 : 1','Aa × Aa'],['1 : 1','Aa × aa'],['全部顯性','AA × aa（或 AA × 任何）']]);return mc(`某性狀 A 對 a 為顯性。兩親代交配，子代顯性 : 隱性 ＝ ${t[0]}。親代基因型最可能是？`,t[1],['Aa × Aa','Aa × aa','AA × aa（或 AA × 任何）','aa × aa'].filter(x=>x!==t[1]),[`${t[0]==='3 : 1'?'3 : 1 是雜種自交（Aa × Aa）的典型比例。':t[0]==='1 : 1'?'1 : 1 是試交（Aa × aa）的典型比例。':'子代沒有隱性，代表至少一方是 AA，不會給出 a 配子。'}`])},
+   ()=>{const n=pick([400,800,1200,160,240]),ask=pick(['rec','dom','het']);const v=ask==='rec'?n/4:ask==='dom'?3*n/4:n/2;
+    return{q:`Aa × Aa 交配共得 ${n} 個子代，理論上${ask==='rec'?'隱性個體':ask==='dom'?'顯性個體':'基因型為 Aa 的個體'}約有幾個？`,ans:[v,1],steps:[`Aa × Aa → AA : Aa : aa ＝ 1 : 2 : 1`,`${ask==='rec'?'aa 佔 1/4':ask==='dom'?'顯性佔 3/4':'Aa 佔 2/4 ＝ 1/2'}，${n} × ${ask==='rec'?fr(1,4):ask==='dom'?fr(3,4):fr(1,2)} ＝ <b>${v}</b>`]}}),
+  ()=>{const t=pick([
+    {q:'Aa × Aa 的子代中，已知某個體是顯性，它是 Aa 的機率？',v:R(2,3),s:['子代 AA : Aa : aa ＝ 1 : 2 : 1。','條件「已知是顯性」把範圍縮小到 AA（1 份）＋ Aa（2 份）＝ 3 份。','Aa 佔 2/3，答案是 <b>2/3</b>。']},
+    {q:'Aa × Aa 生了一個顯性的孩子，他和 aa 結婚，生出隱性孩子的機率？',v:R(1,3),s:['這個顯性孩子是 Aa 的機率 2/3（AA 為 1/3）。','只有他是 Aa 時，才可能和 aa 生出 aa，機率 1/2。','2/3 × 1/2 ＝ <b>1/3</b>。']},
+    {q:'一對正常的夫妻生了一個患白化症（隱性遺傳）的孩子。他們再生一個孩子，是正常的機率？',v:R(3,4),s:['正常父母生出隱性患者，父母都是 Aa（帶因者）。','Aa × Aa → 正常（A_）佔 3/4。','答案是 <b>3/4</b>。']},
+    {q:'Aa × Aa 生兩個孩子，兩個都是隱性的機率？',v:R(1,16),s:['每個孩子是 aa 的機率 1/4，兩次獨立。','兩個都是：1/4 × 1/4 ＝ <b>1/16</b>。']},
+    {q:'Aa × aa 生 3 個孩子，3 個都是顯性的機率？',v:R(1,8),s:['每個孩子是顯性（Aa）的機率 1/2。','三個都是：(1/2)³ ＝ <b>1/8</b>。']}]);return{q:t.q+'（以分數作答）',ans:t.v,steps:t.s}},
+  ()=>{const t=pick([
+    {q:'一對正常夫妻生了一個患病女兒（體染色體隱性遺傳）。他們的正常兒子和一位帶因者女性結婚，生出患病孩子的機率？',v:R(1,6),s:['正常父母生出患者 → 父母都是 Aa。','正常兒子是 Aa 的機率 ＝ 2/3。','帶因者女性是 Aa，Aa × Aa 生出 aa 的機率 1/4。','2/3 × 1/4 ＝ <b>1/6</b>。']},
+    {q:'某隱性遺傳病：甲的妹妹患病、父母正常；乙的哥哥患病、父母正常；甲、乙本身正常。甲、乙結婚，生出患病孩子的機率？',v:R(1,9),s:['甲、乙各自的父母都是 Aa，所以甲、乙是 Aa 的機率都是 2/3。','兩人都是 Aa 時才可能生出 aa，機率 1/4。','2/3 × 2/3 × 1/4 ＝ <b>1/9</b>。']},
+    {q:'Aa × Aa 生 3 個孩子，恰好 1 個是隱性的機率？',v:R(27,64),s:['隱性 1/4，顯性 3/4。','隱性的那個可以是老大、老二或老三，共 3 種排法。','3 × (1/4) × (3/4)² ＝ 3 × 9/64 ＝ <b>27/64</b>。']},
+    {q:'Aa × Aa 生 4 個孩子，恰好 2 個是隱性的機率？',v:R(27,128),s:['隱性 1/4，顯性 3/4。','4 個孩子中選 2 個是隱性，有 6 種組合。','6 × (1/4)² × (3/4)² ＝ 6 × 9/256 ＝ <b>27/128</b>。']},
+    {q:'一對正常夫妻生了患病兒子（體染色體隱性），若他們再生兩個孩子，至少有一個患病的機率？',v:R(7,16),s:['父母都是 Aa，每個孩子患病 1/4、正常 3/4。','「至少一個」用補集：1 − 兩個都正常。','1 − (3/4)² ＝ 1 − 9/16 ＝ <b>7/16</b>。']}]);return{q:t.q+'（以分數作答）',ans:t.v,steps:t.s}}]},
+
+/* ---------- 8 遺傳的延伸 ---------- */
+{id:'b_ext',unit:'第二章　遺傳',title:'遺傳的延伸：雙性狀、血型、性聯遺傳',
+ goal:'處理兩對基因的獨立分配、不完全顯性、ABO 血型（多對等位基因）、多基因遺傳與 X 性聯遺傳。',
+ concept:()=>`${tbl(['類型','特徵','例子'],[['獨立分配律','兩對基因位於不同對染色體，配子形成時各自分離、自由組合。AaBb × AaBb → 9 : 3 : 3 : 1','豌豆種子顏色與形狀'],['不完全顯性','異型合子表現中間型，基因型比 ＝ 表現型比 1 : 2 : 1','紫茉莉紅花 × 白花 → 粉紅花'],['多對等位基因','一個性狀有三種以上等位基因（每人仍只有兩個）','ABO 血型：I<sup>A</sup>、I<sup>B</sup>、i'],['共顯性','兩個等位基因都完全表現','AB 型血'],['多基因遺傳','多對基因共同影響，表現型呈連續變化','身高、膚色'],['性聯遺傳','基因位於 X 染色體上，男性只有一個 X','紅綠色盲、血友病']])}
+  <div class="prose"><p><b>ABO 血型</b>：I<sup>A</sup>、I<sup>B</sup> 對 i 為顯性，I<sup>A</sup> 與 I<sup>B</sup> 共顯性。A 型：I<sup>A</sup>I<sup>A</sup> 或 I<sup>A</sup>i；B 型：I<sup>B</sup>I<sup>B</sup> 或 I<sup>B</sup>i；AB 型：I<sup>A</sup>I<sup>B</sup>；O 型：ii。共 6 種基因型、4 種表現型。</p>
+  <p><b>X 性聯隱性（如色盲 X<sup>b</sup>）</b>：女性 X<sup>B</sup>X<sup>B</sup> 正常、X<sup>B</sup>X<sup>b</sup> 帶因、X<sup>b</sup>X<sup>b</sup> 色盲；男性 X<sup>B</sup>Y 正常、X<sup>b</sup>Y 色盲。男性只要一個 X<sup>b</sup> 就發病，所以男性患者比女性多。</p></div>`,
+ deep:()=>`<div class="prose"><p><b>雙性狀用「拆開算再相乘」</b>：AaBb × Aabb 生出 aabb 的機率？拆成 Aa × Aa → aa 1/4，Bb × bb → bb 1/2，相乘 1/8。不必畫 16 格的棋盤。</p>
+  <p><b>配子種類</b>：AaBbCc（三對異型、獨立分配）產生 2³ ＝ 8 種配子。子代基因型種類：每對 Aa × Aa 有 3 種，三對就是 3³ ＝ 27 種。</p>
+  <p><b>性聯遺傳的特徵</b>：父親的 X 只傳給女兒，Y 傳給兒子。所以兒子的色盲基因一定來自母親；色盲父親的女兒至少是帶因者。母親是色盲，兒子一定是色盲。</p>
+  <p><b>機率要看清楚問法</b>：「生出色盲兒子的機率」是在所有孩子中算（要乘性別 1/2）；「兒子中色盲的機率」是只看兒子。X<sup>B</sup>X<sup>b</sup> × X<sup>B</sup>Y：所有孩子中色盲兒子佔 1/4，兒子中色盲佔 1/2。</p></div>`,
+ example:{q:'AaBb × AaBb（兩對基因獨立分配），子代表現型為 A_bb 的機率？',steps:['拆開：Aa × Aa → A_ 為 3/4。','Bb × Bb → bb 為 1/4。','相乘：3/4 × 1/4 ＝ <b>3/16</b>。']},
+ notes:{2:'ABO 血型：先列出每個親代可能給的配子。',3:'X 性聯遺傳：注意「色盲兒子」和「兒子中色盲」的差別。',4:'多對基因的配子、基因型種類數與綜合機率。'},
+ levels:[
+  ()=>{const g=()=>pick(['AA','Aa','aa']),h=()=>pick(['BB','Bb','bb']);const p1=[pick(['Aa','AA','aa']),pick(['Bb','BB','bb'])],p2=[pick(['Aa','aa']),pick(['Bb','bb'])];const fa=pick(['A_','aa']),fb=pick(['B_','bb']);
+    const pr=(x,y,t)=>{let c=0;for(const a of x)for(const b of y){const k=a+b;const dom=k.toUpperCase()!==k.toLowerCase()&&(k.includes(k[0].toUpperCase())&&(a===a.toUpperCase()||b===b.toUpperCase()));const isDom=a===a.toUpperCase()||b===b.toUpperCase();if(t.endsWith('_')?isDom:!isDom)c++}return R(c,4)};
+    const ra=pr(p1[0],p2[0],fa),rb=pr(p1[1],p2[1],fb),v=R(ra[0]*rb[0],ra[1]*rb[1]);if(v[0]===0)return LEVELS_RETRY();
+    return{q:`兩對基因獨立分配，A 對 a、B 對 b 皆為完全顯性。${p1.join('')} × ${p2.join('')} 的子代中，表現型為 <b>${fa}${fb}</b> 的機率？（以分數作答）`,ans:v,steps:[`拆成兩對分別計算。${p1[0]} × ${p2[0]} → ${fa} 的機率 ${rFmt(ra)}`,`${p1[1]} × ${p2[1]} → ${fb} 的機率 ${rFmt(rb)}`,`相乘：${M(`${rFmt(ra)} × ${rFmt(rb)} = ${rFmt(v)}`)}，答案是 <b>${M(rFmt(v))}</b>`]}},
+  ()=>{const G={A:[['IAIA','I<sup>A</sup>I<sup>A</sup>'],['IAi','I<sup>A</sup>i']],B:[['IBIB','I<sup>B</sup>I<sup>B</sup>'],['IBi','I<sup>B</sup>i']],AB:[['IAIB','I<sup>A</sup>I<sup>B</sup>']],O:[['ii','ii']]};const al=g=>g==='IAIA'?['A','A']:g==='IAi'?['A','i']:g==='IBIB'?['B','B']:g==='IBi'?['B','i']:g==='IAIB'?['A','B']:['i','i'];
+    const ph=(x,y)=>{const s=[x,y].sort().join('');return s==='AA'||s==='Ai'?'A':s==='BB'||s==='Bi'?'B':s==='AB'?'AB':'O'};
+    const g1=pick(['IAi','IBi','IAIB','ii','IAIA']),g2=pick(['IAi','IBi','IAIB','ii','IBIB']),want=pick(['A','B','AB','O']);let c=0;for(const a of al(g1))for(const b of al(g2))if(ph(a,b)===want)c++;
+    const lab=g=>G[Object.keys(G).find(k=>G[k].some(x=>x[0]===g))].find(x=>x[0]===g)[1];
+    return{q:`父親基因型 ${lab(g1)}，母親基因型 ${lab(g2)}，生出 <b>${want} 型</b>孩子的機率？（以分數作答，不可能請填 0）`,ans:R(c,4),steps:[`父親配子：${al(g1).map(x=>x==='i'?'i':'I<sup>'+x+'</sup>').join('、')}；母親配子：${al(g2).map(x=>x==='i'?'i':'I<sup>'+x+'</sup>').join('、')}`,`棋盤方格四種組合中，${want} 型有 ${c} 種${want==='A'?'（I<sup>A</sup>I<sup>A</sup> 或 I<sup>A</sup>i）':want==='B'?'（I<sup>B</sup>I<sup>B</sup> 或 I<sup>B</sup>i）':want==='AB'?'（I<sup>A</sup>I<sup>B</sup>）':'（ii）'}`,`機率 ＝ ${c}/4 ＝ <b>${M(rFmt(R(c,4)))}</b>`]}},
+  ()=>{const t=pick([
+    {q:'母親是色盲帶因者（X<sup>B</sup>X<sup>b</sup>），父親正常（X<sup>B</sup>Y）。他們生出色盲兒子的機率（在所有孩子中）？',v:R(1,4),s:['子代：X<sup>B</sup>X<sup>B</sup>、X<sup>B</sup>X<sup>b</sup>、X<sup>B</sup>Y、X<sup>b</sup>Y 各 1/4。','色盲兒子（X<sup>b</sup>Y）佔所有孩子的 <b>1/4</b>。']},
+    {q:'母親是色盲帶因者（X<sup>B</sup>X<sup>b</sup>），父親正常。他們的<b>兒子中</b>色盲的機率？',v:R(1,2),s:['兒子的 X 來自母親，Y 來自父親。','母親給 X<sup>B</sup> 或 X<sup>b</sup> 各 1/2，所以兒子中色盲佔 <b>1/2</b>。']},
+    {q:'父親色盲（X<sup>b</sup>Y），母親正常且非帶因者（X<sup>B</sup>X<sup>B</sup>）。他們的女兒是帶因者的機率？',v:R(1,1),s:['父親的 X<sup>b</sup> 一定傳給女兒，母親只能給 X<sup>B</sup>。','女兒全部是 X<sup>B</sup>X<sup>b</sup>，機率 <b>1</b>。']},
+    {q:'父親色盲（X<sup>b</sup>Y），母親是帶因者（X<sup>B</sup>X<sup>b</sup>）。生出色盲女兒的機率（在所有孩子中）？',v:R(1,4),s:['女兒得到父親的 X<sup>b</sup>，再從母親得到 X<sup>b</sup> 的機率 1/2。','生女兒的機率 1/2，色盲女兒 ＝ 1/2 × 1/2 ＝ <b>1/4</b>。']},
+    {q:'一位色盲男性的外祖父是色盲、父母正常。他的母親基因型為帶因者的機率？',v:R(1,1),s:['兒子的 X 一定來自母親，他是 X<sup>b</sup>Y，所以母親至少有一個 X<sup>b</sup>。','母親正常，所以她是 X<sup>B</sup>X<sup>b</sup>，機率 <b>1</b>。（外祖父的 X<sup>b</sup> 也一定傳給母親）']},
+    {q:'某女性的父親是血友病患者（X 性聯隱性），她本人正常，和正常男性結婚。他們生出患病孩子的機率？',v:R(1,4),s:['父親的 X<sup>h</sup> 一定傳給她，她正常，所以是 X<sup>H</sup>X<sup>h</sup>。','X<sup>H</sup>X<sup>h</sup> × X<sup>H</sup>Y：只有兒子可能患病，X<sup>h</sup>Y 佔所有孩子的 1/4。','答案是 <b>1/4</b>。']}]);return{q:t.q+'（以分數作答）',ans:t.v,steps:t.s}},
+  mix(()=>{const n=rnd(2,4),het=rnd(1,n),k=pick(['gam','geno']);const letters='ABCD'.slice(0,n).split('');const gt=letters.map((L,i)=>i<het?L+L.toLowerCase():L+L).join('');
+    return k==='gam'?{q:`基因型 ${gt} 的個體（各對基因位於不同對染色體），可以產生幾種配子？`,ans:[2**het,1],steps:[`同型合子的那對只產生一種配子；異型合子的每對產生 2 種。`,`共有 ${het} 對異型合子：2<sup>${het}</sup> ＝ <b>${2**het}</b> 種`]}
+     :{q:`${letters.map(L=>L+L.toLowerCase()).join('')} × ${letters.map(L=>L+L.toLowerCase()).join('')}（${n} 對基因獨立分配，完全顯性），子代有幾種<b>基因型</b>？`,ans:[3**n,1],steps:[`每一對 Aa × Aa 產生 3 種基因型（AA、Aa、aa）。`,`${n} 對獨立組合：3<sup>${n}</sup> ＝ <b>${3**n}</b> 種（表現型則是 2<sup>${n}</sup> ＝ ${2**n} 種）`]}},
+   ()=>{const t=pick([
+     {q:'A 型父親（I<sup>A</sup>i）與 B 型母親（I<sup>B</sup>i）生了一個男孩，他是 O 型且色盲；父母色覺都正常。他們再生一個孩子，是 O 型且色盲的機率？',v:R(1,16),s:['O 型：I<sup>A</sup>i × I<sup>B</sup>i → ii 的機率 1/4。','兒子色盲 → 母親是 X<sup>B</sup>X<sup>b</sup>；X<sup>B</sup>X<sup>b</sup> × X<sup>B</sup>Y → 色盲孩子（X<sup>b</sup>Y）1/4。','兩性狀獨立：1/4 × 1/4 ＝ <b>1/16</b>。']},
+     {q:'紫茉莉花色為不完全顯性（RR 紅、Rr 粉紅、rr 白）。粉紅花自交，子代中粉紅花的比例？',v:R(1,2),s:['Rr × Rr → RR : Rr : rr ＝ 1 : 2 : 1。','不完全顯性時表現型比 ＝ 基因型比，粉紅（Rr）佔 <b>1/2</b>。']},
+     {q:'AaBb × aabb（獨立分配），子代表現型與<b>兩個親代都不同</b>的比例？',v:R(1,2),s:['子代表現型：A_B_、A_bb、aaB_、aabb 各 1/4。','A_B_ 同 AaBb，aabb 同 aabb；和親代不同的是 A_bb 與 aaB_。','1/4 ＋ 1/4 ＝ <b>1/2</b>。']}]);return{q:t.q+'（以分數作答）',ans:t.v,steps:t.s}},
+   bank([{m:1,q:'關於遺傳的延伸，下列哪些正確？',o:[['ABO 血型共有 6 種基因型、4 種表現型',true,''],['一個人的 ABO 血型基因最多有三種',false,'每人只有兩個等位基因；族群中才有三種'],['色盲男性的色盲基因一定來自母親',true,'父親只給兒子 Y'],['身高屬於多基因遺傳，表現型呈連續變化',true,''],['不完全顯性時，雜種自交子代表現型比為 3 : 1',false,'為 1 : 2 : 1']]}]))]},
+
+/* ---------- 9 遺傳物質 DNA ---------- */
+{id:'b_dna',unit:'第二章　遺傳',title:'遺傳物質：DNA 與基因表現',
+ goal:'說明證明 DNA 是遺傳物質的關鍵實驗，描述 DNA 結構與互補配對，並計算鹼基比例、密碼子與半保留複製。',
+ concept:()=>`<div class="prose"><p><b>染色體、DNA、基因的關係</b>：染色體由 DNA 和蛋白質組成；基因是 DNA 上具有遺傳訊息的片段。</p></div>
+  ${tbl(['實驗','做法與結論'],[['格里夫斯（肺炎鏈球菌）','加熱殺死的致病型（S 型）菌與活的無害型（R 型）混合，小鼠死亡 → 有「轉形因子」可使 R 型變成 S 型'],['艾佛瑞','用酵素分別分解蛋白質、RNA、DNA，只有分解 DNA 後失去轉形能力 → 轉形因子是 DNA'],['赫雪與蔡斯（噬菌體）','³⁵S 標記蛋白質、³²P 標記 DNA，只有 ³²P 進入細菌 → DNA 是遺傳物質']])}
+  <div class="prose"><p><b>DNA 結構</b>：由核苷酸組成（磷酸 ＋ 去氧核糖 ＋ 含氮鹼基）。兩股反向平行，鹼基<b>互補配對</b>：A 配 T（2 個氫鍵）、G 配 C（3 個氫鍵），形成雙股螺旋。</p>
+  <p><b>基因表現</b>：DNA →（轉錄）→ mRNA →（轉譯）→ 蛋白質。RNA 用 U 取代 T、用核糖。mRNA 上每 3 個鹼基是一個<b>密碼子</b>，對應一個胺基酸。</p></div>
+  <div class="formula">查加夫法則：A ＝ T，G ＝ C，所以 A ＋ G ＝ T ＋ C ＝ 50%<small>適用於雙股 DNA</small></div>`,
+ deep:()=>`<div class="prose"><p><b>鹼基比例計算</b>：雙股 DNA 中若 A 佔 30%，則 T 也是 30%，G ＋ C ＝ 40%，G ＝ C ＝ 20%。注意：單股 DNA 或 RNA 不遵守 A ＝ T。</p>
+  <p><b>氫鍵數</b>：一段雙股 DNA 有 <i>a</i> 對 A–T、<i>g</i> 對 G–C，氫鍵總數 ＝ 2<i>a</i> ＋ 3<i>g</i>。G–C 越多，氫鍵越多，雙股越不容易分開（熔點越高）。</p>
+  <p><b>半保留複製</b>：複製時兩股分開，各自當模板合成新股，每個新 DNA 都有一條舊股、一條新股。米塞爾森與史達爾用 <sup>15</sup>N 證明：<sup>15</sup>N DNA 在 <sup>14</sup>N 環境中複製 <i>n</i> 次，得到 2<sup><i>n</i></sup> 個 DNA，其中含 <sup>15</sup>N 的（混合型）永遠只有 2 個。</p>
+  <p><b>密碼子計算</b>：mRNA 有 <i>N</i> 個鹼基（從起始到終止密碼子），共 <i>N</i>/3 個密碼子；終止密碼子不對應胺基酸，所以胺基酸數 ＝ <i>N</i>/3 − 1。</p></div>`,
+ example:{q:'某雙股 DNA 中，G 佔全部鹼基的 35%。A 佔多少？',steps:['G ＝ C ＝ 35%，G ＋ C ＝ 70%。','A ＋ T ＝ 100% − 70% ＝ 30%。','A ＝ T，A ＝ <b>15%</b>。']},
+ notes:{2:'互補配對：寫出另一股或 mRNA 序列、計算氫鍵數。',3:'密碼子與胺基酸數目的計算。',4:'半保留複製的同位素計算與經典實驗的綜合判斷。'},
+ levels:[
+  ()=>{const b=pick(['A','T','G','C']),p=rnd(5,45),comp={A:'T',T:'A',G:'C',C:'G'}[b],ask=pick(['comp','other']);const other=ask==='comp'?comp:pick(b==='A'||b==='T'?['G','C']:['A','T']);const v=ask==='comp'?p:50-p;
+    return{q:`某雙股 DNA 中，${b} 佔全部鹼基的 ${p}%。${other} 佔百分之幾？`,ans:[v,1],steps:[`查加夫法則：A ＝ T，G ＝ C。${b} ＝ ${comp} ＝ ${p}%。`,ask==='comp'?`${other} 和 ${b} 互補配對，答案是 <b>${v}</b>%`:`${b} ＋ ${comp} ＝ ${2*p}%，剩下 ${100-2*p}% 由另一對平分，${other} ＝ <b>${v}</b>%`]}},
+  mix(()=>{const L=8;let s='';for(let i=0;i<L;i++)s+=pick('ATGC'.split(''));const comp=s.split('').map(c=>({A:'T',T:'A',G:'C',C:'G'})[c]).join(''),rna=comp.replace(/T/g,'U'),toRNA=Math.random()<.5;
+    const right=toRNA?rna:comp,wrongs=toRNA?[comp,s.replace(/T/g,'U'),s,rna.split('').reverse().join('')]:[s,rna,comp.split('').reverse().join(''),s.replace(/T/g,'U')];
+    return mc(`DNA 模板股的序列為 ${s}。${toRNA?'以它為模板轉錄出的 mRNA 序列是？':'與它互補的另一股 DNA 序列是？'}（方向依序對應）`,right,wrongs,[`互補配對：A–${toRNA?'U':'T'}、T–A、G–C、C–G。`,toRNA?'RNA 沒有 T，和模板上的 A 配對的是 U。':'DNA 中 A 配 T。'])},
+   ()=>{const a=rnd(5,40),g=rnd(5,40);return{q:`一段雙股 DNA 共有 ${a+g} 個鹼基對，其中 A–T 配對有 ${a} 對，其餘是 G–C 配對。這段 DNA 共有多少個氫鍵？`,ans:[2*a+3*g,1],steps:[`A–T 之間 2 個氫鍵，G–C 之間 3 個氫鍵。G–C 有 ${a+g} − ${a} ＝ ${g} 對。`,`${M(`2 × ${a} + 3 × ${g} = ${2*a+3*g}`)}，答案是 <b>${2*a+3*g}</b>`]}}),
+  ()=>{const aa=rnd(20,300),t=pick(['codon','aa','base','dna']);const N=(aa+1)*3;
+    if(t==='aa')return{q:`一段 mRNA 從起始密碼子到終止密碼子共有 ${N} 個鹼基，轉譯出的多肽鏈有幾個胺基酸？`,ans:[aa,1],steps:[`每 3 個鹼基一個密碼子：${N} ÷ 3 ＝ ${aa+1} 個密碼子`,`終止密碼子不對應胺基酸：${aa+1} − 1 ＝ <b>${aa}</b> 個`]};
+    if(t==='codon')return{q:`一段 mRNA 從起始密碼子到終止密碼子共有 ${N} 個鹼基，共有幾個密碼子（含終止密碼子）？`,ans:[aa+1,1],steps:[`每 3 個鹼基一個密碼子`,`${N} ÷ 3 ＝ <b>${aa+1}</b> 個`]};
+    if(t==='base')return{q:`某蛋白質由 ${aa} 個胺基酸組成。對應的 mRNA 從起始到終止密碼子至少有幾個鹼基？`,ans:[N,1],steps:[`${aa} 個胺基酸需要 ${aa} 個密碼子，再加 1 個終止密碼子，共 ${aa+1} 個`,`${aa+1} × 3 ＝ <b>${N}</b> 個鹼基`]};
+    return{q:`某蛋白質由 ${aa} 個胺基酸組成，對應的基因（雙股 DNA，只計算編碼區從起始到終止）至少有幾個鹼基？`,ans:[2*N,1],steps:[`mRNA 至少 (${aa} ＋ 1) × 3 ＝ ${N} 個鹼基`,`DNA 是雙股，鹼基數是 mRNA 的 2 倍：<b>${2*N}</b> 個`]}},
+  mix(()=>{const n=rnd(1,5),tot=2**n,ask=pick(['hyb','light','frac']);const v=ask==='hyb'?[2,1]:ask==='light'?[tot-2,1]:R(2,tot);
+    return{q:`把只含 <sup>15</sup>N 的大腸桿菌 DNA（一個雙股 DNA 分子）移到只含 <sup>14</sup>N 的培養基中複製 ${n} 次。${ask==='hyb'?'得到的 DNA 中，同時含有 <sup>15</sup>N 和 <sup>14</sup>N 的有幾個？':ask==='light'?'得到的 DNA 中，只含 <sup>14</sup>N 的有幾個？':'含有 <sup>15</sup>N 的 DNA 佔全部 DNA 的比例？（分數）'}`,ans:v,steps:[`複製 ${n} 次得到 2<sup>${n}</sup> ＝ ${tot} 個 DNA。`,`半保留複製：原本的兩條 <sup>15</sup>N 股永遠不會消失，各自待在一個 DNA 裡，所以含 <sup>15</sup>N 的 DNA 一直只有 2 個（都是混合型）。`,ask==='hyb'?`答案是 <b>2</b>`:ask==='light'?`只含 <sup>14</sup>N 的 ＝ ${tot} − 2 ＝ <b>${tot-2}</b>`:`比例 ＝ 2/${tot} ＝ <b>${M(rFmt(v))}</b>`]}},
+   bank([{m:1,q:'關於遺傳物質的研究與 DNA，下列哪些正確？',o:[['赫雪與蔡斯以 ³²P 標記噬菌體的 DNA',true,'P 存在於 DNA 的磷酸，蛋白質幾乎不含 P'],['格里夫斯的實驗直接證明轉形因子是 DNA',false,'他只發現有轉形因子；艾佛瑞才證明是 DNA'],['DNA 中 G–C 配對有 3 個氫鍵',true,''],['RNA 中也遵守 A ＝ U 的比例',false,'RNA 通常是單股，不一定'],['DNA 複製方式為半保留複製',true,'']]}]))]},
+
+/* ---------- 10 基因轉殖技術 ---------- */
+{id:'b_gmo',unit:'第二章　遺傳',title:'基因轉殖技術與應用',
+ goal:'說明限制酶、連接酶、質體在基因轉殖中的角色，會判斷切割片段數與電泳結果。',
+ concept:()=>`<div class="prose"><p><b>基因轉殖</b>：把某生物的基因放入另一種生物，使它表現新的性狀。基本步驟：</p>
+  <ol><li>用<b>限制酶</b>在特定序列切開 DNA（目標基因和質體用同一種限制酶，產生互補的黏性末端）。</li><li>用 <b>DNA 連接酶</b>把目標基因接進<b>質體</b>（細菌中的小環狀 DNA，當作載體）。</li><li>把重組質體送入宿主細胞（如大腸桿菌）。</li><li><b>篩選</b>：質體上通常帶有抗生素抗性基因，在含抗生素的培養基中只有成功接受質體的細菌能存活。</li></ol></div>
+  ${tbl(['應用','例子'],[['醫藥','大腸桿菌生產人類胰島素、生長激素'],['農業','Bt 作物（含蘇力菌毒蛋白基因，可抗蟲）、黃金米（含 β-胡蘿蔔素）'],['研究','螢光蛋白基因標記細胞']])}
+  <div class="tip"><b>電泳</b>：DNA 帶負電，在電場中往<b>正極</b>移動。片段越<b>小</b>，在膠體中跑得越<b>遠</b>。</div>`,
+ deep:()=>`<div class="prose"><p><b>切幾刀得到幾段？</b>直線 DNA 切 <i>k</i> 刀得到 <i>k</i> ＋ 1 段；環狀 DNA（如質體）切 <i>k</i> 刀得到 <i>k</i> 段。這是段考計算題常見的陷阱。</p>
+  <p><b>由切位算片段長度</b>：直線 DNA 長 <i>L</i>，切點在 <i>a</i>、<i>b</i>（<i>a</i> &lt; <i>b</i>），片段為 <i>a</i>、<i>b</i> − <i>a</i>、<i>L</i> − <i>b</i>。環狀 DNA 則是相鄰兩切點間的長度，最後一段要「繞回起點」：<i>L</i> − <i>b</i> ＋ <i>a</i>。</p>
+  <p><b>為什麼要用同一種限制酶？</b>同一種限制酶切出的黏性末端互補，目標基因和質體的末端才能配對，再由連接酶補上磷酸雙酯鍵。</p>
+  <p><b>倫理與風險</b>：基因改造生物可能影響生態（基因流入野生種）、食品安全疑慮、標示與知情權等，段考常以閱讀題形式出現。</p></div>`,
+ example:{q:'一段長 1000 bp 的直線 DNA，限制酶在第 300 和第 700 個鹼基對處切開，得到哪些長度的片段？',steps:['直線 DNA 切 2 刀，得到 3 段。','300、700 − 300 ＝ 400、1000 − 700 ＝ 300。','片段為 <b>300、400、300 bp</b>（電泳只會看到 2 條帶，因為兩段一樣長）。']},
+ notes:{2:'切割片段數：直線 k ＋ 1 段、環狀 k 段。',3:'由切點位置算出片段長度，判斷電泳結果。',4:'基因轉殖流程與篩選的綜合判斷。'},
+ levels:[
+  bank([['基因轉殖中，用來把目標基因與質體接合的酵素是？','DNA 連接酶',['限制酶','DNA 聚合酶','澱粉酶'],'限制酶負責切，連接酶負責接。'],['基因轉殖常用的載體「質體」是什麼？','細菌中的小型環狀 DNA',['細胞中的蛋白質','病毒的外殼','真核細胞的染色體'],'質體可以在細菌內自行複製，適合攜帶外來基因。'],['電泳時，DNA 片段往哪一極移動？','正極',['負極','不移動','兩極都會'],'DNA 的磷酸帶負電。'],['電泳時，哪一種 DNA 片段跑得最遠？','最小的片段',['最大的片段','含最多 G–C 的片段','所有片段跑得一樣遠'],'小片段在膠體孔洞中受到的阻力小。'],['Bt 玉米能抵抗害蟲，是因為轉入了哪一種生物的基因？','蘇力菌（一種細菌）',['螢火蟲','水母','人類'],'蘇力菌的毒蛋白對特定昆蟲幼蟲有毒。']]),
+  ()=>{const k=rnd(1,6),circ=Math.random()<.5;return{q:`一段${circ?'<b>環狀</b>質體':'<b>直線</b>'} DNA 上有 ${k} 個某限制酶的切位，完全切割後會得到幾個片段？`,ans:[circ?k:k+1,1],steps:[circ?'環狀 DNA 沒有頭尾，切 1 刀只是打開成一條直線，切 k 刀得到 k 段。':'直線 DNA 切 1 刀變 2 段，切 k 刀得到 k ＋ 1 段。',`答案是 <b>${circ?k:k+1}</b>`]}},
+  ()=>{const L=pick([1000,2000,3000,5000]),circ=Math.random()<.5;let a,b;do{a=rnd(1,L/100-1)*100;b=rnd(1,L/100-1)*100}while(a>=b);const frags=circ?[b-a,L-b+a]:[a,b-a,L-b];const ask=pick(['max','min']);const v=ask==='max'?Math.max(...frags):Math.min(...frags);
+    return{q:`一段長 ${L} bp 的${circ?'環狀質體（從某一點起算位置）':'直線 DNA'}，限制酶在第 ${a} 和第 ${b} bp 處切開。電泳時跑得${ask==='max'?'<b>最慢</b>（最近點樣處）':'<b>最快</b>（最遠）'}的片段長幾 bp？`,ans:[v,1],steps:[circ?`環狀切 2 刀得 2 段：${b} − ${a} ＝ ${b-a}，以及繞回起點的 ${L} − ${b} ＋ ${a} ＝ ${L-b+a}`:`直線切 2 刀得 3 段：${a}、${b} − ${a} ＝ ${b-a}、${L} − ${b} ＝ ${L-b}`,`電泳時${ask==='max'?'大片段跑得慢':'小片段跑得快'}，答案是 <b>${v}</b> bp`]}},
+  bank([{m:1,q:'關於基因轉殖技術，下列哪些正確？',o:[['目標基因與質體通常要用同一種限制酶切割',true,'才能產生互補的黏性末端'],['限制酶可以把 DNA 片段接起來',false,'接合是連接酶的工作'],['質體上的抗生素抗性基因可用於篩選',true,''],['大腸桿菌可以用來生產人類胰島素',true,''],['電泳時大片段 DNA 移動得比小片段快',false,'小片段較快']]},
+   {m:1,q:'將重組質體（含抗安比西林基因）送入大腸桿菌後，培養在含安比西林的培養基中。下列哪些正確？',o:[['沒有接受質體的細菌會死亡',true,'沒有抗性'],['存活的細菌一定都含有目標基因',false,'可能接受的是沒有接上目標基因的空質體，還需進一步篩選'],['安比西林的作用是篩選',true,''],['質體是大腸桿菌的染色體 DNA',false,'質體是染色體外的小環狀 DNA'],['這項技術需要 DNA 連接酶',true,'製作重組質體時']]}])]},
+
+/* ---------- 11 演化學說 ---------- */
+{id:'b_evo',unit:'第三章　演化與生物多樣性',title:'演化學說與證據',
+ goal:'比較拉馬克與達爾文的學說，用天擇解釋生活中的演化現象，並分辨同源器官、同功器官等演化證據。',
+ concept:()=>`${tbl(['','拉馬克','達爾文（天擇說）'],[['核心想法','用進廢退、後天獲得的性狀可以遺傳','族群中本來就有變異，適應環境的個體存活並繁殖較多'],['長頸鹿的解釋','祖先常伸長脖子吃高處葉子，脖子變長並遺傳給後代','祖先的脖子長短本來就不一，脖子長的較能吃到食物，留下較多後代'],['現在的評價','後天性狀無法遺傳，已被否定','加上遺傳學後成為現代演化理論的基礎']])}
+  <div class="prose"><p><b>天擇的四個要素</b>：① 生物會<b>過度繁殖</b>；② 個體間有可遺傳的<b>變異</b>；③ 資源有限，產生<b>生存競爭</b>；④ 適應環境的個體存活並繁殖，有利的變異在族群中越來越多（<b>適者生存</b>）。</p></div>
+  ${tbl(['證據','說明','例子'],[['化石','地層越深越古老，可看出生物逐漸改變','始祖鳥兼具爬蟲類與鳥類特徵'],['同源器官','構造、來源相同，功能不同 → 來自共同祖先','人的手、蝙蝠的翼、鯨的鰭'],['同功器官','功能相似，構造來源不同 → 適應相似環境','鳥翼與昆蟲翅膀'],['痕跡器官','退化、功能不明顯的構造','人的盲腸、尾椎，鯨的後肢骨'],['胚胎','早期胚胎相似','脊椎動物胚胎都有鰓裂與尾'],['分子','DNA、蛋白質序列越相似，親緣越近','人與黑猩猩 DNA 高度相似']])}`,
+ deep:()=>`<div class="prose"><p><b>天擇作用在誰身上？</b>天擇作用在<b>個體</b>的表現型，但演化的單位是<b>族群</b>：個體一生不會演化，是族群中基因的比例隨世代改變。</p>
+  <p><b>常見的錯誤說法</b>：「細菌為了抵抗抗生素而產生抗藥性」是拉馬克式的錯誤。正確說法：族群中本來就有少數細菌帶有抗藥性的變異（隨機突變產生），使用抗生素後，沒有抗藥性的被殺死，有抗藥性的存活並大量繁殖，族群中抗藥性的比例上升。環境負責「篩選」，不負責「製造」變異。</p>
+  <p><b>樺尺蛾（工業黑化）</b>：工業革命後樹幹被煤煙燻黑，淺色蛾容易被鳥看見吃掉，深色蛾比例上升；空氣改善後淺色蛾又變多。這是天擇在短時間內可觀察的例子。</p>
+  <p><b>人擇</b>：人類依自己的喜好挑選個體繁殖，例如狗的品種、各種甘藍菜（高麗菜、花椰菜、芥藍都來自野生甘藍）。原理和天擇相同，只是篩選者是人。</p></div>`,
+ example:{q:'長期使用同一種殺蟲劑，害蟲的抗藥性越來越強。用天擇說解釋。',steps:['害蟲族群中本來就有個體差異，少數個體帶有抗藥性的可遺傳變異。','噴灑殺蟲劑後，沒有抗藥性的死亡，有抗藥性的存活。','存活者繁殖，把抗藥性基因傳給後代。','一代代下來，族群中抗藥個體的<b>比例增加</b>。殺蟲劑沒有「製造」抗藥性，只是篩選。']},
+ notes:{2:'分辨同源器官、同功器官與痕跡器官。',3:'用天擇正確解釋生活中的現象，避開拉馬克式的說法。',4:'演化學說與證據的綜合多選。'},
+ levels:[
+  bank([['「用進廢退」與「後天獲得的性狀可以遺傳」是誰提出的？','拉馬克',['達爾文','孟德爾','華萊士'],'拉馬克的學說，後來被否定。'],['達爾文天擇說中，下列何者<b>不是</b>其要點？','生物會為了適應環境而主動產生有利的變異',['生物會過度繁殖','族群中個體有變異','適應環境的個體較能存活繁殖'],'變異是隨機產生的，不是為了適應而產生。'],['始祖鳥化石同時具有牙齒、爪和羽毛，它最能支持哪一種觀點？','鳥類可能由爬蟲類演化而來',['鳥類與爬蟲類沒有關係','生物不會改變','用進廢退'],'過渡型化石顯示兩類群之間的演化關係。']]),
+  mix(bank([['人的手臂、蝙蝠的翼、鯨的胸鰭，屬於哪一種演化證據？','同源器官',['同功器官','痕跡器官','胚胎證據'],'骨骼構造與來源相同，功能不同，代表來自共同祖先。'],['鳥的翅膀與蝴蝶的翅膀，屬於？','同功器官',['同源器官','痕跡器官','過渡化石'],'都用來飛行，但構造與來源完全不同。'],['人的盲腸、尾椎骨，屬於？','痕跡器官',['同源器官','同功器官','過渡化石'],'功能退化、不明顯的構造。'],['比較不同物種的細胞色素 c 胺基酸序列，差異越少代表？','親緣關係越近',['親緣關係越遠','體型越接近','生活環境越相同'],'分子證據：序列越相似，分開的時間越短。'],['鯊魚（魚類）與海豚（哺乳類）都有流線型身體與鰭，這現象最適合用哪一個概念解釋？','趨同演化：適應相似環境而有相似構造',['兩者是近親','同源器官','用進廢退'],'親緣遙遠的生物因為相似的環境壓力，演化出相似外形；牠們的鰭是同功器官。']])),
+  bank([['細菌對抗生素產生抗藥性，正確的解釋是？','族群中原本就有抗藥的個體，使用抗生素後它們存活並大量繁殖',['細菌接觸抗生素後，為了生存而產生抗藥性','抗生素使細菌的 DNA 定向改變成抗藥性','每一隻細菌都逐漸適應了抗生素'],'抗生素只是篩選者，抗藥性變異原本就存在（隨機突變）。'],['工業革命後英國深色樺尺蛾比例上升，主要原因是？','樹幹變黑後，淺色蛾較容易被鳥捕食',['煤煙使蛾的翅膀染黑並遺傳','深色蛾繁殖力本來就比較強','淺色蛾為了躲避而遷移'],'天擇：環境改變了哪一種顏色比較容易存活。'],['狗有各種品種，高麗菜、花椰菜都來自野生甘藍，這些例子說明的是？','人擇',['天擇','用進廢退','突變不會發生'],'人類依喜好挑選個體繁殖。'],['下列何者是演化的基本單位？','族群',['個體','細胞','器官'],'個體一生不會演化，族群的基因組成會隨世代改變。']]),
+  bank([{m:1,q:'關於演化，下列哪些正確？',o:[['天擇作用於個體的表現型',true,''],['個體在一生中會演化',false,'演化的單位是族群'],['變異是天擇的原料，由突變等隨機產生',true,''],['同功器官是生物具有共同祖先的證據',false,'同源器官才是共同祖先的證據'],['化石證據顯示，越古老的地層中生物構造通常越簡單',true,'']]},
+   {m:1,q:'某島上原本鳥喙大小不一。連續數年乾旱，只剩下堅硬的大種子，之後大喙鳥的比例上升。下列哪些正確？',o:[['乾旱是選擇的環境壓力',true,''],['小喙鳥為了吃大種子，喙逐漸長大並遺傳給後代',false,'這是拉馬克式說法'],['若鳥喙大小可以遺傳，下一代平均鳥喙會變大',true,''],['大喙鳥的出現是乾旱造成的突變',false,'變異原本就存在，乾旱只是篩選'],['這是天擇的實例',true,'']]}])]},
+
+/* ---------- 12 分類與生物多樣性 ---------- */
+{id:'b_div2',unit:'第三章　演化與生物多樣性',title:'生物分類與生物多樣性',
+ goal:'了解分類階層與二名法，判讀親緣關係樹，說出生物多樣性的三個層次與保育意義。',
+ concept:()=>`<div class="prose"><p><b>分類階層</b>（由大到小）：域 → 界 → 門 → 綱 → 目 → 科 → 屬 → 種。越下層，共同特徵越多、親緣越近。</p>
+  <p><b>二名法</b>（林奈）：學名 ＝ <b>屬名 ＋ 種小名</b>，以拉丁文斜體書寫，屬名第一個字母大寫，例如人類 <i>Homo sapiens</i>。同一屬的物種屬名相同。</p>
+  <p><b>種</b>的定義：能夠交配並產生<b>有生殖能力</b>後代的一群生物。馬和驢交配生下的騾不能生育，所以馬和驢是不同種。</p>
+  <p><b>三域系統</b>：細菌域、古菌域（都是原核）、真核生物域（原生生物、真菌、植物、動物）。古菌常生活在極端環境，在分子特徵上和真核生物較接近。</p></div>
+  ${tbl(['多樣性層次','意義','例子'],[['遺傳多樣性','同一物種內基因的差異','稻米的不同品種'],['物種多樣性','一個地區物種的種類與數量','熱帶雨林物種豐富'],['生態系多樣性','不同類型的生態系','森林、濕地、珊瑚礁']])}
+  <div class="tip"><b>病毒</b>沒有細胞構造，必須寄生在活細胞內才能複製，通常<b>不被</b>列入生物分類系統中。</div>`,
+ deep:()=>`<div class="prose"><p><b>讀親緣關係樹（演化樹）</b>：分支點代表共同祖先。兩物種的親緣遠近，看它們「最近的共同祖先」在哪裡：共同祖先越晚出現（越靠近樹梢），親緣越近。樹枝可以旋轉而不改變關係，不要只看左右位置。</p>
+  <p><b>為什麼遺傳多樣性重要？</b>基因多樣的族群中，比較可能有個體能抵抗新疾病或適應環境變化。1840 年代愛爾蘭大饑荒，就是因為大量種植遺傳單一的馬鈴薯，遇到晚疫病幾乎全滅。</p>
+  <p><b>威脅生物多樣性的因素</b>：棲地破壞與破碎化（最主要）、外來入侵種、過度利用、污染、氣候變遷。保育方式有就地保育（設立保護區）和移地保育（種子庫、動物園復育）。</p></div>`,
+ example:{q:'甲、乙同屬不同種；乙、丙同科不同屬；丙、丁同目不同科。哪兩者親緣最近？',steps:['同屬的共同階層最多（種以上全部相同到屬）。','甲、乙同屬，比同科、同目的組合共同點更多。','親緣最近的是<b>甲和乙</b>。']},
+ notes:{2:'學名與分類階層的判斷。',3:'親緣關係樹的判讀。',4:'生物多樣性與分類的綜合多選。'},
+ levels:[
+  bank([['生物分類階層由大到小的正確順序是？','界、門、綱、目、科、屬、種',['界、綱、門、目、屬、科、種','門、界、綱、科、目、屬、種','界、門、目、綱、科、種、屬'],'記法：界門綱目科屬種。'],['學名 <i>Homo sapiens</i> 中，<i>Homo</i> 代表？','屬名',['種小名','科名','命名者'],'二名法：屬名 ＋ 種小名。'],['二名法是誰提出的？','林奈',['達爾文','孟德爾','虎克'],'瑞典植物學家林奈。'],['馬與驢交配生出不能生育的騾，說明馬與驢？','是不同的物種',['是同一物種','屬於不同界','沒有共同祖先'],'同種必須能產生有生殖能力的後代。'],['下列哪一種<b>不具有</b>細胞構造？','病毒',['細菌','酵母菌','草履蟲','藍綠菌'],'病毒由核酸和蛋白質外殼組成，沒有細胞構造。']]),
+  bank([['學名 <i>Felis catus</i>（家貓）與 <i>Felis silvestris</i>（野貓）的關係是？','同屬不同種',['同種','同科不同屬','不同目'],'屬名相同（Felis），種小名不同。'],['下列哪一個學名的寫法正確？','<i>Oryza sativa</i>',['<i>oryza sativa</i>','<i>Oryza Sativa</i>','Oryza sativa（不用斜體）'],'屬名首字母大寫、種小名全小寫，且用斜體。'],['三域系統中，細胞沒有核膜的是哪兩域？','細菌域與古菌域',['古菌域與真核生物域','細菌域與真核生物域','只有細菌域'],'細菌與古菌都是原核生物。'],['兩種生物同目不同科，則下列敘述何者一定正確？','它們同綱',['它們同屬','它們同科','它們不同門'],'同目代表目以上（綱、門、界）都相同。']]),
+  mix(()=>{const sp=shuffle(['甲','乙','丙','丁']);const [a,b,c,d]=sp;const tree=`((${a}, ${b}), ${c}), ${d}`;const q=pick([[`${a}`,b,[c,d]],[`${c}`,'甲乙中任一',null]]);
+    return mc(`某親緣關係樹的結構可寫成 ${tree}（括號越內層，代表越晚分開）。和 ${a} 親緣關係最近的是？`,b,[c,d].concat(['四者一樣近']),[`${a} 和 ${b} 在最內層，有最近的共同祖先。`,`${c} 較早分出，${d} 最早分出。`])},
+   bank([['在親緣關係樹中，兩物種的親緣遠近主要依據？','最近共同祖先出現的時間',['在圖上左右位置的距離','體型大小的相似程度','名字的相似程度'],'共同祖先越晚出現（越近），親緣越近。樹枝旋轉不改變關係。']])),
+  bank([{m:1,q:'關於生物多樣性，下列哪些正確？',o:[['同一種稻米有許多品種，屬於遺傳多樣性',true,''],['生物多樣性只包含物種的數目',false,'還包括遺傳與生態系多樣性'],['棲地破壞是威脅生物多樣性最主要的因素之一',true,''],['外來入侵種一定能增加當地的生物多樣性',false,'常排擠原生種，降低多樣性'],['設立國家公園屬於就地保育',true,'']]},
+   {m:1,q:'關於生物分類，下列哪些正確？',o:[['同屬的生物一定同科',true,'階層是包含關係'],['同科的生物一定同屬',false,'同科可以不同屬'],['學名中的種小名第一個字母要大寫',false,'屬名首字母大寫，種小名小寫'],['古菌常生活在高溫、高鹽等極端環境',true,''],['真菌和植物一樣具有葉綠體',false,'真菌是異營生物，沒有葉綠體']]}])]}
+];
+for(const l of BIO_LESSONS)l.levels=l.levels.map(g=>()=>{for(let i=0;i<60;i++){try{return g()}catch(e){if(e.message!=='retry')throw e}}throw new Error('generator failed: '+l.id)});
+/* ================= math: deeper explanations ================= */
+const MATH_DEEP={
+neg:()=>`<div class="prose"><p><b>為什麼「負負得正」？</b>用分配律就能看出來：0 ＝ (−3) × 0 ＝ (−3) × (2 ＋ (−2)) ＝ (−3) × 2 ＋ (−3) × (−2) ＝ −6 ＋ (−3) × (−2)。要讓等式成立，(−3) × (−2) 只能是 +6。這不是硬背的規定，而是讓運算規則一致的唯一選擇。</p>
+ <p><b>減法其實是加上相反數</b>：<i>a</i> − <i>b</i> ＝ <i>a</i> ＋ (−<i>b</i>)。所以 5 − (−3) ＝ 5 ＋ 3。把所有減法都改寫成加法，就不必記「減負變加」，也不容易在一長串運算中出錯。</p>
+ <p><b>絕對值就是距離</b>：|<i>a</i> − <i>b</i>| 是數線上 <i>a</i> 到 <i>b</i> 的距離，一定 ≥ 0。之後的兩點距離、點到直線距離公式都有絕對值或平方，就是為了保證距離不會是負的。</p>
+ <p><b>段考陷阱</b>：(−2)<sup>3</sup> ＝ −8（奇數次方保留負號），−2<sup>4</sup> ＝ −16（沒有括號），(−2)<sup>4</sup> ＝ 16。</p></div>`,
+coord:()=>`<div class="prose"><p><b>坐標的本質</b>：坐標把「位置」變成「數字」，於是幾何問題（長度、角度、位置關係）可以用代數計算解決。這就是笛卡兒發明解析幾何的想法，也是整個第二章的核心。</p>
+ <p><b>點在哪裡只看正負號</b>：判斷象限時，不需要知道確切數值，只需要知道 <i>x</i>、<i>y</i> 的正負。所以題目給「<i>a</i> &gt; 0、<i>b</i> &lt; 0」也能判斷 (<i>ab</i>, <i>a</i> − <i>b</i>) 的位置：<i>ab</i> &lt; 0、<i>a</i> − <i>b</i> &gt; 0，在第二象限。</p>
+ <p><b>對稱點的規律</b>：對 <i>x</i> 軸對稱 (<i>x</i>, −<i>y</i>)；對 <i>y</i> 軸 (−<i>x</i>, <i>y</i>)；對原點 (−<i>x</i>, −<i>y</i>)；對直線 <i>y</i> ＝ <i>x</i> 是 (<i>y</i>, <i>x</i>)（<i>x</i>、<i>y</i> 互換）。最後一個段考常出現。</p></div>`,
+dist:()=>`<div class="prose"><p><b>距離公式從哪裡來？</b>從 A(<i>x</i><sub>1</sub>, <i>y</i><sub>1</sub>) 到 B(<i>x</i><sub>2</sub>, <i>y</i><sub>2</sub>)，先橫著走 |<i>x</i><sub>2</sub> − <i>x</i><sub>1</sub>|、再直著走 |<i>y</i><sub>2</sub> − <i>y</i><sub>1</sub>|，這兩段互相垂直，和 AB 圍成直角三角形，用畢氏定理就得到公式。平方會把負號消掉，所以絕對值可以省略。</p>
+ <p><b>反過來用：距離固定的點在哪裡？</b>和定點 (<i>h</i>, <i>k</i>) 距離固定為 <i>r</i> 的所有點，滿足 (<i>x</i> − <i>h</i>)<sup>2</sup> ＋ (<i>y</i> − <i>k</i>)<sup>2</sup> ＝ <i>r</i><sup>2</sup>，這就是圓的方程式。第 9 課的圓其實就是距離公式。</p>
+ <p><b>到兩點等距離的點</b>：PA ＝ PB 平方後展開，<i>x</i><sup>2</sup>、<i>y</i><sup>2</sup> 會消掉，剩下一條直線：AB 的<b>中垂線</b>。這解釋了為什麼三角形的外心（到三頂點等距）是三條中垂線的交點。</p></div>`,
+mid:()=>`<div class="prose"><p><b>中點公式為什麼是平均？</b>在數線上，<i>a</i> 和 <i>b</i> 的正中間是 (<i>a</i> ＋ <i>b</i>)/2。平面上，中點在 <i>x</i> 方向和 <i>y</i> 方向都各自在正中間，所以兩個坐標分別取平均。</p>
+ <p><b>推廣：分點公式</b>。P 在 AB 上且 AP : PB ＝ <i>m</i> : <i>n</i>，則 P ＝ (<i>n</i>A ＋ <i>m</i>B) ÷ (<i>m</i> ＋ <i>n</i>)。注意是「交叉」：靠近 A 的權重給 A 比較大。中點就是 <i>m</i> ＝ <i>n</i> ＝ 1 的特例。</p>
+ <p><b>重心</b>：三角形三條中線的交點，坐標是三頂點的平均。重心把每條中線分成 2 : 1（從頂點算起）。</p>
+ <p><b>平行四邊形</b>：對角線互相平分 ⇔ 兩條對角線中點相同 ⇔ A ＋ C ＝ B ＋ D。已知三個頂點求第四個時，要注意頂點順序；若題目沒有給順序，可能有三種答案。</p></div>`,
+slope:()=>`<div class="prose"><p><b>斜率與角度</b>：直線和 <i>x</i> 軸正向的夾角叫<b>斜角</b> θ，斜率 ＝ tan θ（高一下會學三角函數）。所以斜率 1 代表 45°，斜率越大線越陡；斜角在 90° 到 180° 之間時斜率為負。</p>
+ <p><b>為什麼直線上任兩點算出的斜率都一樣？</b>任取直線上兩組點，各自畫出「橫走、直走」的直角三角形，這些三角形都是相似的（對應角相等），所以「直走 ÷ 橫走」的比值固定。這也是三點共線的判斷方法。</p>
+ <p><b>斜率的大小比較</b>：比較兩條線誰比較陡，要比斜率的<b>絕對值</b>。斜率 −3 的線比斜率 2 的線更陡。</p>
+ <p><b>段考陷阱</b>：鉛直線（<i>x</i> ＝ 常數）斜率不存在，不是 0；水平線斜率才是 0。題目說「斜率存在」時，就要排除鉛直線。</p></div>`,
+line:()=>`<div class="prose"><p><b>直線方程式的幾種寫法各有用途</b>：</p>
+ <ul><li><b>點斜式</b> <i>y</i> − <i>y</i><sub>0</sub> ＝ <i>m</i>(<i>x</i> − <i>x</i><sub>0</sub>)：已知斜率和一點時最快，不必解 <i>b</i>。</li>
+ <li><b>斜截式</b> <i>y</i> ＝ <i>m</i><i>x</i> ＋ <i>b</i>：一眼看出斜率和 <i>y</i> 截距。</li>
+ <li><b>截距式</b> <i>x</i>/<i>a</i> ＋ <i>y</i>/<i>b</i> ＝ 1：已知兩軸截距時使用，適合算面積。</li>
+ <li><b>一般式</b> <i>a</i><i>x</i> ＋ <i>b</i><i>y</i> ＋ <i>c</i> ＝ 0：可以表示所有直線（包括鉛直線），點到直線距離公式要用這個。斜率 ＝ −<i>a</i>/<i>b</i>。</li></ul>
+ <p><b>點斜式從哪裡來？</b>直線上任一點 (<i>x</i>, <i>y</i>) 和定點 (<i>x</i><sub>0</sub>, <i>y</i><sub>0</sub>) 算出的斜率都要等於 <i>m</i>：(<i>y</i> − <i>y</i><sub>0</sub>)/(<i>x</i> − <i>x</i><sub>0</sub>) ＝ <i>m</i>，兩邊乘開就是點斜式。</p>
+ <p><b>直線族</b>：<i>y</i> − 2 ＝ <i>m</i>(<i>x</i> − 1) 中 <i>m</i> 可以變，代表「所有通過 (1, 2) 的直線」（鉛直線除外）。很多壓軸題就是在這一族直線中找符合條件的那一條。</p></div>`,
+perp:()=>`<div class="prose"><p><b>為什麼垂直時斜率相乘等於 −1？</b>把斜率 <i>m</i> 的直線想成方向「往右 1、往上 <i>m</i>」。旋轉 90° 後變成「往左 <i>m</i>、往上 1」，也就是「往右 1、往上 −1/<i>m</i>」，斜率是 −1/<i>m</i>。兩者相乘 ＝ −1。</p>
+ <p><b>用一般式更快</b>：<i>a</i><i>x</i> ＋ <i>b</i><i>y</i> ＋ <i>c</i> ＝ 0 的垂直線可直接寫成 <i>b</i><i>x</i> − <i>a</i><i>y</i> ＋ <i>k</i> ＝ 0（係數互換、其中一個變號），平行線寫成 <i>a</i><i>x</i> ＋ <i>b</i><i>y</i> ＋ <i>k</i> ＝ 0（只改常數），再代點求 <i>k</i>。這樣也能處理鉛直線和水平線。</p>
+ <p><b>一般式的垂直條件</b>：<i>a</i><sub>1</sub><i>x</i> ＋ <i>b</i><sub>1</sub><i>y</i> ＋ <i>c</i><sub>1</sub> ＝ 0 和 <i>a</i><sub>2</sub><i>x</i> ＋ <i>b</i><sub>2</sub><i>y</i> ＋ <i>c</i><sub>2</sub> ＝ 0 垂直 ⇔ <i>a</i><sub>1</sub><i>a</i><sub>2</sub> ＋ <i>b</i><sub>1</sub><i>b</i><sub>2</sub> ＝ 0。這個寫法不怕斜率不存在，第一志願段考很常用。</p>
+ <p><b>平行與重合</b>：斜率相同但截距也相同時是同一條線（重合），不叫平行。聯立方程式無解 ⇔ 平行；無限多解 ⇔ 重合。</p></div>`,
+pdist:()=>`<div class="prose"><p><b>公式的推導想法</b>：P 到直線 L 的距離，就是 P 到垂足 H 的長度。直線 <i>a</i><i>x</i> ＋ <i>b</i><i>y</i> ＋ <i>c</i> ＝ 0 的垂直方向是 (<i>a</i>, <i>b</i>)，從 P 沿這個方向走 <i>t</i> 倍到 H：H ＝ (<i>x</i><sub>0</sub> ＋ <i>a</i><i>t</i>, <i>y</i><sub>0</sub> ＋ <i>b</i><i>t</i>)。代入直線解出 <i>t</i> ＝ −(<i>a</i><i>x</i><sub>0</sub> ＋ <i>b</i><i>y</i><sub>0</sub> ＋ <i>c</i>)/(<i>a</i><sup>2</sup> ＋ <i>b</i><sup>2</sup>)，再算 PH ＝ |<i>t</i>|·${rt('<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup>')}，就得到公式。第 7 課 Lv4 的對稱點用的就是這個方法。</p>
+ <p><b>分子的正負代表哪一側</b>：把點代入 <i>a</i><i>x</i> ＋ <i>b</i><i>y</i> ＋ <i>c</i>，同一側的點符號相同、不同側符號相反。所以「兩點在直線同側或異側」可以用代入後的正負判斷，最短路徑題就需要這個。</p>
+ <p><b>平行線距離</b>：在一條線上隨便找一點，算它到另一條線的距離即可。公式 |<i>c</i><sub>1</sub> − <i>c</i><sub>2</sub>|/${rt('<i>a</i><sup>2</sup> + <i>b</i><sup>2</sup>')} 就是這樣化簡來的，但前提是兩式的 <i>a</i>、<i>b</i> 要相同。</p></div>`,
+circle:()=>`<div class="prose"><p><b>一般式怎麼判斷是不是圓？</b><i>x</i><sup>2</sup> ＋ <i>y</i><sup>2</sup> ＋ <i>D</i><i>x</i> ＋ <i>E</i><i>y</i> ＋ <i>F</i> ＝ 0 配方後得到 (<i>x</i> ＋ <i>D</i>/2)<sup>2</sup> ＋ (<i>y</i> ＋ <i>E</i>/2)<sup>2</sup> ＝ (<i>D</i><sup>2</sup> ＋ <i>E</i><sup>2</sup> − 4<i>F</i>)/4。</p>
+ <ul><li><i>D</i><sup>2</sup> ＋ <i>E</i><sup>2</sup> − 4<i>F</i> &gt; 0：圓，圓心 (−<i>D</i>/2, −<i>E</i>/2)，半徑 ${rt('<i>D</i><sup>2</sup> + <i>E</i><sup>2</sup> − 4<i>F</i>')}/2。</li><li>＝ 0：只有一個點（點圓）。</li><li>&lt; 0：沒有圖形（平方和不可能是負數）。</li></ul>
+ <p>另外，<i>x</i><sup>2</sup> 和 <i>y</i><sup>2</sup> 的係數必須相同，而且不能有 <i>xy</i> 項，否則不是圓。</p>
+ <p><b>點和圓的位置</b>：把點代入 (<i>x</i> − <i>h</i>)<sup>2</sup> ＋ (<i>y</i> − <i>k</i>)<sup>2</sup>，和 <i>r</i><sup>2</sup> 比：小於在圓內、等於在圓上、大於在圓外。</p>
+ <p><b>三點定圓的幾何意義</b>：圓心到三點等距，所以是兩條中垂線的交點（三角形外心）。若三點共線，中垂線平行，沒有圓。</p></div>`,
+cline:()=>`<div class="prose"><p><b>兩種判斷方法</b>：① 幾何法：比較圓心到直線距離 <i>d</i> 與半徑 <i>r</i>；② 代數法：把直線代入圓的方程式，得到一元二次方程式，判別式 &gt; 0 兩個交點、＝ 0 相切、&lt; 0 不相交。幾何法通常計算量小很多，段考優先用。</p>
+ <p><b>切線的性質</b>：切線和過切點的半徑垂直。所以：① 求「過圓上一點的切線」，先算半徑的斜率，切線斜率是它的負倒數；② 從圓外一點 P 到圓有兩條切線，切線長相等，都等於 ${rt('PC<sup>2</sup> − <i>r</i><sup>2</sup>')}。</p>
+ <p><b>弦長公式</b>：圓心到弦的垂線會平分弦（垂徑定理），所以弦長 ＝ 2${rt('<i>r</i><sup>2</sup> − <i>d</i><sup>2</sup>')}。弦越靠近圓心（<i>d</i> 越小），弦越長；通過圓心時 <i>d</i> ＝ 0，弦長 ＝ 直徑。</p>
+ <p><b>圓上點到直線的距離範圍</b>：若直線不和圓相交，圓上的點到直線的距離介於 <i>d</i> − <i>r</i> 和 <i>d</i> ＋ <i>r</i> 之間；若相交，最小是 0、最大是 <i>d</i> ＋ <i>r</i>。</p></div>`
+};
+for(const l of MATH_LESSONS)if(MATH_DEEP[l.id])l.deep=MATH_DEEP[l.id];
+/* ================= subjects ================= */
+const ALL_LESSONS=[...MATH_LESSONS,...CHEM_LESSONS,...BIO_LESSONS];
+const unitsOf=ls=>[...new Set(ls.map(l=>l.unit))];
+const mkTopics=ls=>{const u=unitsOf(ls),o={};ls.forEach(l=>{o[l.id]={ch:u.indexOf(l.unit),name:l.title,fromLesson:l.id}});return o};
+const CEEC_LIST='https://www.ceec.edu.tw/xmfile?xsmsid=0J052424829869345634';
+const SUBJ={
+ math:{name:'數學',lessons:MATH_LESSONS,topics:MATH_TOPICS,chapters:MATH_CHAPTERS,tabs:['從頭學・第二章','隨機練習','考古題・模擬考'],
+  sub:{learn:'從頭學第二章「直線與圓」：每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。'},
+  mockFrom:2,mockMin:50,mockDesc:'範圍是第二章第 3～10 課'},
+ chem:{name:'化學',lessons:CHEM_LESSONS,topics:mkTopics(CHEM_LESSONS),chapters:unitsOf(CHEM_LESSONS),tabs:['從頭學・化學','隨機練習','模擬考'],
+  sub:{learn:'高一上基礎化學全冊 12 課：觀念、深入理解、例題，再用四級難度自己練。',prac:'化學 12 課隨機出題，難度可以自動調整。',past:'限時 50 分鐘的化學模擬段考，以及官方歷屆試題連結。'},
+  mockFrom:0,mockMin:50,mockDesc:'範圍是化學全部 12 課',
+  links:[{name:'大考中心・學測歷屆試題與答案',url:CEEC_LIST,note:'學測「自然考科」包含高一化學的範圍，可以挑物質組成、化學計量、酸鹼等題目練習。'}]},
+ bio:{name:'生物',lessons:BIO_LESSONS,topics:mkTopics(BIO_LESSONS),chapters:unitsOf(BIO_LESSONS),tabs:['從頭學・生物','隨機練習','模擬考'],
+  sub:{learn:'高一上生物 12 課：細胞、遺傳、演化與多樣性。觀念、深入理解、例題，再用四級難度自己練。',prac:'生物 12 課隨機出題，難度可以自動調整。',past:'限時 40 分鐘的生物模擬段考，以及官方歷屆試題連結。'},
+  mockFrom:0,mockMin:40,mockDesc:'範圍是生物全部 12 課',
+  links:[{name:'大考中心・學測歷屆試題與答案',url:CEEC_LIST,note:'學測「自然考科」包含高一生物的範圍，細胞、遺傳的題目最常出現。'}]}
+};
+let LESSONS=MATH_LESSONS,TOPICS=MATH_TOPICS,CHAPTERS=MATH_CHAPTERS;
+const lessonById=id=>ALL_LESSONS.find(l=>l.id===id);
 function genTopic(k,lv=1){const t=TOPICS[k];
   if(t.fromLesson){const p=genLv(lessonById(t.fromLesson),lv);
-    return{q:p.q+(p.fig?`<div style="margin-top:8px;max-width:220px">${p.fig}</div>`:''),ans:p.ans,
+    return{q:p.q+(p.fig?`<div style="margin-top:8px;max-width:220px">${p.fig}</div>`:''),ans:p.ans,choices:p.choices,multi:p.multi,
       lv,hint:p.steps[0],sol:'<ol class="steps">'+p.steps.map(s=>`<li><div>${s}</div></li>`).join('')+'</ol>'+(p.fig2?`<div class="sol-fig" style="margin-top:10px">${p.fig2}</div>`:'')}}
   return t.gen();
 }
@@ -1012,20 +1873,40 @@ const same=(a,b)=>a[0]===b[0]&&a[1]===b[1];
 /* ================= DOM ================= */
 if(typeof document!=='undefined'){
 const KEY='hs-math-dojo-v1';
-const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},lv:{},tlv:{},diff:'auto',cur:'neg',tab:'learn'});
+const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},lv:{},tlv:{},diff:'auto',cur:'neg',tab:'learn',subject:'math',curBy:{},enabledBy:{},mockBy:{}});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
-S.enabled=S.enabled.filter(k=>TOPICS[k]);if(!S.enabled.length)S.enabled=Object.keys(TOPICS);
-if(!lessonById(S.cur))S.cur='neg';
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+S.curBy=S.curBy||{};S.enabledBy=S.enabledBy||{};S.mockBy=S.mockBy||{};
+if(S.mockBest!=null&&!S.mockBy.math)S.mockBy.math={best:S.mockBest,n:S.mockN||0};
+if(!S.enabledBy.math)S.enabledBy.math=S.enabled||[];if(!S.curBy.math)S.curBy.math=S.cur;
+if(!SUBJ[S.subject])S.subject='math';
+function useSubject(s){LESSONS=SUBJ[s].lessons;TOPICS=SUBJ[s].topics;CHAPTERS=SUBJ[s].chapters;
+  let en=(S.enabledBy[s]||[]).filter(k=>TOPICS[k]);if(!en.length)en=Object.keys(TOPICS);S.enabled=en;S.enabledBy[s]=en;
+  let c=S.curBy[s];if(!c||!LESSONS.find(l=>l.id===c))c=LESSONS[0].id;S.cur=c;S.curBy[s]=c;}
+useSubject(S.subject);
+const save=()=>{S.enabledBy[S.subject]=S.enabled;S.curBy[S.subject]=S.cur;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const $=id=>document.getElementById(id);
 const NEED=3;
+function answerUI(p,pre){
+  if(p.choices)return `<div class="choices" role="${p.multi?'group':'radiogroup'}" aria-label="選項">${p.choices.map((c,i)=>`<label class="choice"><input type="${p.multi?'checkbox':'radio'}" name="${pre}-c" value="${i}"><span class="key">${ABC[i]}</span><span class="ct">${c}</span></label>`).join('')}</div>`;
+  return `<label for="${pre}">答：</label><input id="${pre}" class="ansin" spellcheck="false" autocomplete="off">`}
+function readAns(p,pre){if(p.choices){const v=[...document.querySelectorAll(`input[name="${pre}-c"]:checked`)].map(x=>+x.value).sort((a,b)=>a-b);return v.length?v:null}const el=$(pre);return el?parseAns(el.value):null}
+function isRight(p,v){if(!v)return false;if(p.choices)return v.length===p.ans.length&&v.every((x,i)=>x===p.ans[i]);return same(v,p.ans)}
+function ansText(p){return p.choices?p.ans.map(i=>'('+ABC[i]+')').join(''):M(rFmt(p.ans))}
+function lockAns(pre,p){if(p.choices){document.querySelectorAll(`input[name="${pre}-c"]`).forEach(x=>{x.disabled=true;const c=p.ans.includes(+x.value)?'right':(x.checked?'wrong':'');if(c)x.closest('.choice').classList.add(c)})}else if($(pre))$(pre).disabled=true}
+function focusAns(pre){const el=$(pre)||document.querySelector(`input[name="${pre}-c"]`);if(el)el.focus({preventScroll:true})}
+function fmtFor(p,btn){return p.choices?(p.multi?`多選題：選出所有正確的選項（全對才算對），再按「${btn}」。`:`點選一個答案，再按「${btn}」。`):'可填整數、分數（如 -3/4）或小數。按 Enter 送出。'}
+function badMsg(p){return p.choices?'還沒有選答案。':'看不懂這個答案，請填整數、分數（如 -3/4）或小數。'}
 
 /* ---------- tabs ---------- */
-const SUB={learn:'從頭學第二章「直線與圓」：每一課先看懂，再跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。'};
-function setTab(t){if(!SUB[t])t='learn';S.tab=t;save();
-  for(const k of ['learn','prac','past']){$('tab-'+k).setAttribute('aria-selected',k===t);$('view-'+k).hidden=k!==t}
+function setTab(t){const SUB=SUBJ[S.subject].sub;if(!SUB[t])t='learn';S.tab=t;save();
+  ['learn','prac','past'].forEach((k,i)=>{$('tab-'+k).setAttribute('aria-selected',k===t);$('tab-'+k).textContent=SUBJ[S.subject].tabs[i];$('view-'+k).hidden=k!==t});
   $('subline').textContent=SUB[t];}
+function renderSubjects(){document.querySelectorAll('.subj').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===S.subject));
+  $('ch2-only').hidden=S.subject!=='math';$('past-math').hidden=S.subject!=='math'}
+function setSubject(s){if(!SUBJ[s]||s===S.subject)return;save();S.subject=s;useSubject(s);save();
+  renderSubjects();renderPast();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab)}
+document.querySelector('.subjects').addEventListener('click',e=>{const b=e.target.closest('.subj');if(b)setSubject(b.dataset.s)});
 $('tab-learn').onclick=()=>setTab('learn');$('tab-prac').onclick=()=>setTab('prac');$('tab-past').onclick=()=>setTab('past');
 
 /* ---------- lesson path ---------- */
@@ -1046,11 +1927,12 @@ function openLesson(id,scroll){
   const i=LESSONS.findIndex(l=>l.id===id),l=LESSONS[i],ex=l.example;
   $('lesson').innerHTML=`
    <section>
-     <p class="eyebrow">第二章 直線與圓・第 ${i+1} 課 / 共 ${LESSONS.length} 課</p>
+     <p class="eyebrow">${SUBJ[S.subject].name}・${(l.unit||'第二章 直線與圓').replace('　',' ')}・第 ${i+1} 課 / 共 ${LESSONS.length} 課</p>
      <h2>${l.title}</h2>
      <p class="goal"><b>學完你會：</b>${l.goal}</p>
    </section>
    <section><h3><span class="kicker">看懂</span>觀念</h3>${l.concept()}</section>
+   ${l.deep?`<section class="deep"><h3><span class="kicker">想更深</span>深入理解</h3>${l.deep()}</section>`:''}
    <section class="example"><h3><span class="kicker">跟著做</span>例題</h3>
      <div class="pq-wrap"><div class="qbox">${ex.q}</div>${ex.fig?ex.fig():''}</div>
      <ol class="steps" id="ex-steps"></ol>
@@ -1079,7 +1961,7 @@ function openLesson(id,scroll){
 }
 function setLevel(n){const o=lvOf(S.cur);o.cur=n;o.miss=0;save();
   drawLvTabs();
-  const note=n===1?'':LV[S.cur]['n'+n];$('lvnote').hidden=!note;$('lvnote').innerHTML=note?`<b>Lv${n} ${LVNAME[n]}・新觀念：</b>${note}`:'';
+  const note=n===1?'':(LV[S.cur]?LV[S.cur]['n'+n]:((lessonById(S.cur).notes||{})[n]||''));$('lvnote').hidden=!note;$('lvnote').innerHTML=note?`<b>Lv${n} ${LVNAME[n]}・新觀念：</b>${note}`:'';
   newLessonProblem()}
 function drawLvTabs(){const o=lvOf(S.cur);
   $('lvtabs').innerHTML=[1,2,3,4].map(k=>`<button type="button" class="lvtab${k===4?' top':''}" data-lv="${k}" aria-pressed="${k===o.cur}">Lv${k} ${LVNAME[k]}${o.c[k-1]>=NEED?' ★':''}</button>`).join('')}
@@ -1091,11 +1973,11 @@ function newLessonProblem(){
   $('lp').innerHTML=`
     <div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${o.cur}">Lv${o.cur}</span> ${lp.q}</div>${lp.fig||''}</div>
     <form class="answer-row" id="lform" autocomplete="off" style="margin-top:12px">
-      <label for="lans">答：</label><input id="lans" class="ansin" spellcheck="false" aria-describedby="lfmt">
+      ${answerUI(lp,'lans')}
       <button class="btn btn-primary" type="submit" id="lsubmit">對答案</button>
       <button class="btn btn-ghost" type="button" id="lhint">不會，教我一步</button>
     </form>
-    <p class="fmt" id="lfmt" style="margin-top:6px">可填整數、分數（如 -3/4）或小數。</p>
+    <p class="fmt" id="lfmt" style="margin-top:6px">${fmtFor(lp,'對答案')}</p>
     <ol class="steps" id="lsteps" style="margin-top:10px"></ol>
     <div class="result" id="lres" hidden></div>
     <div id="lmark"></div>`;
@@ -1104,10 +1986,10 @@ function newLessonProblem(){
     if(lp.revealed>=lp.steps.length-1){$('lhint').disabled=true;$('lhint').textContent='最後一步請自己算算看'}};
 }
 function drawSteps(){$('lsteps').innerHTML=lp.steps.slice(0,lp.revealed).map(s=>`<li><div>${s}</div></li>`).join('')}
-function gradeLesson(e){e.preventDefault();if(lp.done){newLessonProblem();$('lans').focus();return}
-  const v=parseAns($('lans').value);
-  if(!v){$('lfmt').textContent='看不懂這個答案，請填整數、分數（如 -3/4）或小數。';$('lfmt').classList.add('err');return}
-  lp.done=true;const ok=same(v,lp.ans),o=lvOf(S.cur),n=o.cur,i=LESSONS.findIndex(l=>l.id===S.cur);
+function gradeLesson(e){e.preventDefault();if(lp.done){newLessonProblem();focusAns('lans');return}
+  const v=readAns(lp,'lans');
+  if(!v){$('lfmt').textContent=badMsg(lp);$('lfmt').classList.add('err');return}
+  lp.done=true;const ok=isRight(lp,v),o=lvOf(S.cur),n=o.cur,i=LESSONS.findIndex(l=>l.id===S.cur);
   let justDone=false;
   if(ok){o.c[n-1]++;o.miss=0;justDone=o.c[n-1]===NEED}else o.miss++;
   save();renderPath();renderDots();
@@ -1119,14 +2001,14 @@ function gradeLesson(e){e.preventDefault();if(lp.done){newLessonProblem();$('lan
   const allStars=stars(o)===MAXLV;
   if(justDone&&!allStars&&n<MAXLV)box=`<div class="done-box"><b>Lv${n} ${LVNAME[n]}拿到一顆星！</b><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" type="button" id="go-up">試試 Lv${n+1} ${LVNAME[n+1]}</button>${i<LESSONS.length-1?`<button class="btn btn-ghost" type="button" id="go-next">前往第 ${i+2} 課</button>`:''}</div></div>`;
   else if(justDone&&!allStars)box=`<div class="done-box"><b>段考壓軸拿下了！</b>${i<LESSONS.length-1?`<button class="btn btn-primary" type="button" id="go-next">前往第 ${i+2} 課：${LESSONS[i+1].title}</button>`:''}</div>`;
-  else if(justDone)box=`<div class="done-box"><b>第 ${i+1} 課精通！四顆星到手</b>${i<LESSONS.length-1?`<button class="btn btn-primary" type="button" id="go-next">前往第 ${i+2} 課：${LESSONS[i+1].title}</button>`:'<span>第二章全部精通，去「隨機練習」用段考壓軸難度複習吧。</span>'}</div>`;
+  else if(justDone)box=`<div class="done-box"><b>第 ${i+1} 課精通！四顆星到手</b>${i<LESSONS.length-1?`<button class="btn btn-primary" type="button" id="go-next">前往第 ${i+2} 課：${LESSONS[i+1].title}</button>`:`<span>這個科目全部精通了，去「隨機練習」用段考壓軸難度複習吧。</span>`}</div>`;
   const down=!ok&&n>1&&o.miss>=2?`<p class="fmt">連續錯 2 題了。可以先回 <button class="linkbtn" type="button" id="go-down">Lv${n-1} ${LVNAME[n-1]}</button> 練熟再上來，不丟臉。</p>`:'';
   $('lres').hidden=false;
-  $('lres').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'答對了！':'差一點'}<small>${ok?'上面是完整算法，可以對照看看':`正確答案是 ${M(rFmt(lp.ans))}。對照上面的步驟，找出哪一步不一樣`}</small></div>
+  $('lres').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'答對了！':'差一點'}<small>${ok?'上面是完整算法，可以對照看看':`正確答案是 ${ansText(lp)}。對照上面的${lp.choices?'解析':'步驟'}，找出哪裡想錯了`}</small></div>
     ${lp.fig2?`<div class="sol-fig">${lp.fig2}</div>`:''}${box}${down}
     <div><button class="btn ${justDone?'btn-ghost':'btn-primary'}" type="button" id="lnext">再一題 →</button></div>`;
-  $('lans').disabled=true;$('lsubmit').disabled=true;$('lhint').disabled=true;
-  $('lnext').onclick=()=>{newLessonProblem();$('lans').focus()};
+  lockAns('lans',lp);$('lsubmit').disabled=true;$('lhint').disabled=true;
+  $('lnext').onclick=()=>{newLessonProblem();focusAns('lans')};
   if($('go-up'))$('go-up').onclick=()=>{setLevel(n+1);$('lvnote').scrollIntoView({behavior:'smooth',block:'center'})};
   if($('go-down'))$('go-down').onclick=()=>setLevel(n-1);
   if($('go-next'))$('go-next').onclick=()=>openLesson(LESSONS[i+1].id,true);
@@ -1224,7 +2106,9 @@ function renderPast(){
     <form class="answer-row" data-past="${i}" autocomplete="off"><label for="pa-${i}">答：</label><input id="pa-${i}" class="ansin" spellcheck="false">
       <button class="btn btn-primary" type="submit">對答案</button><button class="btn btn-ghost" type="button" data-sol="${i}">看詳解</button></form>
     <div class="verdict" id="pv-${i}"></div><ol class="steps" id="ps-${i}" hidden>${p.steps.map(s=>`<li><div>${s}</div></li>`).join('')}</ol></div>`).join('');
-  $('official').innerHTML=OFFICIAL.map(o=>`<li><a href="${o.url}" target="_blank" rel="noopener">${o.name}</a><span>${o.note}</span></li>`).join('');
+  $('links-title').textContent=S.subject==='math'?'各校段考原卷':'官方歷屆試題';
+  $('links-note').textContent=S.subject==='math'?'段考試題的著作權屬於各校，這裡不轉載，請到學校官方網站下載原卷練習。':'各校段考題的著作權屬於學校，這裡不轉載。學測自然考科的官方試題可以免費下載練習。';
+  $('official').innerHTML=(S.subject==='math'?OFFICIAL:SUBJ[S.subject].links).map(o=>`<li><a href="${o.url}" target="_blank" rel="noopener">${o.name}</a><span>${o.note}</span></li>`).join('');
 }
 $('pastlist').addEventListener('submit',e=>{e.preventDefault();const i=+e.target.dataset.past,v=parseAns($('pa-'+i).value),el=$('pv-'+i);
   if(!v){el.className='verdict no';el.innerHTML='<small>看不懂這個答案，請填整數或分數（如 24/5）。</small>';return}
@@ -1234,16 +2118,17 @@ $('pastlist').addEventListener('click',e=>{const b=e.target.closest('[data-sol]'
 let mock=null,mockTimer=null;
 const MOCK_LV=[2,2,2,3,3,3,3,4,4,4],MOCK_MIN=50;
 function mockIntro(){clearInterval(mockTimer);mock=null;
-  $('mock').innerHTML=`<p class="prose" style="margin:0">10 題、${MOCK_MIN} 分鐘，範圍是第二章第 3～10 課，難度 Lv2 三題、Lv3 四題、Lv4 三題，每題 10 分。作答時不能看提示，交卷後才會顯示詳解，時間到會自動交卷。</p>
-   ${S.mockBest!=null?`<p class="fmt">你的最高分：${S.mockBest} 分（共考過 ${S.mockN||0} 次）</p>`:''}
+  const SJ=SUBJ[S.subject],MB=S.mockBy[S.subject];
+  $('mock').innerHTML=`<p class="prose" style="margin:0">10 題、${SJ.mockMin} 分鐘，${SJ.mockDesc}，難度 Lv2 三題、Lv3 四題、Lv4 三題，每題 10 分。作答時不能看提示，交卷後才會顯示詳解，時間到會自動交卷。</p>
+   ${MB&&MB.best!=null?`<p class="fmt">你的${SJ.name}最高分：${MB.best} 分（共考過 ${MB.n} 次）</p>`:''}
    <div><button class="btn btn-primary" type="button" id="mock-start">開始模擬考</button></div>`;
   $('mock-start').onclick=startMock}
 function startMock(){
-  const pool=LESSONS.slice(2).sort(()=>Math.random()-.5);
-  mock={items:MOCK_LV.map((lv,i)=>{const l=pool[i%pool.length];return{l,p:genLv(l,lv)}}),end:Date.now()+MOCK_MIN*60000,done:false};
+  const SJ=SUBJ[S.subject],pool=shuffle(LESSONS.slice(SJ.mockFrom));
+  mock={items:MOCK_LV.map((lv,i)=>{const l=pool[i%pool.length];return{l,p:genLv(l,lv)}}),end:Date.now()+SJ.mockMin*60000,done:false};
   $('mock').innerHTML=`<div class="mockbar"><span>剩餘時間 <span class="timer" id="mock-time"></span></span><button class="btn btn-primary" type="button" id="mock-submit">交卷</button></div>
    <ol class="mocklist">${mock.items.map((it,i)=>`<li class="pitem" id="mi-${i}"><div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${it.p.lv}">Lv${it.p.lv}</span> <span class="fmt">${it.l.title}</span><br>${it.p.q}</div>${it.p.fig||''}</div>
-     <div class="answer-row"><label for="mq-${i}">答：</label><input id="mq-${i}" class="ansin" spellcheck="false"></div><div id="mr-${i}"></div></li>`).join('')}</ol>
+     <div class="answer-row">${answerUI(it.p,'mq-'+i)}</div><div id="mr-${i}"></div></li>`).join('')}</ol>
    <div><button class="btn btn-primary" type="button" id="mock-submit2">交卷</button></div>`;
   $('mock-submit').onclick=$('mock-submit2').onclick=submitMock;
   tick();mockTimer=setInterval(tick,1000);$('mock').scrollIntoView({behavior:'smooth',block:'start'})}
@@ -1251,12 +2136,12 @@ function tick(){if(!mock||mock.done)return;const left=Math.max(0,mock.end-Date.n
   const t=$('mock-time');if(t){t.textContent=`${m}:${String(s).padStart(2,'0')}`;t.classList.toggle('low',left<5*60000)}
   if(left<=0)submitMock()}
 function submitMock(){if(!mock||mock.done)return;mock.done=true;clearInterval(mockTimer);let score=0;
-  mock.items.forEach((it,i)=>{const v=parseAns($('mq-'+i).value),ok=!!v&&same(v,it.p.ans);if(ok)score+=10;$('mq-'+i).disabled=true;
-    $('mr-'+i).innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'○ 正確':'✗ 錯誤'}<small>${ok?'':`正確答案 ${M(rFmt(it.p.ans))}`}</small></div>
+  mock.items.forEach((it,i)=>{const v=readAns(it.p,'mq-'+i),ok=isRight(it.p,v);if(ok)score+=10;lockAns('mq-'+i,it.p);
+    $('mr-'+i).innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'○ 正確':'✗ 錯誤'}<small>${ok?'':`正確答案 ${ansText(it.p)}`}</small></div>
      <details${ok?'':' open'}><summary>看詳解</summary><ol class="steps" style="margin-top:8px">${it.p.steps.map(s=>`<li><div>${s}</div></li>`).join('')}</ol>${it.p.fig2?`<div class="sol-fig" style="margin-top:8px">${it.p.fig2}</div>`:''}</details>`});
-  S.mockN=(S.mockN||0)+1;const best=S.mockBest==null||score>S.mockBest;if(best)S.mockBest=score;save();
+  const MB=S.mockBy[S.subject]||(S.mockBy[S.subject]={best:null,n:0});MB.n++;const best=MB.best==null||score>MB.best;if(best)MB.best=score;save();
   const bar=document.querySelector('.mockbar');
-  bar.innerHTML=`<span><span class="score">${score}</span> 分${best&&S.mockN>1?'・新的最高分！':''}</span><button class="btn btn-primary" type="button" id="mock-again">再考一次</button>`;
+  bar.innerHTML=`<span><span class="score">${score}</span> 分${best&&MB.n>1?'・新的最高分！':''}</span><button class="btn btn-primary" type="button" id="mock-again">再考一次</button>`;
   $('mock-submit2').parentElement.remove();
   $('mock-again').onclick=()=>{mockIntro();startMock()};
   bar.scrollIntoView({behavior:'smooth',block:'start'})}
@@ -1270,33 +2155,33 @@ function show(p,retryIdx=null){cur=p;cur.retryIdx=retryIdx;answered=false;
   $('qno').textContent=`第 ${qn} 題`;$('qtag').textContent=(retryIdx!==null?'錯題重做・':'')+TOPICS[p.topic].name+(p.lv&&TOPICS[p.topic].fromLesson?`・Lv${p.lv} ${LVNAME[p.lv]}`:'');
   $('qtag').className='tag'+(retryIdx!==null?' retry':'');$('question').innerHTML=p.q;
   $('phint').hidden=true;$('presult').hidden=true;$('pmark').innerHTML='';
-  $('pans').value='';$('pans').disabled=false;$('psubmit').disabled=false;$('phint-btn').disabled=false}
+  $('pans-slot').innerHTML=answerUI(p,'pans');$('pfmt').textContent=fmtFor(p,'交卷批改');$('pfmt').classList.remove('err');$('psubmit').disabled=false;$('phint-btn').disabled=false}
 function tl(k){S.tlv=S.tlv||{};return S.tlv[k]||(S.tlv[k]={lv:1,st:0,miss:0})}
 function pickLv(k){if(!TOPICS[k].fromLesson)return 1;if(S.diff==='auto')return tl(k).lv;return +S.diff}
 function newProblem(){const k=chooseTopic();const p=genTopic(k,pickLv(k));p.topic=k;show(p)}
 function grade(e){e.preventDefault();if(answered){next();return}
-  const v=parseAns($('pans').value);
-  if(!v){$('pfmt').textContent='看不懂這個答案，請填整數、分數（如 -3/4）或小數。';$('pfmt').classList.add('err');return}
-  $('pfmt').textContent='可填整數、分數（如 -3/4）或小數。按 Enter 送出。';$('pfmt').classList.remove('err');
-  answered=true;const ok=same(v,cur.ans);
+  const v=readAns(cur,'pans');
+  if(!v){$('pfmt').textContent=badMsg(cur);$('pfmt').classList.add('err');return}
+  $('pfmt').classList.remove('err');
+  answered=true;const ok=isRight(cur,v);
   const st=S.stats[cur.topic]||(S.stats[cur.topic]={r:0,t:0});st.t++;S.total++;
   let lvMsg='';
   if(cur.retryIdx===null&&TOPICS[cur.topic].fromLesson&&S.diff==='auto'){const t=tl(cur.topic);
     if(ok){t.st++;t.miss=0;if(t.st>=3&&t.lv<MAXLV){t.lv++;t.st=0;lvMsg=`「${TOPICS[cur.topic].name}」升到 Lv${t.lv} ${LVNAME[t.lv]}`}}
     else{t.miss++;t.st=0;if(t.miss>=2&&t.lv>1){t.lv--;t.miss=0;lvMsg=`「${TOPICS[cur.topic].name}」先降回 Lv${t.lv} ${LVNAME[t.lv]}練熟`}}}
   if(ok){st.r++;S.right++;S.streak++;S.best=Math.max(S.best,S.streak);if(cur.retryIdx!==null)S.wrong.splice(cur.retryIdx,1)}
-  else{S.streak=0;if(cur.retryIdx===null){S.wrong.unshift({topic:cur.topic,q:cur.q,ans:cur.ans,hint:cur.hint,sol:cur.sol,lv:cur.lv});S.wrong=S.wrong.slice(0,40)}}
+  else{S.streak=0;if(cur.retryIdx===null){S.wrong.unshift({topic:cur.topic,q:cur.q,ans:cur.ans,hint:cur.hint,sol:cur.sol,lv:cur.lv,choices:cur.choices,multi:cur.multi});S.wrong=S.wrong.slice(0,40)}}
   save();
   $('pmark').innerHTML=ok?'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true" style="top:56px"><path d="M50 10 C 80 9, 93 32, 90 54 C 87 80, 62 93, 42 89 C 18 85, 7 62, 12 40 C 16 22, 34 12, 56 13"/></svg>'
     :'<svg class="mark" viewBox="0 0 100 100" aria-hidden="true" style="top:56px"><path d="M20 18 L 82 84"/><path d="M82 16 L 22 86"/></svg>';
   $('pverdict').className='verdict '+(ok?'ok':'no');
-  $('pverdict').innerHTML=(ok?`答對了！${S.streak>=3?`<small>已經連續答對 ${S.streak} 題</small>`:''}`:`再想想看<small>正確答案是 ${M(rFmt(cur.ans))}${cur.retryIdx===null?'，已加入錯題本':''}</small>`)+(lvMsg?`<small style="display:block;margin:4px 0 0;color:var(--blue)">${lvMsg}</small>`:'');
+  $('pverdict').innerHTML=(ok?`答對了！${S.streak>=3?`<small>已經連續答對 ${S.streak} 題</small>`:''}`:`再想想看<small>正確答案是 ${ansText(cur)}${cur.retryIdx===null?'，已加入錯題本':''}</small>`)+(lvMsg?`<small style="display:block;margin:4px 0 0;color:var(--blue)">${lvMsg}</small>`:'');
   $('psol').innerHTML='<h4>詳解</h4>'+cur.sol;$('presult').hidden=false;
-  $('pans').disabled=true;$('psubmit').disabled=true;$('phint-btn').disabled=true;$('pnext').focus({preventScroll:true});renderPrac()}
-function next(){qn++;newProblem();$('pans').focus()}
+  lockAns('pans',cur);$('psubmit').disabled=true;$('phint-btn').disabled=true;$('pnext').focus({preventScroll:true});renderPrac()}
+function next(){qn++;newProblem();focusAns('pans')}
 const DIFFS=[['auto','自動調整'],['1','Lv1 基礎'],['2','Lv2 進階'],['3','Lv3 挑戰'],['4','Lv4 段考壓軸']];
 function renderDiff(){$('diff').innerHTML=DIFFS.map(([v,t])=>`<button type="button" class="chip" data-d="${v}" aria-pressed="${S.diff===v}">${t}</button>`).join('');
-  $('diffnote').textContent=S.diff==='auto'?'每個單元連對 3 題升一級，連錯 2 題降一級。（第一、三章只有一種難度）':'第一、三章的單元只有一種難度。'}
+  $('diffnote').textContent=S.diff==='auto'?`每個單元連對 3 題升一級，連錯 2 題降一級。${S.subject==='math'?'（第一、三章只有一種難度）':''}`:(S.subject==='math'?'第一、三章的單元只有一種難度。':'')}
 function renderChips(){$('chapters').innerHTML=CHAPTERS.map((c,i)=>`<div class="chapter"><h3>${c}</h3><div class="chips">`+
   Object.entries(TOPICS).filter(([,t])=>t.ch===i).map(([k,t])=>`<button type="button" class="chip" data-k="${k}" aria-pressed="${S.enabled.includes(k)}">${t.name}</button>`).join('')+`</div></div>`).join('')}
 function renderPrac(){
@@ -1307,8 +2192,9 @@ function renderPrac(){
   const tried=Object.entries(S.stats).filter(([k,s])=>TOPICS[k]&&s.t>=3).sort((a,b)=>a[1].r/a[1].t-b[1].r/b[1].t);
   $('advice').innerHTML=!tried.length?'每個單元做滿 3 題後，這裡會告訴你哪裡要加強。'
     :tried[0][1].r/tried[0][1].t<.8?`建議加強：<b>${TOPICS[tried[0][0]].name}</b>（正確率 ${Math.round(100*tried[0][1].r/tried[0][1].t)}%）。`:'目前每個單元都在 80% 以上。';
-  $('wcount').textContent=S.wrong.length+' 題';
-  $('wrong').innerHTML=S.wrong.length?S.wrong.map((w,i)=>`<li><span class="wq"><b>${TOPICS[w.topic]?.name||''}</b>${w.q.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<[^>]+>/g,'').slice(0,40)}</span><button class="linkbtn" type="button" data-retry="${i}">重做</button></li>`).join('')
+  const mine=S.wrong.map((w,i)=>[w,i]).filter(([w])=>TOPICS[w.topic]);
+  $('wcount').textContent=mine.length+' 題';
+  $('wrong').innerHTML=mine.length?mine.map(([w,i])=>`<li><span class="wq"><b>${TOPICS[w.topic]?.name||''}</b>${w.q.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<[^>]+>/g,'').slice(0,40)}</span><button class="linkbtn" type="button" data-retry="${i}">重做</button></li>`).join('')
     :'<li class="empty">目前沒有錯題。答錯的題目會自動收進來，重做答對就會移除。</li>'}
 $('pform').addEventListener('submit',grade);$('pnext').onclick=next;
 $('phint-btn').onclick=()=>{$('phint').innerHTML='<b>提示：</b>'+cur.hint;$('phint').hidden=false};
@@ -1321,15 +2207,15 @@ $('weak-only').onclick=()=>{const weak=Object.entries(S.stats).filter(([k,s])=>T
   if(!weak.length){$('advice').innerHTML='還沒有找到弱項：單元做滿 3 題、正確率低於 80% 才會列入。';return}
   S.enabled=weak;save();renderChips();next()};
 $('wrong').addEventListener('click',e=>{const b=e.target.closest('[data-retry]');if(!b)return;const i=+b.dataset.retry;
-  qn++;show(Object.assign({},S.wrong[i]),i);$('pans').focus()});
+  qn++;show(Object.assign({},S.wrong[i]),i);focusAns('pans')});
 $('reset-area').addEventListener('click',e=>{
   if(e.target.id==='reset')$('reset-area').innerHTML='確定要清除所有作答紀錄、課程進度和錯題本？<button class="linkbtn" id="reset-yes" type="button" style="color:var(--pen)">清除</button><button class="linkbtn" id="reset-no" type="button">取消</button>';
-  else if(e.target.id==='reset-yes'){S=fresh();save();renderDiff();renderChips();renderPrac();openLesson('neg');restoreReset()}
+  else if(e.target.id==='reset-yes'){const sj=S.subject;S=fresh();S.subject=sj;useSubject(sj);save();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);restoreReset()}
   else if(e.target.id==='reset-no')restoreReset()});
 function restoreReset(){$('reset-area').innerHTML='<button class="linkbtn" id="reset" type="button">清除所有紀錄</button>'}
 
 $('diff').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;S.diff=b.dataset.d;save();renderDiff();if(!answered&&cur.retryIdx===null)newProblem()});
-renderPast();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
+renderSubjects();renderPast();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
 }
 </script>
 
