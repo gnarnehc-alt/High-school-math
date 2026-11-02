@@ -352,7 +352,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
       <section class="units" aria-label="選擇單元">
         <div class="units-head">
           <h2>選擇練習單元（可複選）</h2>
-          <div><button class="linkbtn" id="all-on" type="button">全選</button> <button class="linkbtn" id="ch2-only" type="button">只練第二章</button> <button class="linkbtn" id="weak-only" type="button">只練弱項</button></div>
+          <div><button class="linkbtn" id="all-on" type="button">全選</button> <button class="linkbtn" id="ch2-only" type="button">只練直線與圓</button> <button class="linkbtn" id="weak-only" type="button">只練弱項</button></div>
         </div>
         <div class="chapters" id="chapters"></div>
         <div class="diffrow"><span>難度</span><div class="chips" id="diff" role="group" aria-label="難度"></div><span class="fmt" id="diffnote"></span></div>
@@ -410,7 +410,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v13・2026/11/02 23:45</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v14・2026/11/02 23:52</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -2666,9 +2666,9 @@ const unitsOf=ls=>[...new Set(ls.map(l=>l.unit))];
 const mkTopics=ls=>{const u=unitsOf(ls),o={};ls.forEach(l=>{o[l.id]={ch:u.indexOf(l.unit),name:l.title,fromLesson:l.id}});return o};
 const CEEC_LIST='https://www.ceec.edu.tw/xmfile?xsmsid=0J052424829869345634';
 const SUBJ={
- math:{name:'數學',lessons:MATH_LESSONS,topics:MATH_TOPICS,chapters:MATH_CHAPTERS,tabs:['從頭學・數學1','隨機練習','考古題・模擬考','題庫'],
-  sub:{learn:'數學 1 全冊（南一版 1-1～3-3）：每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
-  mockFrom:1,mockMin:50,mockDesc:'範圍是數學 1 全冊（1-1～3-3）'},
+ math:{name:'數學',lessons:MATH_LESSONS,topics:MATH_TOPICS,chapters:MATH_CHAPTERS,tabs:['從頭學・數學','隨機練習','考古題・模擬考','題庫'],
+  sub:{learn:'高一數學依主題分類：數與式、坐標平面與直線、圓、多項式。每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
+  mockFrom:1,mockMin:50,mockDesc:'範圍是全部數學主題（暖身除外）'},
  chem:{name:'化學',lessons:CHEM_LESSONS,topics:mkTopics(CHEM_LESSONS),chapters:unitsOf(CHEM_LESSONS),tabs:['從頭學・化學','隨機練習','模擬考','題庫'],
   sub:{learn:'高一上基礎化學全冊 12 課：觀念、深入理解、例題，再用四級難度自己練。',prac:'化學 12 課隨機出題，難度可以自動調整。',past:'限時 50 分鐘的化學模擬段考，以及官方歷屆試題連結。',bank:'每個單元固定 100 題，八成是中等以上難度。題號固定，可以分次做完。'},
   mockFrom:0,mockMin:50,mockDesc:'範圍是化學全部 12 課',
@@ -2678,7 +2678,11 @@ const SUBJ={
   mockFrom:0,mockMin:40,mockDesc:'範圍是生物全部 12 課',
   links:[{name:'大考中心・學測歷屆試題與答案',url:CEEC_LIST,note:'學測「自然考科」包含高一生物的範圍，細胞、遺傳的題目最常出現。'}]}
 };
-let LESSONS=MATH_LESSONS,TOPICS=MATH_TOPICS,CHAPTERS=MATH_CHAPTERS;
+/* math: group by topic instead of textbook sections */
+{const G={neg:'數與式',m11:'數與式',m12:'數與式',m13:'數與式',m14:'數與式',coord:'坐標平面與直線',dist:'坐標平面與直線',mid:'坐標平面與直線',slope:'坐標平面與直線',line:'坐標平面與直線',perp:'坐標平面與直線',pdist:'坐標平面與直線',circle:'圓',cline:'圓',m31:'多項式',m32:'多項式',m33:'多項式'};
+ for(const l of MATH_LESSONS){l.unit=G[l.id]||l.unit;delete l.sec;delete l.secName;delete l.pre}
+ SUBJ.math.topics=mkTopics(MATH_LESSONS);SUBJ.math.chapters=unitsOf(MATH_LESSONS);}
+let LESSONS=MATH_LESSONS,TOPICS=SUBJ.math.topics,CHAPTERS=SUBJ.math.chapters;
 const lessonById=id=>ALL_LESSONS.find(l=>l.id===id);
 function genTopic(k,lv=1){const t=TOPICS[k];
   if(t.fromLesson){const p=genLv(lessonById(t.fromLesson),lv);
@@ -2744,7 +2748,7 @@ function renderPath(){
   let lastHead='';
   $('path-list').innerHTML=LESSONS.map((l,i)=>{const o=lvOf(l.id),st=stars(o),done=st>0;
     const cnt=st===MAXLV?'精通':'★'.repeat(st)+'☆'.repeat(MAXLV-st);
-    const head=l.sec?`${l.sec} ${l.secName}`:l.pre?`${l.pre}（課本沒有這一節）`:'';let h='';if(head&&head!==lastHead){h=`<li class="sec-head">${head}</li>`;lastHead=head}
+    const head=(l.unit||'').replace('　',' ');let h='';if(head&&head!==lastHead){h=`<li class="sec-head">${head}</li>`;lastHead=head}
     return `${h}<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.title}</span><span class="cnt">${cnt}</span></button></li>`}).join('');
   const s=LESSONS.reduce((a,l)=>a+stars(lvOf(l.id)),0),T=LESSONS.length*MAXLV;
   $('overall').innerHTML=`星星 ${s} / ${T}（每級答對 3 題得一顆）<div class="bar"><i style="width:${s/T*100}%"></i></div>`;
@@ -3061,7 +3065,7 @@ $('chapters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(
   if(S.enabled.includes(k)){if(S.enabled.length===1)return;S.enabled=S.enabled.filter(x=>x!==k)}else S.enabled.push(k);
   save();renderChips();if(!answered&&!S.enabled.includes(cur.topic)&&cur.retryIdx===null)newProblem()});
 $('all-on').onclick=()=>{S.enabled=Object.keys(TOPICS);save();renderChips()};
-$('ch2-only').onclick=()=>{S.enabled=Object.keys(TOPICS).filter(k=>TOPICS[k].ch===1);save();renderChips();next()};
+$('ch2-only').onclick=()=>{S.enabled=Object.keys(TOPICS).filter(k=>/直線|圓/.test(CHAPTERS[TOPICS[k].ch]||''));save();renderChips();next()};
 $('weak-only').onclick=()=>{const weak=Object.entries(S.stats).filter(([k,s])=>TOPICS[k]&&s.t>=3&&s.r/s.t<.8).map(([k])=>k);
   if(!weak.length){$('advice').innerHTML='還沒有找到弱項：單元做滿 3 題、正確率低於 80% 才會列入。';return}
   S.enabled=weak;save();renderChips();next()};
