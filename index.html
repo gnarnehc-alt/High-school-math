@@ -324,6 +324,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
       <button class="subj" type="button" data-s="hist" aria-pressed="false">歷史</button>
       <button class="subj" type="button" data-s="civ" aria-pressed="false">公民</button>
       <button class="subj" type="button" data-s="mathA" aria-pressed="false">數A</button>
+      <button class="subj" type="button" data-s="mathB" aria-pressed="false">數B</button>
     </div>
     <div class="tabs" role="tablist" aria-label="模式">
       <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="view-learn" type="button">從頭學・第二章</button>
@@ -417,7 +418,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v21・2026/11/03 01:01</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v22・2026/11/03 01:04</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -4854,6 +4855,88 @@ ptrans:{unit:'矩陣',title:'平面上的線性變換',
 };
 const MA_ORDER=['rad','graph','sum','amp','exp','log','logapp','vec','dot','area','space','cross','plane','line','cond','bayes','mat','lin','trans','ptrans'];
 const MATHA_LESSONS=MA_ORDER.map(k=>mkLesson(Object.assign({},DA[k],{id:'ma_'+k,subj:'mathA'})));
+/* ================= 高二數學 B（與數A 共用部分主題，另加數B 專屬單元） ================= */
+const ER=6400;
+const DB={
+cont:{unit:'指數與對數函數',title:'複利、連續複利與等比級數',
+ goal:'會計算一年多次複利與連續複利，用等比級數處理零存整付與分期付款問題。',
+ concept:`<div class="formula"><i>A</i> ＝ <i>P</i>(1 ＋ ${fr('<i>r</i>','<i>n</i>')})<sup><i>nt</i></sup><small>年利率 <i>r</i>、一年複利 <i>n</i> 次、<i>t</i> 年；每期利率 <i>r</i>／<i>n</i>，共 <i>nt</i> 期</small></div>
+  <div class="formula">連續複利：<i>A</i> ＝ <i>Pe</i><sup><i>rt</i></sup>，<i>e</i> ≈ 2.71828<small><i>n</i> 越來越大時，(1 ＋ 1／<i>n</i>)<sup><i>n</i></sup> 趨近 <i>e</i></small></div>
+  <div class="prose"><p><b>零存整付</b>（每期期末存 <i>a</i> 元，每期利率 <i>i</i>，共 <i>n</i> 期）：本利和 ＝ <i>a</i> ＋ <i>a</i>(1＋<i>i</i>) ＋ … ＋ <i>a</i>(1＋<i>i</i>)<sup><i>n</i>−1</sup> ＝ <i>a</i> · ${fr('(1＋<i>i</i>)<sup><i>n</i></sup> − 1','<i>i</i>')}，是一個等比級數。</p>
+  <p><b>分期付款</b>（借 <i>P</i> 元，每期期末還 <i>x</i> 元）：<i>P</i>(1＋<i>i</i>)<sup><i>n</i></sup> ＝ <i>x</i> · ${fr('(1＋<i>i</i>)<sup><i>n</i></sup> − 1','<i>i</i>')}。</p></div>
+  <div class="tip"><b>常見錯誤：</b>期末存入時，最後一期的錢沒有生利息，所以首項是 <i>a</i>，不是 <i>a</i>(1＋<i>i</i>)。</div>`,
+ deep:`<div class="prose"><p><b>複利次數越多，錢越多，但有上限</b>：年利率 100%，一年複利 1 次變 2 倍；複利 12 次變 (1 ＋ 1／12)¹² ≈ 2.613 倍；複利無限多次也只會變成 <i>e</i> ≈ 2.718 倍。這就是 <i>e</i> 的由來。</p>
+  <p><b>分期付款公式的意義</b>：把借款與每期還款都「換算到最後一期的價值」，兩邊相等。左邊是借款滾到最後的本利和，右邊是每期還款各自滾到最後的總和。</p></div>`,
+ ex:{q:'每年期末存入 10000 元，年利率 10%（每年複利），第 2 年期末存入後共有多少？',steps:['第 1 年末存入的 10000 元滾 1 年：11000。','第 2 年末存入 10000。','合計 <b>21000</b> 元。']},
+ T:[['一年複利次數越多，本利和越多',1,''],['連續複利公式 A ＝ Pe^(rt)',1,''],['一年複利無限多次，本利和會變無限大',0,'趨近 Pe^r'],['年利率 12%、每月複利，每期利率 1%',1,''],['零存整付的本利和是等比級數',1,''],['期末存入的最後一期也會生一期利息',0,''],
+  ['(1 ＋ 1／n)ⁿ 隨 n 增大趨近 e',1,''],['e 約為 2.718',1,''],['分期付款每期還款相同時，前期還的利息比較多',1,''],['年利率 6%、半年複利，一年有 2 期',1,''],['連續複利一定比每年複利一次的本利和少',0,''],['分期付款的公式來自比較最後一期的價值',1,'']],
+ gens:{1:[()=>{const r=pick([6,8,12,24]),n=pick([2,4,12]);const i=r/n;if(!exact2(i))LEVELS_RETRY();const t=rnd(1,5);const ask=Math.random()<.5;return{q:`年利率 ${r}%，一年複利 ${n} 次，${ask?'每期利率是百分之幾':`${t} 年共有幾期`}？`,ans:ask?RD(i):[n*t,1],steps:[ask?`${r}% ÷ ${n}`:`${n} × ${t}`,`答案是 <b>${ask?dec(i):n*t}</b>`]}}],
+  2:[()=>{const P=pick([10000,20000,50000,100000]),r=pick([10,20,8,4]),n=pick([1,2]);const v=P*(1+r/100/n)**(2*n);if(!exact2(v))LEVELS_RETRY();return{q:`本金 ${P} 元，年利率 ${r}%，${n===1?'每年':'每半年'}複利一次，2 年後本利和是多少元？`,ans:RD(v),steps:[`每期利率 ${dec(r/n)}%，共 ${2*n} 期`,`${P} × ${dec(1+r/100/n)}<sup>${2*n}</sup> ＝ <b>${dec(v)}</b>`]}},
+   ()=>{const a=pick([1000,2000,5000,10000]),i=pick([10,20]),n=pick([2,3]);const v=a*((1+i/100)**n-1)/(i/100);if(!exact2(v))LEVELS_RETRY();return{q:`每年期末存入 ${a} 元，年利率 ${i}%（每年複利），第 ${n} 年期末存入後，本利和共多少元？`,ans:RD(v),steps:[`${a} ＋ ${a} × ${dec(1+i/100)}${n===3?` ＋ ${a} × ${dec(1+i/100)}²`:''}`,`＝ <b>${dec(v)}</b>`]}}],
+  3:[()=>{const T={'1.01^12':[1.01,12,1.1268],'1.02^10':[1.02,10,1.2190],'1.005^24':[1.005,24,1.1272],'1.03^10':[1.03,10,1.3439],'1.05^10':[1.05,10,1.6289]};const k=pick(Object.keys(T));const[b,n,val]=T[k];const a=pick([1000,2000,5000,10000]);const v=Math.round(a*(val-1)/(b-1));return{q:`每期期末存入 ${a} 元，每期利率 ${dec(Math.round((b-1)*1000)/10)}%，共 ${n} 期。期滿本利和約多少元？（${dec(b)}<sup>${n}</sup> ≈ ${val}，四捨五入到整數）`,ans:[v,1],steps:[`本利和 ＝ ${a} × (${val} − 1) ÷ ${dec(Math.round((b-1)*10000)/10000)}`,`≈ <b>${v}</b>`]}},
+   ()=>{const E={'0.5':1.6487,'0.2':1.2214,'0.3':1.3499,'0.4':1.4918,'0.6':1.8221,'1':2.7183};const rt=pick(Object.keys(E));const P=pick([10000,1000,5000,100000]);const v=Math.round(P*E[rt]);const r=pick([5,10,2]);const t=Math.round(+rt*100/r);if(Math.abs(t*r/100-(+rt))>1e-9)LEVELS_RETRY();return{q:`本金 ${P} 元，年利率 ${r}% 連續複利 ${t} 年，本利和約多少元？（e<sup>${rt}</sup> ≈ ${E[rt]}，四捨五入到整數）`,ans:[v,1],steps:[`A ＝ Pe<sup>rt</sup>，rt ＝ ${rt}`,`${P} × ${E[rt]} ≈ <b>${v}</b>`]}}],
+  4:[()=>{const T=[[0.01,12,1.1268],[0.005,24,1.1272],[0.02,10,1.2190],[0.01,24,1.2697],[0.005,36,1.1967]];const[i,n,val]=pick(T);const P=pick([100000,200000,500000,60000]);const x=Math.round(P*val*i/(val-1));return{q:`借款 ${P} 元，每期利率 ${dec(i*100)}%，分 ${n} 期，每期期末等額還款。每期約還多少元？（${dec(1+i)}<sup>${n}</sup> ≈ ${val}，四捨五入到整數）`,ans:[x,1],steps:[`${P} × ${val} ＝ x × (${val} − 1)／${i}`,`x ＝ ${P} × ${val} × ${i} ÷ ${dec(Math.round((val-1)*10000)/10000)} ≈ <b>${x}</b>`]}}]}},
+
+persp:{unit:'平面向量與比例',title:'單點透視與黃金比例',
+ goal:'了解單點透視的消失點與相似三角形的關係，會計算透視中物體的影像大小，並認識黃金比例的性質。',
+ concept:`<div class="prose"><p><b>單點透視</b>：所有和視線方向平行的直線，在畫面上會匯集到同一個點（<b>消失點</b>），消失點位在地平線（視線高度）上。和畫面平行的直線在畫中仍然平行。</p>
+  <p><b>影像大小</b>：眼睛到畫面的距離 <i>f</i>，物體高 <i>H</i>、距離 <i>d</i>，由相似三角形，畫面上的高度 <i>h</i> ＝ ${fr('<i>f</i> · <i>H</i>','<i>d</i>')}。距離加倍，影像高度減半。</p></div>
+  <div class="formula">黃金比例 φ ＝ ${fr('1 ＋ √5',2)} ≈ 1.618<small>線段 AB 上一點 C 使 AB : AC ＝ AC : CB ＝ φ（黃金分割）</small></div>
+  <div class="prose"><ul><li>φ² ＝ φ ＋ 1；${fr(1,'φ')} ＝ φ − 1 ≈ 0.618。</li><li>黃金矩形（長：寬 ＝ φ）切掉一個正方形後，剩下的仍是黃金矩形。</li><li>費氏數列相鄰兩項的比值趨近 φ。</li></ul></div>
+  <div class="tip"><b>常見錯誤：</b>等距排列的電線桿，畫面上的間隔不是等距，而是越遠越密。</div>`,
+ deep:`<div class="prose"><p><b>為什麼平行線會交於一點？</b>兩條平行的鐵軌間距固定為 <i>w</i>，在距離 <i>d</i> 處，畫面上的間距是 <i>f</i> · <i>w</i>／<i>d</i>。<i>d</i> 越大，間距越小，<i>d</i> 趨近無限大時間距趨近 0，看起來交於一點。</p>
+  <p><b>φ 的冪次</b>：由 φ² ＝ φ ＋ 1，可以推得 φ³ ＝ 2φ ＋ 1、φ⁴ ＝ 3φ ＋ 2、φ⁵ ＝ 5φ ＋ 3……係數正是費氏數列：φⁿ ＝ Fₙφ ＋ Fₙ₋₁。</p></div>`,
+ ex:{q:'眼睛到畫面 50 公分，前方 20 公尺處有 4 公尺高的樹，畫面上的高度？',steps:['h ＝ f · H／d ＝ 0.5 × 4 ÷ 20（單位：公尺）。','＝ 0.1 公尺。','答案是 <b>10 公分</b>。']},
+ T:[['和視線平行的直線在畫面上交於消失點',1,''],['消失點位在地平線上',1,''],['等距的電線桿在畫面上也是等距',0,'越遠越密'],['距離加倍，影像高度減半',1,''],['φ² ＝ φ ＋ 1',1,''],['1／φ ＝ φ ＋ 1',0,'＝ φ − 1'],
+  ['黃金比例約為 1.618',1,''],['費氏數列相鄰兩項比值趨近 φ',1,''],['和畫面平行的直線在畫中會交於消失點',0,'仍保持平行'],['黃金矩形切掉一個正方形仍是黃金矩形',1,''],['φ 是有理數',0,''],['φ³ ＝ 2φ ＋ 1',1,'']],
+ gens:{1:[()=>{const f=pick([20,25,40,50]),H=rnd(2,20),d=pick([5,10,20,25,40,50]);const h=f*H/d;if(!exact2(h))LEVELS_RETRY();return{q:`眼睛到畫面 ${f} 公分，前方 ${d} 公尺處有一個高 ${H} 公尺的物體，它在畫面上的高度是幾公分？`,ans:RD(h),steps:[`h ＝ f · H／d ＝ ${f} × ${H} ÷ ${d}`,`＝ <b>${dec(h)}</b> 公分`]}}],
+  2:[()=>{const d1=rnd(2,20),k=pick([2,3,4,5]);const h1=rnd(2,12)*k;return{q:`兩根一樣高的柱子，距離觀察者分別為 ${d1} 公尺與 ${d1*k} 公尺。近的柱子在畫面上高 ${h1} 公分，遠的柱子在畫面上高幾公分？`,ans:[h1/k,1],steps:[`影像高度與距離成反比`,`${h1} ÷ ${k} ＝ <b>${h1/k}</b>`]}},
+   ()=>{const f=pick([30,40,50]),w=pick([1,1.5,2]),d=pick([10,20,30,50,60]);const v=f*w/d;if(!exact2(v))LEVELS_RETRY();return{q:`鐵軌間距 ${dec(w)} 公尺，眼睛到畫面 ${f} 公分。前方 ${d} 公尺處，兩條鐵軌在畫面上相距幾公分？`,ans:RD(v),steps:[`間距 ＝ f · w／d ＝ ${f} × ${dec(w)} ÷ ${d}`,`＝ <b>${dec(v)}</b>`]}}],
+  3:[()=>{const f=pick([30,40,60]),H=pick([6,8,10,12]),d0=pick([10,20,30]),s=pick([10,20,30]),k=rnd(1,4);const d=d0+k*s;const h=f*H/d;if(!exact2(h))LEVELS_RETRY();return{q:`路旁電線桿高 ${H} 公尺、間隔 ${s} 公尺，最近的一根距離 ${d0} 公尺。眼睛到畫面 ${f} 公分，從近數來第 ${k+1} 根在畫面上高幾公分？`,ans:RD(h),steps:[`第 ${k+1} 根距離 ${d0} ＋ ${k} × ${s} ＝ ${d}`,`${f} × ${H} ÷ ${d} ＝ <b>${dec(h)}</b>`]}}],
+  4:[()=>{const n=rnd(3,10);const F=[0,1,1];for(let i=3;i<=n;i++)F[i]=F[i-1]+F[i-2];const ask=Math.random()<.5;return{q:`黃金比例 φ 滿足 φ² ＝ φ ＋ 1。把 φ<sup>${n}</sup> 寫成 aφ ＋ b（a、b 為整數），求 ${ask?'a':'b'}。`,ans:[ask?F[n]:F[n-1],1],steps:[`φ³ ＝ 2φ ＋ 1，φ⁴ ＝ 3φ ＋ 2，…，φⁿ ＝ Fₙφ ＋ Fₙ₋₁`,`φ<sup>${n}</sup> ＝ ${F[n]}φ ＋ ${F[n-1]}`,`答案是 <b>${ask?F[n]:F[n-1]}</b>`]}},
+   ()=>mc('線段 AB 長 1，點 C 在 AB 上使 AB : AC ＝ AC : CB，則 AC 的長度是？','(√5 − 1)／2',['(√5 ＋ 1)／2','½','(3 − √5)／2','√5 − 2'],['設 AC ＝ x，1 : x ＝ x : (1 − x)，x² ＋ x − 1 ＝ 0','x ＝ (√5 − 1)／2 ≈ 0.618'])]}},
+
+earth:{unit:'空間概念',title:'地球經緯度與大圓航線',
+ goal:'會用經緯度表示地球上的位置，計算同一經線或同一緯線上兩地的距離，並了解大圓航線是最短路徑。',
+ concept:`<div class="prose"><p>把地球看成半徑 <i>R</i> 的球（約 6400 公里）。</p>
+  <ul><li><b>同一經線</b>上兩地：沿大圓走，距離 ＝ <i>R</i> × 緯度差（弧度）。</li><li>緯度 φ 的<b>緯線圈半徑</b> ＝ <i>R</i> cos φ；沿緯線走的距離 ＝ <i>R</i> cos φ × 經度差（弧度）。</li>
+  <li><b>大圓</b>：通過球心的平面和球面的交線（赤道、經線圈都是大圓）。球面上兩點之間的<b>最短路徑</b>是過這兩點的大圓上的劣弧。</li></ul></div>
+  <div class="formula">坐標：(<i>R</i> cos φ cos λ, <i>R</i> cos φ sin λ, <i>R</i> sin φ)<small>φ 為緯度、λ 為經度；兩地球心角 θ 滿足 cos θ ＝ cos φ₁ cos φ₂ cos Δλ ＋ sin φ₁ sin φ₂</small></div>
+  <div class="tip"><b>常見錯誤：</b>除了赤道，緯線都<b>不是</b>大圓，所以沿著緯線飛不是最短路線。</div>`,
+ deep:`<div class="prose"><p><b>為什麼飛機要繞「北邊」飛？</b>臺北飛紐約，在平面地圖上看起來往東走最短，其實大圓航線會經過接近北極的地方。這是因為麥卡托地圖把高緯度放大了，地圖上的直線不是球面上的最短路線。</p>
+  <p><b>球心角公式的由來</b>：把兩地寫成空間坐標，兩個位置向量的內積 ＝ <i>R</i>² cos θ，展開就得到上面的公式。這是把空間向量用在地球上的例子。</p></div>`,
+ ex:{q:'北緯 60°、經度差 90° 的兩地，沿緯線走的距離？（R ＝ 6400）',steps:['緯線圈半徑 ＝ 6400 × cos 60° ＝ 3200。','經度差 90° ＝ π／2。','距離 ＝ 3200 × π／2 ＝ <b>1600π</b> 公里。']},
+ T:[['赤道是大圓',1,''],['北緯 30° 的緯線是大圓',0,'只有赤道是'],['經線圈是大圓',1,''],['球面上兩點的最短路徑在大圓上',1,''],['緯度 φ 的緯線圈半徑是 R sin φ',0,'是 R cos φ'],['北緯 60° 的緯線圈半徑是地球半徑的一半',1,''],
+  ['沿緯線飛一定是最短路線',0,''],['同一經線上兩地的距離 ＝ R × 緯度差（弧度）',1,''],['大圓所在平面通過球心',1,''],['麥卡托地圖上的直線就是最短航線',0,''],['兩極點之間沿經線的距離是 πR',1,''],['兩地的球心角可用位置向量的內積求得',1,'']],
+ gens:{1:[()=>{const a=rnd(-6,8)*10,b=a+rnd(1,6)*10;if(b>90)LEVELS_RETRY();const dl=b-a;const v=R(ER*dl,180);const lab=x=>x>=0?`北緯 ${x}°`:`南緯 ${-x}°`;return{q:`同一條經線上的兩地，分別位於${lab(a)}與${lab(b)}。地球半徑 6400 公里，兩地沿經線的距離為 kπ 公里，求 k。`,ans:v,steps:[`緯度差 ${dl}° ＝ ${rFmt(R(dl,180))}π`,`6400 × ${rFmt(R(dl,180))}π`,fin(v)]}}],
+  2:[()=>{const lat=pick([0,60]);const dl=pick([30,45,60,90,120,180]);const r=lat===0?ER:ER/2;const v=R(r*dl,180);return{q:`${lat===0?'赤道上':'北緯 60° 的緯線上'}兩地經度相差 ${dl}°，沿${lat===0?'赤道':'緯線'}的距離為 kπ 公里（地球半徑 6400 公里），求 k。`,ans:v,steps:[`${lat===0?'赤道半徑 6400':'緯線圈半徑 ＝ 6400 × cos 60° ＝ 3200'}`,`${r} × ${rFmt(R(dl,180))}π`,fin(v)]}}],
+  3:[()=>{const phi=pick([30,45,60,75]);const ang=180-2*phi;const v=R(ER*ang,180);return{q:`甲、乙兩地都在北緯 ${phi}°，經度相差 180°。地球半徑 6400 公里，兩地的大圓航線（經過北極）距離為 kπ 公里，求 k。`,ans:v,steps:[`從甲沿經線到北極 ${90-phi}°，再到乙 ${90-phi}°，球心角 ${ang}°`,`6400 × ${rFmt(R(ang,180))}π`,fin(v)]}}],
+  4:[()=>{const L=[0,60,-60];const p1=pick(L),p2=pick(L),dl=pick([0,60,90,120,180]);const c=x=>x===0?[1,1]:[1,2];const s=x=>x===0?0:(x>0?1:-1);
+     const cc=Fm(Fm(c(p1),c(p2)),{0:[1,1],60:[1,2],90:[0,1],120:[-1,2],180:[-1,1]}[dl]);const ss=p1&&p2?R(3*s(p1)*s(p2),4):[0,1];const v=Fa(cc,ss);const lab=x=>x>0?`北緯 ${x}°`:x<0?`南緯 ${-x}°`:'赤道（緯度 0°）';
+     return{q:`甲地在${lab(p1)}、乙地在${lab(p2)}，兩地經度相差 ${dl}°。兩地對地心的夾角為 θ，求 cos θ。`,ans:v,steps:['cos θ ＝ cos φ₁ cos φ₂ cos Δλ ＋ sin φ₁ sin φ₂',`＝ ${rFmt(cc)} ＋ ${rFmt(ss)}`,fin(v)]}}]}},
+
+conic:{unit:'圓錐截痕',title:'圓錐截痕：圓、橢圓、拋物線、雙曲線',
+ goal:'了解平面與直圓錐相截產生的各種曲線，並認識拋物線、橢圓、雙曲線的焦點定義與基本計算。',
+ concept:`<div class="prose"><p>設直圓錐的軸和母線夾角為 θ（半頂角），截平面和軸的夾角為 α（截平面不過頂點）：</p></div>
+  ${tbl(['情形','截痕'],[['α ＝ 90°（垂直於軸）','圓'],['θ ＜ α ＜ 90°','橢圓'],['α ＝ θ（平行於一條母線）','拋物線'],['α ＜ θ（同時截到上下兩個錐）','雙曲線']])}
+  <div class="prose"><p>截平面通過頂點時，截痕退化成一點、一條直線或兩條相交直線。</p></div>
+  ${tbl(['曲線','定義','標準式'],[['拋物線','到焦點與到準線距離相等','<i>y</i>² ＝ 4<i>cx</i>，焦點 (<i>c</i>, 0)，準線 <i>x</i> ＝ −<i>c</i>'],['橢圓','到兩焦點距離和為 2<i>a</i>',`${fr('<i>x</i>²','<i>a</i>²')} ＋ ${fr('<i>y</i>²','<i>b</i>²')} ＝ 1，<i>c</i>² ＝ <i>a</i>² − <i>b</i>²`],['雙曲線','到兩焦點距離差的絕對值為 2<i>a</i>',`${fr('<i>x</i>²','<i>a</i>²')} − ${fr('<i>y</i>²','<i>b</i>²')} ＝ 1，<i>c</i>² ＝ <i>a</i>² ＋ <i>b</i>²`]])}
+  <div class="tip"><b>常見錯誤：</b>橢圓是 <i>c</i>² ＝ <i>a</i>² − <i>b</i>²，雙曲線是 <i>c</i>² ＝ <i>a</i>² ＋ <i>b</i>²，不要搞混。</div>`,
+ deep:`<div class="prose"><p><b>丹德林球</b>：在圓錐內放兩顆球，同時和圓錐面及截平面相切，切點就是橢圓的兩個焦點。截痕上任一點到兩焦點的距離，等於沿母線到兩顆球切圓的距離，和是固定值，所以截痕滿足橢圓的定義。這說明「切圓錐得到的曲線」和「焦點定義的曲線」是同一種東西。</p>
+  <p><b>生活中的圓錐曲線</b>：手電筒照在牆上的光斑（隨角度變圓、橢圓、拋物線、雙曲線）；拋物面天線把平行訊號集中到焦點；行星軌道是橢圓。</p></div>`,
+ ex:{q:'橢圓 x²／25 ＋ y²／9 ＝ 1 的焦點坐標？',steps:['a² ＝ 25、b² ＝ 9。','c² ＝ 25 − 9 ＝ 16，c ＝ 4。','焦點 <b>(±4, 0)</b>。']},
+ T:[['截平面垂直於圓錐軸時截痕是圓',1,''],['截平面平行於一條母線時截痕是拋物線',1,''],['雙曲線只截到圓錐的一半',0,'截到上下兩個錐'],['橢圓上任一點到兩焦點距離和為定值',1,''],['橢圓的 c² ＝ a² ＋ b²',0,'是 a² − b²'],['雙曲線的 c² ＝ a² ＋ b²',1,''],
+  ['拋物線上任一點到焦點與到準線距離相等',1,''],['截平面通過圓錐頂點時可能截出兩條相交直線',1,''],['y² ＝ 8x 的焦點是 (2, 0)',1,''],['圓是橢圓的一種特殊情形（兩焦點重合）',1,''],['拋物線有兩個焦點',0,'只有一個'],['行星繞太陽的軌道是拋物線',0,'是橢圓']],
+ gens:{1:[()=>{const th=pick([20,25,30,35,40]);const c=rnd(0,3);const al=c===0?90:c===1?th+rnd(5,90-th-5):c===2?th:rnd(5,th-5);const ans=['圓','橢圓','拋物線','雙曲線'][c];return mc(`直圓錐的半頂角為 ${th}°，一平面（不過頂點）與圓錐的軸夾 ${al}°，截痕是什麼？`,ans,['圓','橢圓','拋物線','雙曲線'].filter(x=>x!==ans),[`比較 α ＝ ${al}° 與 θ ＝ ${th}°`])}],
+  2:[()=>{const k=4*nz(-6,6);const xy=Math.random()<.5;const v=R(k,4);return{q:`拋物線 ${xy?'y²':'x²'} ＝ ${num(k)}${xy?'x':'y'} 的焦點${xy?' x':' y'} 坐標是多少？`,ans:v,steps:[`4c ＝ ${num(k)}，c ＝ ${rFmt(v)}`,`焦點 ${xy?`(${rFmt(v)}, 0)`:`(0, ${rFmt(v)})`}`,fin(v)]}}],
+  3:[()=>{const[p,q,r]=pick(TRIPLES);const k=rnd(1,2);const ell=Math.random()<.5;let a,b,c;if(ell){a=r*k;b=q*k;c=p*k}else{a=p*k;b=q*k;c=r*k}const ask=Math.random()<.5;
+     return{q:`${ell?'橢圓':'雙曲線'} x²／${a*a} ${ell?'＋':'−'} y²／${b*b} ＝ 1 的${ask?'兩焦點距離':'焦點的正 x 坐標'}是多少？`,ans:[ask?2*c:c,1],steps:[ell?`c² ＝ ${a*a} − ${b*b} ＝ ${c*c}`:`c² ＝ ${a*a} ＋ ${b*b} ＝ ${c*c}`,`c ＝ ${c}`,`答案是 <b>${ask?2*c:c}</b>`]}}],
+  4:[()=>{const t=rnd(0,2);if(t===0){const a=rnd(4,12),d=rnd(1,2*a-1);return{q:`橢圓的長軸長為 ${2*a}，P 在橢圓上且 P 到一個焦點的距離為 ${d}，P 到另一個焦點的距離是多少？`,ans:[2*a-d,1],steps:[`PF₁ ＋ PF₂ ＝ 2a ＝ ${2*a}`,`${2*a} − ${d} ＝ <b>${2*a-d}</b>`]}}
+     if(t===1){const a=rnd(2,6),d=rnd(2*a+1,2*a+12);return{q:`雙曲線的貫軸長（2a）為 ${2*a}，P 在雙曲線上且 P 到一個焦點的距離為 ${d}，P 到另一個焦點的距離可能是多少？（填較大的那個值）`,ans:[d+2*a,1],steps:[`|PF₁ − PF₂| ＝ ${2*a}`,`PF₂ ＝ ${d} ± ${2*a}，較大的是 <b>${d+2*a}</b>`]}}
+     const c=rnd(1,6),x0=rnd(1,15);return{q:`拋物線 y² ＝ ${4*c}x 上一點 P 的 x 坐標為 ${x0}，P 到焦點的距離是多少？`,ans:[x0+c,1],steps:[`焦點 (${c}, 0)、準線 x ＝ −${c}`,`到焦點距離 ＝ 到準線距離 ＝ ${x0} ＋ ${c} ＝ <b>${x0+c}</b>`]}}]}}
+};
+const MB_ORDER=[['rad'],['graph'],['exp'],['log'],['logapp'],['cont','B'],['vec',0,'平面向量與比例'],['dot',0,'平面向量與比例'],['persp','B'],['space',0,'空間概念'],['earth','B'],['conic','B'],['cond'],['bayes'],['mat']];
+const MATHB_LESSONS=MB_ORDER.map(([k,src,u])=>{const base=src==='B'?DB[k]:DA[k];const o=Object.assign({},base,{id:'mb_'+k,subj:'mathB'});if(u)o.unit=u;return mkLesson(o)});
 /* ================= 南一版 section labels (math) ================= */
 const NANI_SEC={coord:['2-1','直線方程式及其圖形'],dist:['2-1','直線方程式及其圖形'],mid:['2-1','直線方程式及其圖形'],slope:['2-1','直線方程式及其圖形'],line:['2-1','直線方程式及其圖形'],
  perp:['2-2','直線方程式的應用'],pdist:['2-2','直線方程式的應用'],circle:['2-3','圓方程式'],cline:['2-4','圓與直線的關係']};
@@ -4913,6 +4996,11 @@ SUBJ.mathA={name:'數A',lessons:MATHA_LESSONS,topics:mkTopics(MATHA_LESSONS),cha
  sub:{learn:'高二數學A（第三、四冊）依主題分類：三角函數、指數與對數函數、平面向量、空間向量、條件機率、矩陣。每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'數A隨機出題，難度可以自動調整。',past:'限時 50 分鐘的數A模擬考，以及官方歷屆試題連結。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
  mockFrom:0,mockMin:50,mockDesc:'範圍是數A全部主題',links:[{name:'大考中心・學測歷屆試題與答案',url:CEEC_LIST,note:'學測「數學A」考科可參考大考中心公布的試題'}]};
 BANK_PLAN.mathA=[10,13,13,14];
+ALL_LESSONS.push(...MATHB_LESSONS);
+SUBJ.mathB={name:'數B',lessons:MATHB_LESSONS,topics:mkTopics(MATHB_LESSONS),chapters:unitsOf(MATHB_LESSONS),tabs:['從頭學・數B','隨機練習','模擬考','題庫'],
+ sub:{learn:'高二數學B（第三、四冊）依主題分類：三角函數、指數與對數（含連續複利）、平面向量與比例（單點透視、黃金比例）、空間概念與地球、圓錐截痕、條件機率、矩陣。每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'數B隨機出題，難度可以自動調整。',past:'限時 50 分鐘的數B模擬考，以及官方歷屆試題連結。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
+ mockFrom:0,mockMin:50,mockDesc:'範圍是數B全部主題',links:[{name:'大考中心・學測歷屆試題與答案',url:CEEC_LIST,note:'學測「數學B」考科可參考大考中心公布的試題'}]};
+BANK_PLAN.mathB=[10,13,13,14];
 let LESSONS=MATH_LESSONS,TOPICS=SUBJ.math.topics,CHAPTERS=SUBJ.math.chapters;
 const lessonById=id=>ALL_LESSONS.find(l=>l.id===id);
 function genTopic(k,lv=1){const t=TOPICS[k];
