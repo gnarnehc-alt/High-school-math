@@ -416,7 +416,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v19・2026/11/03 00:23</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v20・2026/11/03 00:47</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -4131,13 +4131,354 @@ for(const l of MATH_LESSONS){const x=NANI_SEC[l.id];if(x){l.sec=x[0];l.secName=x
 {const T={abs:'1-2',root:'1-1',mult:'1-1',rem:'3-1',quad:'3-2'};for(const k in MATH_TOPICS){const t=MATH_TOPICS[k],sec=t.fromLesson?(NANI_SEC[t.fromLesson]||[])[0]:T[k];if(sec)t.name=sec+' '+t.name}}
 const secTitle=l=>l.sec?`${l.sec} ${l.title}`:l.pre?`${l.pre}・${l.title}`:l.title;
 /* ================= subjects ================= */
+/* ================= 數學 2（高一下）：三角比、數列與級數、排列組合、機率、數據分析 ================= */
+const fct=n=>{let r=1;for(let i=2;i<=n;i++)r*=i;return r};
+const nPk=(n,k)=>{let r=1;for(let i=0;i<k;i++)r*=n-i;return r};
+const nCk=(n,k)=>k<0||k>n?0:Math.round(nPk(n,k)/fct(k));
+const fin=r=>`答案是 <b>${M(rFmt(r))}</b>`;
+const TRIPLES=[[3,4,5],[5,12,13],[8,15,17],[7,24,25],[20,21,29]];
+const SIG=(n,body)=>`${M(`<span style="font-size:1.25em">∑</span><sub>k=1</sub><sup>${n}</sup> ${body}`)}`;
+const deg=d=>`${d}°`;
+const trig=(f,d)=>`${f} ${deg(d)}`;
+/* 平均為 0、變異數為完全平方數的 5 筆離差組（給統計題用） */
+const DEVSETS=(()=>{const out=[];const R6=[-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6];
+ for(let a=0;a<13;a++)for(let b=a;b<13;b++)for(let c=b;c<13;c++)for(let d=c;d<13;d++)for(let e=d;e<13;e++){const v=[R6[a],R6[b],R6[c],R6[d],R6[e]];if(v.reduce((s,x)=>s+x,0))continue;const q=v.reduce((s,x)=>s+x*x,0)/5;if(q>0&&Number.isInteger(q)&&Number.isInteger(Math.sqrt(q)))out.push(v)}return out})();
+const listStr=a=>a.map(num).join('，');
+const DEV4=DEVSETS.filter(v=>new Set(v).size>=4);
+
+const M2_LESSONS=[
+/* ---------------- 三角比 ---------------- */
+mkLesson({id:'m2_tri',unit:'三角比',title:'直角三角形的三角比',
+ goal:'會用直角三角形的邊長比定義 sin、cos、tan，背熟 30°、45°、60° 的值，並用平方關係、商數關係與餘角關係計算。',
+ concept:`<div class="prose"><p>直角三角形中，對銳角 θ 來說：</p></div>
+  <div class="formula">sin θ ＝ ${fr('對邊','斜邊')}　cos θ ＝ ${fr('鄰邊','斜邊')}　tan θ ＝ ${fr('對邊','鄰邊')}<small>口訣：「正弦對斜、餘弦鄰斜、正切對鄰」</small></div>
+  ${tbl(['θ','30°','45°','60°'],[['sin θ',fr(1,2),fr(rt(2),2),fr(rt(3),2)],['cos θ',fr(rt(3),2),fr(rt(2),2),fr(1,2)],['tan θ',fr(1,rt(3)),'1',rt(3)]])}
+  <div class="prose"><ul><li><b>平方關係</b>：sin²θ ＋ cos²θ ＝ 1</li><li><b>商數關係</b>：tan θ ＝ ${fr('sin θ','cos θ')}</li><li><b>餘角關係</b>：sin(90° − θ) ＝ cos θ，cos(90° − θ) ＝ sin θ</li></ul></div>
+  <div class="tip"><b>常見錯誤：</b>sin²θ 是 (sin θ)²，不是 sin(θ²)。</div>`,
+ deep:`<div class="prose"><p><b>為什麼三角比只和角度有關？</b>兩個直角三角形只要有一個銳角相等，就相似，對應邊成比例，所以邊長比（三角比）只由角度決定，和三角形大小無關。</p>
+  <p><b>已知一個三角比，求其他</b>：例如 tan θ ＝ ${fr(5,12)}，就畫一個對邊 5、鄰邊 12 的直角三角形，用畢氏定理得斜邊 13，於是 sin θ ＝ ${fr(5,13)}、cos θ ＝ ${fr(12,13)}。</p>
+  <p><b>sin θ ＋ cos θ 與 sin θ cos θ 的關係</b>：(sin θ ＋ cos θ)² ＝ 1 ＋ 2 sin θ cos θ。知道其中一個就能求另一個，這是段考很愛考的技巧。</p></div>`,
+ ex:{q:'直角三角形 ABC 中，∠C ＝ 90°，BC ＝ 5，AC ＝ 12，求 sin A。',steps:['斜邊 AB ＝ √(5² ＋ 12²) ＝ 13。','∠A 的對邊是 BC ＝ 5。',`sin A ＝ 5／13，答案是 <b>${M(fr(5,13))}</b>。`]},
+ T:[['sin 30° ＝ cos 60°',1,''],['tan 45° ＝ 1',1,''],['sin 60° ＝ 1／2',0,'sin 60° ＝ √3／2'],['對任意銳角 θ，sin²θ ＋ cos²θ ＝ 1',1,''],['銳角 θ 越大，cos θ 越大',0,'cos θ 隨 θ 增大而變小'],['銳角 θ 越大，tan θ 越大',1,''],
+  ['sin θ 可能大於 1（θ 為銳角）',0,'對邊不會大於斜邊'],['sin(90° − θ) ＝ cos θ',1,''],['三角比會隨三角形大小改變',0,'相似三角形邊長比相同'],['tan θ ＝ sin θ ÷ cos θ',1,''],['sin 45° ＋ cos 45° ＝ 1',0,'＝ √2'],['(sin θ ＋ cos θ)² ＝ 1 ＋ 2 sin θ cos θ',1,'']],
+ gens:{1:[()=>{const t=pick(TRIPLES),k=rnd(1,3);const[a,b,c]=t.map(x=>x*k);const sw=Math.random()<.5;const [opp,adj]=sw?[a,b]:[b,a];const f=pick(['sin','cos','tan']);const r=f==='sin'?R(opp,c):f==='cos'?R(adj,c):R(opp,adj);
+     return{q:`直角三角形 ABC 中，∠C ＝ 90°，BC ＝ ${opp}，AC ＝ ${adj}，AB ＝ ${c}。求 ${f} A。`,ans:r,steps:[`∠A 的對邊 BC ＝ ${opp}，鄰邊 AC ＝ ${adj}，斜邊 ${c}`,`${f} A ＝ ${f==='sin'?`${opp}／${c}`:f==='cos'?`${adj}／${c}`:`${opp}／${adj}`}`,fin(r)]}},
+   ()=>{const V={'sin 30°':R(1,2),'cos 60°':R(1,2),'tan 45°':R(1,1),'sin²45°':R(1,2),'cos²45°':R(1,2),'sin²60°':R(3,4),'cos²30°':R(3,4),'tan²60°':R(3,1),'tan²30°':R(1,3),'cos²60°':R(1,4),'sin²30°':R(1,4)};const ks=Object.keys(V);const p=pick(ks);let q;do{q=pick(ks)}while(q===p);const a=nz(-3,4),b=nz(-3,4);
+     const v=R(a*V[p][0]*V[q][1]+b*V[q][0]*V[p][1],V[p][1]*V[q][1]);const t=(c,s)=>`${c===1?'':c===-1?'−':num(c)+' '}${s}`;
+     return{q:`求 ${M(`${t(a,p)} ${b>0?'＋':'−'} ${t(Math.abs(b),q)}`)} 的值。`,ans:v,steps:[`${p} ＝ ${rFmt(V[p])}，${q} ＝ ${rFmt(V[q])}`,`${num(a)} × ${rFmt(V[p])} ${b>0?'＋':'−'} ${Math.abs(b)} × ${rFmt(V[q])}`,fin(v)]}}],
+  2:[()=>{const[a,b,c]=pick(TRIPLES);const sw=Math.random()<.5;const[o,d]=sw?[a,b]:[b,a];const ask=pick(['sc','s+c','s-c']);const r=ask==='sc'?R(o*d,c*c):ask==='s+c'?R(o+d,c):R(o-d,c);
+     return{q:`θ 為銳角，tan θ ＝ ${M(fr(o,d))}，求 ${ask==='sc'?'sin θ · cos θ':ask==='s+c'?'sin θ ＋ cos θ':'sin θ − cos θ'}。`,ans:r,steps:[`畫對邊 ${o}、鄰邊 ${d} 的直角三角形，斜邊 ＝ ${c}`,`sin θ ＝ ${o}／${c}，cos θ ＝ ${d}／${c}`,fin(r)]}},
+   ()=>{const[a,b,c]=pick(TRIPLES);const k=pick([1,2,3]);const s=R(a,c);const cc=R(b,c);const v=R(a*a*k+b*b*k,c*c);return{q:`θ 為銳角，sin θ ＝ ${M(fr(a,c))}，求 ${k===1?'':k}sin²θ ＋ ${k===1?'':k}cos²θ 的值。`,ans:R(k,1),steps:['sin²θ ＋ cos²θ ＝ 1 恆成立',`所以原式 ＝ ${k} × 1`,fin(R(k,1))]}}],
+  3:[()=>{const[a,b,c]=pick(TRIPLES);const s=R(a+b,c);const v=R(2*a*b,2*c*c);return{q:`θ 為銳角，sin θ ＋ cos θ ＝ ${M(rFmt(s))}，求 sin θ · cos θ。`,ans:v,steps:[`兩邊平方：1 ＋ 2 sin θ cos θ ＝ ${M(fr((a+b)*(a+b),c*c))}`,`2 sin θ cos θ ＝ ${M(fr((a+b)**2-c*c,c*c))}`,fin(v)]}},
+   ()=>{const[a,b,c]=pick(TRIPLES);const sw=Math.random()<.5;const[o,d]=sw?[a,b]:[b,a];const v=R(o+d,o-d);if(o===d)LEVELS_RETRY();return{q:`θ 為銳角且 tan θ ＝ ${M(fr(o,d))}，求 ${M(fr('sin θ ＋ cos θ','sin θ − cos θ'))}。`,ans:v,steps:['分子分母同除以 cos θ：原式 ＝ (tan θ ＋ 1)／(tan θ − 1)',`＝ (${o}／${d} ＋ 1)／(${o}／${d} − 1) ＝ ${o+d}／${num(o-d)}`,fin(v)]}}],
+  4:[()=>{const d=2*rnd(5,40);const h=d/2;return mc(`在平地上 A 點測得塔頂的仰角為 30°，向塔前進 ${d} 公尺到 B 點，測得仰角為 60°。塔高為多少公尺？`,`${h}√3`,[`${d}√3`,`${h}`,`${d/2/2}√3`,`${d}`,`${h}√2`],[`∠ATB ＝ 60° − 30° ＝ 30°，所以 △ABT 等腰，BT ＝ AB ＝ ${d}`,`塔高 ＝ BT × sin 60° ＝ ${d} × √3／2 ＝ ${h}√3`])},
+   ()=>{const[a,b,c]=pick(TRIPLES);const v=R(a*b*c*c,(a*a)*(b*b));/* tan + cot = 1/(sin cos) */const r=R(c*c,a*b);return{q:`θ 為銳角，sin θ ＝ ${M(fr(a,c))}，求 tan θ ＋ ${M(fr(1,'tan θ'))} 的值。`,ans:r,steps:[`tan θ ＋ 1／tan θ ＝ ${M(fr('sin²θ ＋ cos²θ','sin θ cos θ'))} ＝ ${M(fr(1,'sin θ cos θ'))}`,`cos θ ＝ ${b}／${c}，sin θ cos θ ＝ ${a*b}／${c*c}`,fin(r)]}}]}}),
+
+mkLesson({id:'m2_gen',unit:'三角比',title:'廣義角與極坐標',
+ goal:'會找同界角、判斷終邊所在象限與三角比正負，用參考角求廣義角的三角比，並在直角坐標與極坐標之間轉換。',
+ concept:`<div class="prose"><p><b>廣義角</b>：以 x 軸正向為始邊，逆時針轉為正角、順時針為負角。<b>同界角</b>：終邊相同的角，相差 360° 的整數倍。</p>
+  <p>終邊上任一點 P(<i>x</i>, <i>y</i>)，<i>r</i> ＝ √(<i>x</i>² ＋ <i>y</i>²)：</p></div>
+  <div class="formula">sin θ ＝ ${fr('<i>y</i>','<i>r</i>')}　cos θ ＝ ${fr('<i>x</i>','<i>r</i>')}　tan θ ＝ ${fr('<i>y</i>','<i>x</i>')}<small>各象限為正的三角比：一全、二 sin、三 tan、四 cos</small></div>
+  <div class="prose"><p><b>參考角</b>：終邊和 x 軸所夾的銳角。廣義角的三角比 ＝ ±（參考角的三角比），正負由象限決定。例：sin 150° ＝ sin 30° ＝ 1／2；cos 240° ＝ −cos 60° ＝ −1／2。</p>
+  <p><b>極坐標</b> [<i>r</i>, θ]：<i>x</i> ＝ <i>r</i> cos θ，<i>y</i> ＝ <i>r</i> sin θ。</p></div>
+  <div class="tip"><b>常見錯誤：</b>tan 的正負是看 <i>y</i>／<i>x</i>，第三象限 <i>x</i>、<i>y</i> 都負，tan 為正。</div>`,
+ deep:`<div class="prose"><p><b>重要公式</b>：sin(180° − θ) ＝ sin θ，cos(180° − θ) ＝ −cos θ；sin(−θ) ＝ −sin θ，cos(−θ) ＝ cos θ。這些都可以從單位圓上點的對稱看出來：θ 和 180° − θ 的終邊對 y 軸對稱，所以 <i>y</i> 相同、<i>x</i> 相反。</p>
+  <p><b>已知一個三角比與象限</b>：例如 sin θ ＝ −3／5 且 θ 在第三象限，就取 <i>y</i> ＝ −3、<i>r</i> ＝ 5，得 <i>x</i> ＝ −4（第三象限 <i>x</i> 為負），於是 cos θ ＝ −4／5、tan θ ＝ 3／4。</p>
+  <p><b>極坐標不唯一</b>：[2, 60°]、[2, 420°]、[2, −300°] 都是同一點。</p></div>`,
+ ex:{q:'點 P(−3, 4) 在角 θ 的終邊上，求 cos θ。',steps:['r ＝ √(9 ＋ 16) ＝ 5。','cos θ ＝ x／r ＝ −3／5。',`答案是 <b>${M('−'+fr(3,5))}</b>。`]},
+ T:[['30° 與 390° 是同界角',1,''],['−30° 的終邊在第四象限',1,''],['第二象限的 cos 值為正',0,'第二象限只有 sin 為正'],['第三象限的 tan 值為正',1,''],['sin 150° ＝ sin 30°',1,''],['cos 120° ＝ cos 60°',0,'cos 120° ＝ −cos 60°'],
+  ['cos(−θ) ＝ cos θ',1,''],['sin(−θ) ＝ sin θ',0,'＝ −sin θ'],['極坐標 [2, 60°] 與 [2, 420°] 表示同一點',1,''],['參考角一定是銳角或 0°、90°',1,''],['sin 270° ＝ 1',0,'＝ −1'],['tan 90° 沒有定義',1,'']],
+ gens:{1:[()=>{let t;do{t=rnd(-800,1500)}while(t%360===0||Math.abs(t)<360);const r=((t%360)+360)%360;return{q:`求介於 0° 與 360° 之間、和 ${deg(num(t))} 為同界角的角度。（填度數）`,ans:[r,1],steps:[`同界角相差 360° 的整數倍`,`${num(t)} ${t>0?'−':'＋'} 360° × ${Math.abs(Math.round((t-r)/360))} ＝ <b>${r}</b>°`]}},
+   ()=>{const T={sin:{150:[1,2],210:[-1,2],330:[-1,2],30:[1,2],270:[-1,1],90:[1,1]},cos:{120:[-1,2],240:[-1,2],300:[1,2],60:[1,2],180:[-1,1],0:[1,1]},tan:{135:[-1,1],225:[1,1],315:[-1,1],45:[1,1],180:[0,1]}};const f=pick(Object.keys(T));const d=pick(Object.keys(T[f]));const r=T[f][d];
+     return{q:`求 ${trig(f,d)} 的值。`,ans:r,steps:[`參考角與象限決定大小與正負`,fin(r)]}}],
+  2:[()=>{const[a,b,c]=pick(TRIPLES);const x=pick([a,-a,b,-b]);const y=(Math.abs(x)===a?b:a)*pick([1,-1]);const f=pick(['sin','cos','tan']);const r=f==='sin'?R(y,c):f==='cos'?R(x,c):R(y,x);
+     return{q:`點 P(${num(x)}, ${num(y)}) 在角 θ 的終邊上，求 ${f} θ。`,ans:r,steps:[`r ＝ √(${x*x} ＋ ${y*y}) ＝ ${c}`,`${f} θ ＝ ${f==='sin'?'y／r':f==='cos'?'x／r':'y／x'}`,fin(r)]}},
+   ()=>{const Q=rnd(1,4),ref=pick([10,20,25,35,40,50,55,65,70,80]);const ang=[0,180,180,360][Q-1]+(Q===1||Q===3?ref:-ref);const f=pick(['sin','cos','tan']);const pos={sin:[1,2],cos:[1,4],tan:[1,3]}[f].includes(Q);
+     return mc(`${trig(f,ang)} 等於下列何者？`,`${pos?'':'−'}${trig(f,ref)}`,[`${pos?'−':''}${trig(f,ref)}`,`${trig(f==='sin'?'cos':'sin',ref)}`,`−${trig(f==='sin'?'cos':'sin',ref)}`],[`${ang}° 在第 ${Q} 象限，參考角 ${ref}°`,`第 ${Q} 象限 ${f} 為${pos?'正':'負'}`])}],
+  3:[()=>{const[a,b,c]=pick(TRIPLES);const Q=pick([2,3,4]);const sx=Q===2||Q===3?-1:1,sy=Q===2?1:-1;const giv=pick(['sin','cos']);const x=sx*b,y=sy*a;const askf=giv==='sin'?pick(['cos','tan']):pick(['sin','tan']);const r=askf==='sin'?R(y,c):askf==='cos'?R(x,c):R(y,x);
+     return{q:`已知 ${giv} θ ＝ ${M(rFmt(giv==='sin'?R(y,c):R(x,c)))}，且 θ 為第 ${Q} 象限角，求 ${askf} θ。`,ans:r,steps:[`取 ${giv==='sin'?`y ＝ ${num(y)}`:`x ＝ ${num(x)}`}、r ＝ ${c}`,`第 ${Q} 象限：${giv==='sin'?`x ＝ ${num(x)}`:`y ＝ ${num(y)}`}`,fin(r)]}},
+   ()=>{const r=2*rnd(1,8);const xa=pick([0,60,120,180,240,300]),ya=pick([30,90,150,210,270,330]);const useX=Math.random()<.5;const th=useX?xa:ya;const v=useX?R(Math.round(r*Math.cos(th*Math.PI/180)),1):R(Math.round(r*Math.sin(th*Math.PI/180)),1);
+     return{q:`極坐標 [${r}, ${deg(th)}] 化成直角坐標 (x, y)，${useX?'x':'y'} 坐標是多少？`,ans:v,steps:[`${useX?'x ＝ r cos θ':'y ＝ r sin θ'} ＝ ${r} × ${useX?'cos':'sin'} ${deg(th)}`,fin(v)]}}],
+  4:[()=>{const k=rnd(1,6);const th=pick([30,60,120,150,210,240,300,330]);const c=Math.cos(th*Math.PI/180),s=Math.sin(th*Math.PI/180);const f=v=>{const a=Math.round(v*2);const big=Math.abs(Math.abs(v)-Math.sqrt(3)/2)<1e-9;return (v<0?'−':'')+(big?`${k===1?'':k}√3`:`${k}`)};
+     const x=f(c),y=f(s);return{q:`點 P(${x}, ${y}) 的極坐標為 [r, θ]，0° ≤ θ ＜ 360°，求 θ。（填度數）`,ans:[th,1],steps:[`r ＝ ${2*k}，cos θ ＝ x／r，sin θ ＝ y／r`,`x ${c>0?'＞':'＜'} 0、y ${s>0?'＞':'＜'} 0，在第 ${th<90?1:th<180?2:th<270?3:4} 象限，參考角 ${Math.min(th%180,180-th%180)}°`,`θ ＝ <b>${th}</b>°`]}},
+   ()=>{const[a,b,c]=pick(TRIPLES);const Q=pick([2,4]);const s=Q===2?R(a,c):R(-a,c);const co=Q===2?R(-b,c):R(b,c);const v=R(s[0]+co[0],c);const ask=Math.random()<.5;
+     return{q:`θ 為第 ${Q} 象限角且 tan θ ＝ ${M(rFmt(R(-a,b)))}，求 sin θ ＋ cos θ。`,ans:R(Q===2?a-b:b-a,c),steps:[`|tan θ| ＝ ${a}／${b}，斜邊 ${c}`,`第 ${Q} 象限：sin θ ＝ ${rFmt(s)}，cos θ ＝ ${rFmt(co)}`,fin(R(Q===2?a-b:b-a,c))]}}]}}),
+
+mkLesson({id:'m2_law',unit:'三角比',title:'正弦定理、餘弦定理與三角形面積',
+ goal:'會用正弦定理、餘弦定理解三角形，用兩邊夾角與海龍公式求面積，並求外接圓與內切圓半徑。',
+ concept:`<div class="formula">正弦定理：${fr('<i>a</i>','sin A')} ＝ ${fr('<i>b</i>','sin B')} ＝ ${fr('<i>c</i>','sin C')} ＝ 2<i>R</i><small><i>R</i> 為外接圓半徑</small></div>
+  <div class="formula">餘弦定理：<i>c</i>² ＝ <i>a</i>² ＋ <i>b</i>² − 2<i>ab</i> cos C<small>或 cos C ＝ ${fr('<i>a</i>² ＋ <i>b</i>² − <i>c</i>²','2<i>ab</i>')}</small></div>
+  <div class="formula">面積 ＝ ${fr(1,2)}<i>ab</i> sin C ＝ √(<i>s</i>(<i>s</i>−<i>a</i>)(<i>s</i>−<i>b</i>)(<i>s</i>−<i>c</i>)) ＝ <i>rs</i> ＝ ${fr('<i>abc</i>','4<i>R</i>')}<small><i>s</i> 為半周長，<i>r</i> 為內切圓半徑（第二個是海龍公式）</small></div>
+  <div class="tip"><b>使用時機：</b>已知兩角一邊或要求外接圓 → 正弦定理；已知三邊或兩邊夾角 → 餘弦定理。</div>`,
+ deep:`<div class="prose"><p><b>餘弦定理是畢氏定理的推廣</b>：C ＝ 90° 時 cos C ＝ 0，就變回 <i>c</i>² ＝ <i>a</i>² ＋ <i>b</i>²。cos C 的正負可以判斷角的種類：<i>a</i>² ＋ <i>b</i>² ＞ <i>c</i>² 時 C 為銳角，＝ 時直角，＜ 時鈍角。</p>
+  <p><b>正弦定理的推論</b>：sin A : sin B : sin C ＝ <i>a</i> : <i>b</i> : <i>c</i>，大邊對大角。</p>
+  <p><b>常見的整數三角形</b>：13、14、15 的面積是 84；3、5、7 的最大角是 120°；5、7、8 中 7 所對的角是 60°。記住它們可以加快計算。</p></div>`,
+ ex:{q:'△ABC 中 a ＝ 3、b ＝ 5、C ＝ 120°，求 c。',steps:['c² ＝ 9 ＋ 25 − 2·3·5·cos 120°。','＝ 34 − 30 × (−1／2) ＝ 49。','答案是 <b>7</b>。']},
+ T:[['C ＝ 90° 時餘弦定理就是畢氏定理',1,''],['a² ＋ b² ＜ c² 時 C 為鈍角',1,''],['大邊對大角',1,''],['sin A : sin B : sin C ＝ a : b : c',1,''],['a／sin A 等於外接圓半徑',0,'等於直徑 2R'],['三角形面積 ＝ ½ab cos C',0,'＝ ½ab sin C'],
+  ['已知三邊可以用海龍公式求面積',1,''],['已知兩邊與一個對角，三角形一定唯一',0,'可能有兩解'],['面積 ＝ rs（r 為內切圓半徑）',1,''],['cos C ＜ 0 時 C 為銳角',0,'C 為鈍角'],['面積 ＝ abc／(4R)',1,''],['邊長 13、14、15 的三角形面積是 84',1,'']],
+ gens:{1:[()=>{const S=[[3,8,7,60],[5,8,7,60],[8,15,13,60],[5,21,19,60],[3,5,7,120],[7,8,13,120],[5,16,19,120],[3,4,5,90],[5,12,13,90]];const[a,b,c,C]=pick(S);const k=rnd(1,3);return{q:`△ABC 中，a ＝ ${a*k}、b ＝ ${b*k}、C ＝ ${C}°，求 c。`,ans:[c*k,1],steps:[`c² ＝ ${(a*k)**2} ＋ ${(b*k)**2} − 2 × ${a*k} × ${b*k} × cos ${C}°`,`＝ ${(c*k)**2}`,`c ＝ <b>${c*k}</b>`]}},
+   ()=>{const a=rnd(2,14),b=rnd(2,14),C=pick([30,150]);const r=R(a*b,4);return{q:`△ABC 中，a ＝ ${a}、b ＝ ${b}、C ＝ ${C}°，求面積。`,ans:r,steps:[`面積 ＝ ½ab sin C ＝ ½ × ${a} × ${b} × ½`,fin(r)]}}],
+  2:[()=>{let a,b,c;do{a=rnd(3,12);b=rnd(3,12);c=rnd(3,12)}while(a+b<=c||a+c<=b||b+c<=a);const r=R(a*a+b*b-c*c,2*a*b);return{q:`△ABC 三邊 a ＝ ${a}、b ＝ ${b}、c ＝ ${c}，求 cos C。`,ans:r,steps:[`cos C ＝ (a² ＋ b² − c²)／2ab ＝ (${a*a} ＋ ${b*b} − ${c*c})／${2*a*b}`,fin(r)]}},
+   ()=>{const[p,q]=pick([[1,2],[3,5],[4,5],[5,13],[12,13],[8,17],[1,3],[2,3]]);const a=rnd(2,20);const r=R(a*q,2*p);return{q:`△ABC 中，a ＝ ${a}，sin A ＝ ${M(fr(p,q))}，求外接圓半徑 R。`,ans:r,steps:[`a／sin A ＝ 2R`,`R ＝ ${a} ÷ (2 × ${p}／${q})`,fin(r)]}}],
+  3:[()=>{const H=[[13,14,15,84],[5,5,6,12],[5,5,8,12],[10,13,13,60],[9,10,17,36],[7,15,20,42],[6,25,29,60],[11,13,20,66],[13,20,21,126],[3,4,5,6]];const[a,b,c,A]=pick(H);const k=rnd(1,3);return{q:`三角形三邊長為 ${a*k}、${b*k}、${c*k}，求面積。`,ans:[A*k*k,1],steps:[`s ＝ ${(a+b+c)*k/2}`,`面積 ＝ √(s(s−a)(s−b)(s−c))`,`＝ <b>${A*k*k}</b>`]}},
+   ()=>{const S=[[3,5,7,7,120],[7,8,13,13,120],[5,16,19,19,120],[3,7,8,7,60],[5,7,8,7,60],[8,13,15,13,60],[3,8,7,7,60]];const[a,b,c,side,ang]=pick(S);return{q:`三角形三邊長的比為 ${a}：${b}：${c}，${ang===120?'最大角':`比值為 ${side} 的邊所對的角`}是幾度？`,ans:[ang,1],steps:['設三邊為 ka、kb、kc，用餘弦定理求 cos',`cos ＝ ${ang===120?'−½':'½'}`,`答案是 <b>${ang}</b>°`]}}],
+  4:[()=>{const H=[[13,14,15,84],[5,5,6,12],[5,5,8,12],[10,13,13,60],[9,10,17,36],[7,15,20,42],[6,25,29,60],[11,13,20,66],[13,20,21,126],[3,4,5,6]];const[a,b,c,A]=pick(H);const k=rnd(1,2);const s=(a+b+c)*k/2,Ar=A*k*k;const ask=Math.random()<.5;const r=ask?R(Ar,s):R(a*b*c*k*k*k,4*Ar);
+     return{q:`三角形三邊長為 ${a*k}、${b*k}、${c*k}，求${ask?'內切圓半徑 r':'外接圓半徑 R'}。`,ans:r,steps:[`面積 ＝ ${Ar}（海龍公式），s ＝ ${s}`,ask?`r ＝ 面積 ÷ s ＝ ${Ar}／${s}`:`R ＝ abc ÷ (4 × 面積) ＝ ${a*b*c*k**3}／${4*Ar}`,fin(r)]}}]}}),
+
+/* ---------------- 數列與級數 ---------------- */
+mkLesson({id:'m2_ap',unit:'數列與級數',title:'等差數列',
+ goal:'會求等差數列的公差、一般項與項數，使用等差中項，並解決兩個等差數列的公共項問題。',
+ concept:`<div class="prose"><p><b>等差數列</b>：後項減前項是固定值 <i>d</i>（公差）。</p></div>
+  <div class="formula"><i>a<sub>n</sub></i> ＝ <i>a</i><sub>1</sub> ＋ (<i>n</i> − 1)<i>d</i><small>也可以寫 <i>a<sub>n</sub></i> ＝ <i>a<sub>m</sub></i> ＋ (<i>n</i> − <i>m</i>)<i>d</i></small></div>
+  <div class="prose"><p><b>等差中項</b>：<i>a</i>、<i>b</i>、<i>c</i> 成等差 ⇔ 2<i>b</i> ＝ <i>a</i> ＋ <i>c</i>。</p>
+  <p><b>三數成等差</b>常設為 <i>x</i> − <i>d</i>、<i>x</i>、<i>x</i> ＋ <i>d</i>，和就是 3<i>x</i>，很快求出中間項。</p>
+  <p><b>項數</b>：從 <i>a</i> 到 <i>b</i>、公差 <i>d</i>，共有 ${fr('<i>b</i> − <i>a</i>','<i>d</i>')} ＋ 1 項。</p></div>
+  <div class="tip"><b>常見錯誤：</b>第 <i>n</i> 項只加了 (<i>n</i> − 1) 個公差，不是 <i>n</i> 個。</div>`,
+ deep:`<div class="prose"><p><b>等差數列是一次函數</b>：<i>a<sub>n</sub></i> ＝ <i>dn</i> ＋ (<i>a</i><sub>1</sub> − <i>d</i>)，把 (<i>n</i>, <i>a<sub>n</sub></i>) 畫出來，點都在一條斜率為 <i>d</i> 的直線上。所以「兩項決定一個等差數列」，就像兩點決定一條直線。</p>
+  <p><b>性質</b>：若 <i>p</i> ＋ <i>q</i> ＝ <i>m</i> ＋ <i>n</i>，則 <i>a<sub>p</sub></i> ＋ <i>a<sub>q</sub></i> ＝ <i>a<sub>m</sub></i> ＋ <i>a<sub>n</sub></i>。</p>
+  <p><b>公共項</b>：兩個等差數列的公共項也會形成等差數列，公差是兩個公差的最小公倍數。</p></div>`,
+ ex:{q:'等差數列 a₃ ＝ 11、a₇ ＝ 23，求 a₁₅。',steps:['4d ＝ 23 − 11 ＝ 12，d ＝ 3。','a₁₅ ＝ a₇ ＋ 8d ＝ 23 ＋ 24。','答案是 <b>47</b>。']},
+ T:[['等差數列的一般項是 n 的一次式（d ≠ 0）',1,''],['a, b, c 成等差則 2b ＝ a ＋ c',1,''],['等差數列每一項都乘以 3 仍是等差數列',1,''],['等差數列的公差一定是正數',0,'可以是負數或 0'],['a₂ ＋ a₉ ＝ a₅ ＋ a₆',1,'2 ＋ 9 ＝ 5 ＋ 6'],['從 3 到 99 公差 3 共有 32 項',0,'(99 − 3)／3 ＋ 1 ＝ 33'],
+  ['兩個等差數列對應項相加仍是等差數列',1,''],['等差數列的每一項平方後仍是等差數列',0,''],['已知任兩項就能決定等差數列',1,''],['a₁₀ ＝ a₁ ＋ 10d',0,'＝ a₁ ＋ 9d'],['兩等差數列的公共項若存在也成等差數列',1,''],['常數數列 5, 5, 5, … 是等差數列',1,'公差 0']],
+ gens:{1:[()=>{const a=rnd(-20,20),d=nz(-7,9),n=rnd(8,40);const v=a+(n-1)*d;return{q:`等差數列首項 ${num(a)}、公差 ${num(d)}，求第 ${n} 項。`,ans:[v,1],steps:[`a<sub>${n}</sub> ＝ ${num(a)} ＋ ${n-1} × ${par(d)}`,`＝ <b>${num(v)}</b>`]}}],
+  2:[()=>{const a=rnd(-20,20),d=nz(-6,8);let p=rnd(2,8),q=rnd(p+2,15),n=rnd(16,40);const ap=a+(p-1)*d,aq=a+(q-1)*d,v=a+(n-1)*d;return{q:`等差數列中 a<sub>${p}</sub> ＝ ${num(ap)}、a<sub>${q}</sub> ＝ ${num(aq)}，求 a<sub>${n}</sub>。`,ans:[v,1],steps:[`${q-p}d ＝ ${num(aq)} − ${par(ap)}，d ＝ ${num(d)}`,`a<sub>${n}</sub> ＝ a<sub>${q}</sub> ＋ ${n-q}d ＝ <b>${num(v)}</b>`]}},
+   ()=>{const d=rnd(2,9),a=rnd(1,30),n=rnd(10,60);const b=a+(n-1)*d;return{q:`等差數列 ${a}, ${a+d}, ${a+2*d}, …, ${b} 共有幾項？`,ans:[n,1],steps:[`(${b} − ${a}) ÷ ${d} ＋ 1`,`＝ <b>${n}</b>`]}}],
+  3:[()=>{const x=rnd(-5,12),d=rnd(1,8);const P=(x-d)*x*(x+d);if(x===0)LEVELS_RETRY();return{q:`三數成等差，和為 ${num(3*x)}、積為 ${num(P)}，且公差為正，求最大的數。`,ans:[x+d,1],steps:[`設三數 x − d、x、x ＋ d，3x ＝ ${num(3*x)}，x ＝ ${num(x)}`,`(${x} − d)·${x}·(${x} ＋ d) ＝ ${num(P)} → ${x*x} − d² ＝ ${P/x}，d ＝ ${d}`,`最大數 ＝ <b>${num(x+d)}</b>`]}},
+   ()=>{const lo=rnd(1,50)*1,hi=lo+rnd(100,400),m=rnd(3,13);const first=Math.ceil(lo/m)*m,last=Math.floor(hi/m)*m;const n=(last-first)/m+1;return{q:`介於 ${lo} 與 ${hi} 之間（含）的 ${m} 的倍數共有幾個？`,ans:[n,1],steps:[`最小 ${first}、最大 ${last}，公差 ${m}`,`(${last} − ${first}) ÷ ${m} ＋ 1 ＝ <b>${n}</b>`]}}],
+  4:[()=>{const a1=rnd(1,8),d1=rnd(2,7),a2=rnd(1,8),d2=rnd(2,7),N=rnd(100,300);if(d1===d2)LEVELS_RETRY();const s1=new Set();for(let v=a1;v<=N;v+=d1)s1.add(v);let c=0,f=null;for(let v=a2;v<=N;v+=d2)if(s1.has(v)){c++;if(f===null)f=v}if(c<2)LEVELS_RETRY();
+     return{q:`數列 ${a1}, ${a1+d1}, ${a1+2*d1}, … 與 ${a2}, ${a2+d2}, ${a2+2*d2}, … 在不超過 ${N} 的範圍內，共有幾個公共項？`,ans:[c,1],steps:[`最小公共項 ${f}，公共項公差 ＝ ${d1} 與 ${d2} 的最小公倍數 ${d1*d2/gcd(d1,d2)}`,`(${f} ＋ k × ${d1*d2/gcd(d1,d2)} ≤ ${N})，共 <b>${c}</b> 個`]}}]}}),
+
+mkLesson({id:'m2_gp',unit:'數列與級數',title:'等比數列',
+ goal:'會求等比數列的公比與一般項，使用等比中項，並應用在複利與成長問題。',
+ concept:`<div class="prose"><p><b>等比數列</b>：後項除以前項是固定值 <i>r</i>（公比，<i>r</i> ≠ 0）。</p></div>
+  <div class="formula"><i>a<sub>n</sub></i> ＝ <i>a</i><sub>1</sub> · <i>r</i><sup><i>n</i>−1</sup><small>也可以寫 <i>a<sub>n</sub></i> ＝ <i>a<sub>m</sub></i> · <i>r</i><sup><i>n</i>−<i>m</i></sup></small></div>
+  <div class="prose"><p><b>等比中項</b>：<i>a</i>、<i>b</i>、<i>c</i> 成等比 ⇔ <i>b</i>² ＝ <i>ac</i>。</p>
+  <p><b>三數成等比</b>常設為 ${fr('<i>x</i>','<i>r</i>')}、<i>x</i>、<i>xr</i>，積就是 <i>x</i>³。</p>
+  <p><b>複利</b>：本金 <i>P</i>、每期利率 <i>i</i>，<i>n</i> 期後本利和 ＝ <i>P</i>(1 ＋ <i>i</i>)<sup><i>n</i></sup>，本利和成等比數列。</p></div>
+  <div class="tip"><b>常見錯誤：</b><i>b</i>² ＝ <i>ac</i> 時，<i>b</i> 可能是正或負，題目沒說要兩個都考慮。</div>`,
+ deep:`<div class="prose"><p><b>等比數列是指數函數</b>：<i>a<sub>n</sub></i> ＝ (<i>a</i><sub>1</sub>／<i>r</i>) · <i>r</i><sup><i>n</i></sup>。當 <i>r</i> ＞ 1 時快速成長，0 ＜ <i>r</i> ＜ 1 時逐漸變小趨近 0，<i>r</i> ＜ 0 時正負交錯。</p>
+  <p><b>性質</b>：若 <i>p</i> ＋ <i>q</i> ＝ <i>m</i> ＋ <i>n</i>，則 <i>a<sub>p</sub></i> · <i>a<sub>q</sub></i> ＝ <i>a<sub>m</sub></i> · <i>a<sub>n</sub></i>。</p>
+  <p><b>對數的連結</b>：正項等比數列取 log 後變成等差數列。例如 2, 4, 8, 16 取 log₂ 得 1, 2, 3, 4。這就是為什麼「翻倍幾次」的問題要用對數解。</p></div>`,
+ ex:{q:'等比數列 a₂ ＝ 6、a₅ ＝ 48，求 a₇。',steps:['r³ ＝ 48 ÷ 6 ＝ 8，r ＝ 2。','a₇ ＝ a₅ × r² ＝ 48 × 4。','答案是 <b>192</b>。']},
+ T:[['a, b, c 成等比則 b² ＝ ac',1,''],['等比數列的公比可以是 0',0,'r ≠ 0'],['公比為負時各項正負交錯',1,''],['正項等比數列取對數後成等差數列',1,''],['a₂ · a₈ ＝ a₄ · a₆',1,'2 ＋ 8 ＝ 4 ＋ 6'],['b² ＝ ac 時 a, b, c 一定成等比',0,'例如 a ＝ b ＝ 0'],
+  ['等比數列每一項乘以 5 仍是等比數列',1,''],['兩個等比數列對應項相加一定是等比數列',0,''],['兩個等比數列對應項相乘仍是等比數列',1,''],['複利的本利和形成等差數列',0,'形成等比數列'],['0 < r < 1 的正項等比數列遞減',1,''],['4 和 9 的等比中項只有 6',0,'也可以是 −6']],
+ gens:{1:[()=>{const r=pick([2,3,-2,-3,2,5]),a=nz(-5,6),n=rnd(3,7);const v=a*r**(n-1);return{q:`等比數列首項 ${num(a)}、公比 ${num(r)}，求第 ${n} 項。`,ans:[v,1],steps:[`a<sub>${n}</sub> ＝ ${num(a)} × ${par(r)}<sup>${n-1}</sup>`,`＝ <b>${num(v)}</b>`]}},
+   ()=>{const n=rnd(3,7),a=2**(n-1)*rnd(1,5)*pick([1,-1]);const v=R(a,2**(n-1));return{q:`等比數列 ${num(a)}, ${num(a/2)}, ${num(a/4)}, …，求第 ${n} 項。`,ans:v,steps:[`公比 ½`,`a<sub>${n}</sub> ＝ ${num(a)} × (½)<sup>${n-1}</sup>`,fin(v)]}}],
+  2:[()=>{const r=pick([2,3,-2,-3]),a=nz(-4,4);const p=rnd(1,3),gap=pick([2,3]),q=p+gap;const n=q+rnd(1,3);if(gap===2&&r<0)LEVELS_RETRY();const ap=a*r**(p-1),aq=a*r**(q-1),v=a*r**(n-1);
+     return{q:`等比數列中 a<sub>${p}</sub> ＝ ${num(ap)}、a<sub>${q}</sub> ＝ ${num(aq)}${gap===2?'，且公比為正':''}，求 a<sub>${n}</sub>。`,ans:[v,1],steps:[`r<sup>${gap}</sup> ＝ ${num(aq)} ÷ ${par(ap)} ＝ ${num(r**gap)}，r ＝ ${num(r)}`,`a<sub>${n}</sub> ＝ a<sub>${q}</sub> × r<sup>${n-q}</sup> ＝ <b>${num(v)}</b>`]}},
+   ()=>{const m=rnd(2,12),a=rnd(1,6),c=a*rnd(2,6)**2;const k=Math.sqrt(c/a);const b=a*k;return{q:`${a} 與 ${c} 的正等比中項是多少？`,ans:[b,1],steps:[`b² ＝ ${a} × ${c} ＝ ${a*c}`,`b ＝ <b>${b}</b>`]}}],
+  3:[()=>{const P=pick([10000,20000,50000,100000]),i=pick([10,20,5]),n=pick([2,3]);const v=P*((100+i)/100)**n;if(!exact2(v))LEVELS_RETRY();return{q:`本金 ${P} 元，年利率 ${i}%，每年複利一次，${n} 年後本利和是多少元？`,ans:RD(v),steps:[`本利和 ＝ ${P} × (1 ＋ ${i/100})<sup>${n}</sup>`,`＝ <b>${dec(v)}</b>`]}},
+   ()=>{const a=nz(-4,4),r=pick([2,-2,3]);const p=rnd(3,5),q=p+2;const ap=a*r**(p-1),aq=a*r**(q-1);const v=ap*aq;return{q:`等比數列中 a<sub>${p}</sub> ＝ ${num(ap)}、a<sub>${q}</sub> ＝ ${num(aq)}，求 a<sub>${p-1}</sub> · a<sub>${q+1}</sub>。`,ans:[v,1],steps:[`${p-1} ＋ ${q+1} ＝ ${p} ＋ ${q}，所以 a<sub>${p-1}</sub>a<sub>${q+1}</sub> ＝ a<sub>${p}</sub>a<sub>${q}</sub>`,`＝ ${num(ap)} × ${par(aq)} ＝ <b>${num(v)}</b>`]}}],
+  4:[()=>{const b=nz(-6,6)*2,r=pick([2,3]);const t=[b/r,b,b*r];if(!Number.isInteger(t[0]))LEVELS_RETRY();const S=t[0]+t[1]+t[2],Pd=t[0]*t[1]*t[2];return{q:`三數成等比，和為 ${num(S)}、積為 ${num(Pd)}，公比大於 1，求最大的數。`,ans:[Math.max(...t),1],steps:[`設三數 x／r、x、xr，積 x³ ＝ ${num(Pd)}，x ＝ ${num(b)}`,`${num(b)}(1／r ＋ 1 ＋ r) ＝ ${num(S)}，解得 r ＝ ${r}`,`三數 ${t.map(num).join('、')}，最大 <b>${num(Math.max(...t))}</b>`]}},
+   ()=>{const k=rnd(3,9),r=2;const N=2**k*rnd(1,3);const x=k;return{q:`某細菌每 20 分鐘分裂一次（數量變 2 倍），一開始有 ${N/2**k} 隻，經過幾分鐘後數量變成 ${N} 隻？`,ans:[20*k,1],steps:[`${N/2**k} × 2<sup>n</sup> ＝ ${N}，2<sup>n</sup> ＝ ${2**k}，n ＝ ${k}`,`${k} × 20 ＝ <b>${20*k}</b> 分鐘`]}}]}}),
+
+mkLesson({id:'m2_sum',unit:'數列與級數',title:'級數與 ∑ 符號',
+ goal:'會求等差級數、等比級數的和，熟悉 ∑ 的運算性質與常用公式，並用分項對消法求和。',
+ concept:`<div class="formula">等差級數 <i>S<sub>n</sub></i> ＝ ${fr('<i>n</i>(<i>a</i><sub>1</sub> ＋ <i>a<sub>n</sub></i>)',2)} ＝ ${fr('<i>n</i>[2<i>a</i><sub>1</sub> ＋ (<i>n</i>−1)<i>d</i>]',2)}<small>（首項 ＋ 末項）× 項數 ÷ 2</small></div>
+  <div class="formula">等比級數 <i>S<sub>n</sub></i> ＝ ${fr('<i>a</i><sub>1</sub>(<i>r</i><sup><i>n</i></sup> − 1)','<i>r</i> − 1')}（<i>r</i> ≠ 1）<small><i>r</i> ＝ 1 時 <i>S<sub>n</sub></i> ＝ <i>na</i><sub>1</sub></small></div>
+  <div class="prose"><p><b>常用公式</b>：∑<i>k</i> ＝ ${fr('<i>n</i>(<i>n</i>＋1)',2)}，∑<i>k</i>² ＝ ${fr('<i>n</i>(<i>n</i>＋1)(2<i>n</i>＋1)',6)}，∑<i>k</i>³ ＝ ${M(`[${fr('<i>n</i>(<i>n</i>＋1)',2)}]<sup>2</sup>`)}。</p>
+  <p><b>∑ 的性質</b>：∑(<i>a<sub>k</sub></i> ± <i>b<sub>k</sub></i>) ＝ ∑<i>a<sub>k</sub></i> ± ∑<i>b<sub>k</sub></i>；∑<i>c</i>·<i>a<sub>k</sub></i> ＝ <i>c</i>∑<i>a<sub>k</sub></i>；∑<i>c</i> ＝ <i>nc</i>。</p></div>
+  <div class="tip"><b>常見錯誤：</b>∑<i>a<sub>k</sub>b<sub>k</sub></i> ≠ (∑<i>a<sub>k</sub></i>)(∑<i>b<sub>k</sub></i>)，乘積不能拆。</div>`,
+ deep:`<div class="prose"><p><b>高斯的倒加法</b>：1 ＋ 2 ＋ … ＋ 100，倒過來再寫一次相加，每一對都是 101，共 100 對，所以和 ＝ 101 × 100 ÷ 2 ＝ 5050。等差級數公式就是這樣來的。</p>
+  <p><b>等比級數的錯位相減</b>：<i>S</i> ＝ <i>a</i> ＋ <i>ar</i> ＋ … ＋ <i>ar</i><sup><i>n</i>−1</sup>，乘以 <i>r</i> 後相減，中間全部消掉，得 (<i>r</i> − 1)<i>S</i> ＝ <i>a</i>(<i>r</i><sup><i>n</i></sup> − 1)。</p>
+  <p><b>分項對消</b>：${M(`${fr(1,'<i>k</i>(<i>k</i>＋1)')} = ${fr(1,'<i>k</i>')} − ${fr(1,'<i>k</i>＋1')}`)}，相加時中間一正一負全部抵銷，只剩頭尾：∑ ＝ 1 − ${fr(1,'<i>n</i>＋1')} ＝ ${fr('<i>n</i>','<i>n</i>＋1')}。</p></div>`,
+ ex:{q:`求 ${SIG(10,'(2<i>k</i> ＋ 1)')}。`,steps:['＝ 2∑k ＋ ∑1 ＝ 2 × 55 ＋ 10。','＝ 110 ＋ 10。','答案是 <b>120</b>。']},
+ T:[['∑(aₖ ＋ bₖ) ＝ ∑aₖ ＋ ∑bₖ',1,''],['∑aₖbₖ ＝ (∑aₖ)(∑bₖ)',0,'乘積不能拆'],['∑(k＝1 到 n) 5 ＝ 5n',1,''],['1 ＋ 2 ＋ … ＋ 100 ＝ 5050',1,''],['∑k² ＝ [n(n＋1)/2]²',0,'那是 ∑k³'],['∑3aₖ ＝ 3∑aₖ',1,''],
+  ['公比為 1 的等比級數和為 n·a₁',1,''],['1 ＋ 3 ＋ 5 ＋ … ＋ (2n−1) ＝ n²',1,''],['1／(k(k＋1)) ＝ 1／k − 1／(k＋1)',1,''],['∑(k＝1 到 n)(aₖ)² ＝ (∑aₖ)²',0,''],['等差級數和 ＝ (首項 ＋ 末項) × 項數 ÷ 2',1,''],['1 ＋ 2 ＋ 4 ＋ … ＋ 2⁹ ＝ 2¹⁰',0,'＝ 2¹⁰ − 1']],
+ gens:{1:[()=>{const a=rnd(-10,15),d=nz(-4,6),n=rnd(8,30);const S=n*(2*a+(n-1)*d)/2;return{q:`等差數列首項 ${num(a)}、公差 ${num(d)}，求前 ${n} 項的和。`,ans:[S,1],steps:[`S ＝ ${n}[2 × ${par(a)} ＋ ${n-1} × ${par(d)}] ÷ 2`,`＝ <b>${num(S)}</b>`]}}],
+  2:[()=>{const a=nz(-4,5),b=rnd(-6,6),n=rnd(6,25);const v=a*n*(n+1)/2+b*n;return{q:`求 ${SIG(n,`(${a===1?'':a===-1?'−':a}<i>k</i> ${b>=0?'＋':'−'} ${Math.abs(b)})`)}。`,ans:[v,1],steps:[`＝ ${a}∑k ${b>=0?'＋':'−'} ${Math.abs(b)} × ${n} ＝ ${a} × ${n*(n+1)/2} ${b>=0?'＋':'−'} ${Math.abs(b*n)}`,`＝ <b>${num(v)}</b>`]}},
+   ()=>{const n=rnd(5,15);const v=n*(n+1)*(2*n+1)/6;return{q:`求 1² ＋ 2² ＋ 3² ＋ … ＋ ${n}²。`,ans:[v,1],steps:[`＝ ${n}(${n+1})(${2*n+1})／6`,`＝ <b>${v}</b>`]}}],
+  3:[()=>{const a=nz(-3,5),r=pick([2,3,-2]),n=rnd(4,8);const S=a*(r**n-1)/(r-1);return{q:`等比數列首項 ${num(a)}、公比 ${num(r)}，求前 ${n} 項的和。`,ans:[S,1],steps:[`S ＝ ${num(a)}(${par(r)}<sup>${n}</sup> − 1)／(${num(r)} − 1)`,`＝ <b>${num(S)}</b>`]}},
+   ()=>{const n=rnd(5,15);const v=n*(n+1)*(n+2)/3;return{q:`求 ${SIG(n,'<i>k</i>(<i>k</i> ＋ 1)')}。`,ans:[v,1],steps:[`＝ ∑k² ＋ ∑k ＝ ${n*(n+1)*(2*n+1)/6} ＋ ${n*(n+1)/2}`,`＝ <b>${v}</b>`]}}],
+  4:[()=>{const n=rnd(5,40);const t=rnd(0,2);if(t===0){const r=R(n,n+1);return{q:`求 ${SIG(n,fr(1,'<i>k</i>(<i>k</i> ＋ 1)'))}。`,ans:r,steps:['1／(k(k＋1)) ＝ 1／k − 1／(k＋1)，中間對消',`＝ 1 − 1／${n+1}`,fin(r)]}}
+     if(t===1){const r=R(n,2*n+1);return{q:`求 ${SIG(n,fr(1,'(2<i>k</i> − 1)(2<i>k</i> ＋ 1)'))}。`,ans:r,steps:['＝ ½∑[1／(2k−1) − 1／(2k＋1)]',`＝ ½(1 − 1／${2*n+1})`,fin(r)]}}
+     const m=rnd(3,12);const v=(m*(m+1)/2)**2;return{q:`求 1³ ＋ 2³ ＋ … ＋ ${m}³。`,ans:[v,1],steps:[`＝ [${m}(${m+1})／2]² ＝ ${m*(m+1)/2}²`,`＝ <b>${v}</b>`]}}]}}),
+
+mkLesson({id:'m2_rec',unit:'數列與級數',title:'遞迴關係與數學歸納法',
+ goal:'會依遞迴式逐項計算，把常見遞迴式化成一般項，用遞迴解計數問題，並了解數學歸納法的證明步驟。',
+ concept:`<div class="prose"><p><b>遞迴關係</b>：用前面的項來定義後面的項，例如 <i>a</i><sub>1</sub> ＝ 2，<i>a</i><sub><i>n</i>＋1</sub> ＝ 3<i>a<sub>n</sub></i> − 1。</p>
+  <ul><li><i>a</i><sub><i>n</i>＋1</sub> ＝ <i>a<sub>n</sub></i> ＋ <i>d</i>：等差數列；<i>a</i><sub><i>n</i>＋1</sub> ＝ <i>r</i> · <i>a<sub>n</sub></i>：等比數列。</li>
+  <li><i>a</i><sub><i>n</i>＋1</sub> ＝ <i>a<sub>n</sub></i> ＋ <i>f</i>(<i>n</i>)：<i>a<sub>n</sub></i> ＝ <i>a</i><sub>1</sub> ＋ ∑<sub><i>k</i>=1</sub><sup><i>n</i>−1</sup> <i>f</i>(<i>k</i>)（累加）。</li>
+  <li><b>河內塔</b>：<i>a</i><sub><i>n</i>＋1</sub> ＝ 2<i>a<sub>n</sub></i> ＋ 1，<i>a</i><sub>1</sub> ＝ 1，得 <i>a<sub>n</sub></i> ＝ 2<sup><i>n</i></sup> − 1。</li></ul>
+  <p><b>數學歸納法</b>：要證明對所有正整數 <i>n</i> 命題 <i>P</i>(<i>n</i>) 成立：① 證 <i>P</i>(1) 成立；② 假設 <i>P</i>(<i>k</i>) 成立，推出 <i>P</i>(<i>k</i>＋1) 也成立。</p></div>
+  <div class="tip"><b>常見錯誤：</b>數學歸納法兩個步驟缺一不可。只驗證前幾項成立，不算證明。</div>`,
+ deep:`<div class="prose"><p><b>一階線性遞迴</b> <i>a</i><sub><i>n</i>＋1</sub> ＝ <i>pa<sub>n</sub></i> ＋ <i>q</i>（<i>p</i> ≠ 1）：先找「不動點」α ＝ <i>q</i>／(1 − <i>p</i>)，則 <i>a</i><sub><i>n</i>＋1</sub> − α ＝ <i>p</i>(<i>a<sub>n</sub></i> − α)，所以 <i>a<sub>n</sub></i> − α 成等比，<i>a<sub>n</sub></i> ＝ (<i>a</i><sub>1</sub> − α)<i>p</i><sup><i>n</i>−1</sup> ＋ α。</p>
+  <p><b>爬樓梯問題</b>：一次可走 1 階或 2 階，走到第 <i>n</i> 階的方法數 <i>a<sub>n</sub></i> ＝ <i>a</i><sub><i>n</i>−1</sub> ＋ <i>a</i><sub><i>n</i>−2</sub>（最後一步走 1 階或 2 階），<i>a</i><sub>1</sub> ＝ 1、<i>a</i><sub>2</sub> ＝ 2，這就是費氏數列。</p>
+  <p><b>骨牌比喻</b>：歸納法像推倒骨牌：第一張會倒（基礎步驟），而且任一張倒下會推倒下一張（遞推步驟），所以全部都會倒。</p></div>`,
+ ex:{q:'a₁ ＝ 1，aₙ₊₁ ＝ 2aₙ ＋ 1，求 a₅。',steps:['a₂ ＝ 3，a₃ ＝ 7，a₄ ＝ 15。','a₅ ＝ 2 × 15 ＋ 1。','答案是 <b>31</b>。']},
+ T:[['數學歸納法要先驗證 n ＝ 1 成立',1,''],['只要驗證前 10 項都成立，就證明了對所有 n 成立',0,''],['aₙ₊₁ ＝ aₙ ＋ 3 表示公差 3 的等差數列',1,''],['aₙ₊₁ ＝ 2aₙ 表示公比 2 的等比數列',1,''],['河內塔 n 個圓盤最少要移動 2ⁿ 次',0,'2ⁿ − 1 次'],['費氏數列滿足 aₙ ＝ aₙ₋₁ ＋ aₙ₋₂',1,''],
+  ['遞迴式加上首項就能決定整個數列',1,''],['歸納法的遞推步驟是假設 P(k) 成立推出 P(k＋1)',1,''],['aₙ₊₁ ＝ aₙ ＋ n 是等差數列',0,'相鄰差不是固定值'],['爬樓梯（一次 1 或 2 階）到第 5 階有 8 種方法',1,''],['歸納法只需要遞推步驟',0,'也需要基礎步驟'],['aₙ₊₁ ＝ 3aₙ − 2 的不動點是 1',1,'α ＝ 3α − 2']],
+ gens:{1:[()=>{const a=rnd(-5,8),p=pick([2,3,-1,2]),q=rnd(-4,5),n=rnd(4,6);let v=a;const seq=[a];for(let i=1;i<n;i++){v=p*v+q;seq.push(v)}if(Math.abs(v)>5000)LEVELS_RETRY();return{q:`a<sub>1</sub> ＝ ${num(a)}，a<sub>n＋1</sub> ＝ ${p===1?'':p===-1?'−':p}a<sub>n</sub> ${q>=0?'＋':'−'} ${Math.abs(q)}，求 a<sub>${n}</sub>。`,ans:[v,1],steps:[`逐項計算：${seq.slice(0,-1).map(num).join('、')}`,`a<sub>${n}</sub> ＝ <b>${num(v)}</b>`]}}],
+  2:[()=>{const a=rnd(-5,8),c=rnd(1,4),n=rnd(8,20);const v=a+c*(n-1)*n/2;return{q:`a<sub>1</sub> ＝ ${num(a)}，a<sub>n＋1</sub> ＝ a<sub>n</sub> ＋ ${c===1?'':c}n，求 a<sub>${n}</sub>。`,ans:[v,1],steps:[`a<sub>${n}</sub> ＝ a<sub>1</sub> ＋ ${c}(1 ＋ 2 ＋ … ＋ ${n-1})`,`＝ ${num(a)} ＋ ${c} × ${(n-1)*n/2} ＝ <b>${num(v)}</b>`]}},
+   ()=>{const n=rnd(4,12);const f=[0,1,2];for(let i=3;i<=n;i++)f[i]=f[i-1]+f[i-2];return{q:`爬樓梯每一步可以走 1 階或 2 階，走完 ${n} 階共有幾種走法？`,ans:[f[n],1],steps:['a<sub>n</sub> ＝ a<sub>n−1</sub> ＋ a<sub>n−2</sub>，a<sub>1</sub> ＝ 1，a<sub>2</sub> ＝ 2',`依序 ${f.slice(1).join('、')}`,`答案是 <b>${f[n]}</b>`]}}],
+  3:[()=>{const p=pick([2,3]),al=nz(-4,5);const q=al*(1-p);const a1=al+nz(-3,3);const n=rnd(5,9);const v=(a1-al)*p**(n-1)+al;return{q:`a<sub>1</sub> ＝ ${num(a1)}，a<sub>n＋1</sub> ＝ ${p}a<sub>n</sub> ${q>=0?'＋':'−'} ${Math.abs(q)}，求 a<sub>${n}</sub>。`,ans:[v,1],steps:[`不動點 α：α ＝ ${p}α ${q>=0?'＋':'−'} ${Math.abs(q)}，α ＝ ${num(al)}`,`a<sub>n</sub> − ${par(al)} ＝ (${num(a1)} − ${par(al)}) × ${p}<sup>n−1</sup>`,`a<sub>${n}</sub> ＝ <b>${num(v)}</b>`]}},
+   ()=>{const n=rnd(3,12);return{q:`河內塔有 ${n} 個圓盤，最少需要移動幾次？`,ans:[2**n-1,1],steps:['a<sub>n＋1</sub> ＝ 2a<sub>n</sub> ＋ 1，a<sub>n</sub> ＝ 2<sup>n</sup> − 1',`2<sup>${n}</sup> − 1 ＝ <b>${2**n-1}</b>`]}}],
+  4:[()=>{const n=rnd(4,10);/* 平面上 n 條直線最多分成幾區 */const v=n*(n+1)/2+1;return{q:`平面上 ${n} 條直線，任兩條不平行、任三條不共點，最多把平面分成幾個區域？`,ans:[v,1],steps:['第 k 條直線與前 k−1 條交出 k−1 個點，被分成 k 段，多出 k 個區域：a<sub>k</sub> ＝ a<sub>k−1</sub> ＋ k，a<sub>0</sub> ＝ 1',`a<sub>${n}</sub> ＝ 1 ＋ (1 ＋ 2 ＋ … ＋ ${n}) ＝ <b>${v}</b>`]}},
+   ()=>{const n=rnd(4,9);/* 長 n、寬 2 的走道用 1×2 磁磚鋪滿 */const f=[1,1];for(let i=2;i<=n;i++)f[i]=f[i-1]+f[i-2];return{q:`用 1 × 2 的磁磚鋪滿 2 × ${n} 的走道（磁磚可直放或橫放），共有幾種鋪法？`,ans:[f[n],1],steps:['最左邊直放一塊 → 剩 2 × (n−1)；橫放兩塊 → 剩 2 × (n−2)',`a<sub>n</sub> ＝ a<sub>n−1</sub> ＋ a<sub>n−2</sub>，a<sub>1</sub> ＝ 1，a<sub>2</sub> ＝ 2`,`a<sub>${n}</sub> ＝ <b>${f[n]}</b>`]}}]}}),
+
+/* ---------------- 排列組合 ---------------- */
+mkLesson({id:'m2_count',unit:'排列組合',title:'計數原理與取捨原理',
+ goal:'會分辨加法原理與乘法原理，用樹狀圖與分類討論計數，並用取捨原理計算聯集的個數。',
+ concept:`<div class="prose"><ul><li><b>加法原理</b>：完成一件事有幾類方法，<b>分類</b>互斥時，方法數相加。</li><li><b>乘法原理</b>：完成一件事要分幾個<b>步驟</b>，每步方法數相乘。</li></ul>
+  <p><b>因數個數</b>：<i>n</i> ＝ <i>p</i><sup><i>a</i></sup><i>q</i><sup><i>b</i></sup><i>r</i><sup><i>c</i></sup>，正因數有 (<i>a</i>＋1)(<i>b</i>＋1)(<i>c</i>＋1) 個（每個質因數的次方各有幾種選法）。</p></div>
+  <div class="formula">取捨原理：n(A ∪ B) ＝ n(A) ＋ n(B) − n(A ∩ B)<small>三個集合：n(A∪B∪C) ＝ ∑n(A) − ∑n(A∩B) ＋ n(A∩B∩C)</small></div>
+  <div class="tip"><b>常見錯誤：</b>首位不能是 0。用 0～9 排三位數時，百位只有 9 種選法。</div>`,
+ deep:`<div class="prose"><p><b>「分類用加，分步用乘」</b>：從臺北到高雄，可以搭高鐵（3 班）或客運（5 班），是分類，3 ＋ 5 ＝ 8 種。先從臺北到臺中（3 種），再從臺中到高雄（4 種），是分步，3 × 4 ＝ 12 種。</p>
+  <p><b>正難則反</b>：「至少一個」常用「全部 − 一個都沒有」。例如 1～100 中不是 2 的倍數也不是 3 的倍數：100 − n(2 或 3 的倍數)。</p>
+  <p><b>有限制的排數字</b>：先處理有限制的位置（首位、個位要偶數等）。若限制互相影響（例如 0 是偶數又不能當首位），就分「個位是 0」和「個位不是 0」兩類。</p></div>`,
+ ex:{q:'1～100 中，是 3 的倍數或 5 的倍數的有幾個？',steps:['3 的倍數 33 個，5 的倍數 20 個。','15 的倍數 6 個。','33 ＋ 20 − 6 ＝ <b>53</b> 個。']},
+ T:[['分類計數用加法、分步計數用乘法',1,''],['72 ＝ 2³ × 3² 有 12 個正因數',1,'4 × 3'],['n(A∪B) ＝ n(A) ＋ n(B)',0,'要減 n(A∩B)'],['用 0～9 組成三位數，百位有 10 種選法',0,'9 種'],['1～60 中 4 的倍數有 15 個',1,''],['同時是 4 與 6 的倍數就是 24 的倍數',0,'是 12 的倍數'],
+  ['n(A∪B∪C) 要加回 n(A∩B∩C)',1,''],['「至少一個」可以用全部減去「一個都沒有」',1,''],['質數 p 的正因數有 2 個',1,''],['3 件上衣、4 件褲子的搭配有 7 種',0,'12 種'],['1～100 中 2 的倍數或 5 的倍數有 60 個',1,'50 ＋ 20 − 10'],['完全平方數的正因數個數是奇數',1,'']],
+ gens:{1:[()=>{const p=[[2,rnd(1,5)],[3,rnd(0,3)],[5,rnd(0,2)],[7,rnd(0,1)]];const n=p.reduce((s,[b,e])=>s*b**e,1);const v=p.reduce((s,[,e])=>s*(e+1),1);if(n>5000||v<4)LEVELS_RETRY();return{q:`${n} 的正因數有幾個？`,ans:[v,1],steps:[`${n} ＝ ${p.filter(x=>x[1]).map(([b,e])=>e>1?`${b}<sup>${e}</sup>`:b).join(' × ')}`,`(${p.filter(x=>x[1]).map(x=>x[1]+1).join(')(')}) ＝ <b>${v}</b>`]}},
+   ()=>{const a=rnd(2,6),b=rnd(2,6),c=rnd(2,5);const t=Math.random()<.5;return t?{q:`從甲地到乙地有 ${a} 條路，乙地到丙地有 ${b} 條路，從甲經乙到丙有幾種走法？`,ans:[a*b,1],steps:['分步用乘法',`${a} × ${b} ＝ <b>${a*b}</b>`]}:{q:`從甲地到丙地，可以搭火車（${a} 班）、客運（${b} 班）或高鐵（${c} 班），只選一種交通工具，有幾種選擇？`,ans:[a+b+c,1],steps:['分類用加法',`${a} ＋ ${b} ＋ ${c} ＝ <b>${a+b+c}</b>`]}}],
+  2:[()=>{const N=pick([100,120,150,200,300,500,1000]);let a=rnd(2,9),b=rnd(2,12);if(a===b)LEVELS_RETRY();const l=a*b/gcd(a,b);const v=Math.floor(N/a)+Math.floor(N/b)-Math.floor(N/l);return{q:`1～${N} 的整數中，是 ${a} 的倍數或 ${b} 的倍數的有幾個？`,ans:[v,1],steps:[`${a} 的倍數 ${Math.floor(N/a)} 個，${b} 的倍數 ${Math.floor(N/b)} 個`,`${a} 與 ${b} 的最小公倍數 ${l}，有 ${Math.floor(N/l)} 個`,`${Math.floor(N/a)} ＋ ${Math.floor(N/b)} − ${Math.floor(N/l)} ＝ <b>${v}</b>`]}}],
+  3:[()=>{const N=pick([100,120,200,300,500,600,1000]);const[a,b,c]=pick([[2,3,5],[2,3,7],[3,5,7],[2,5,7]]);const f=k=>Math.floor(N/k);const u=f(a)+f(b)+f(c)-f(a*b)-f(a*c)-f(b*c)+f(a*b*c);const not=Math.random()<.5;const v=not?N-u:u;
+     return{q:`1～${N} 的整數中，${not?`<b>不是</b> ${a}、${b}、${c} 任一數倍數`:`是 ${a}、${b} 或 ${c} 的倍數`}的有幾個？`,ans:[v,1],steps:[`n(聯集) ＝ ${f(a)} ＋ ${f(b)} ＋ ${f(c)} − ${f(a*b)} − ${f(a*c)} − ${f(b*c)} ＋ ${f(a*b*c)} ＝ ${u}`,not?`${N} − ${u} ＝ <b>${v}</b>`:`答案是 <b>${v}</b>`]}},
+   ()=>{const k=rnd(4,9);const v=k*k*(k-1);return{q:`用 0, 1, 2, …, ${k} 這 ${k+1} 個數字組成數字不重複的三位數，共有幾個？`,ans:[v,1],steps:[`百位不能是 0：${k} 種；十位 ${k} 種；個位 ${k-1} 種`,`${k} × ${k} × ${k-1} ＝ <b>${v}</b>`]}}],
+  4:[()=>{const k=rnd(4,9);let c=0;for(let a=1;a<=k;a++)for(let b=0;b<=k;b++)for(let d=0;d<=k;d++)if(a!==b&&a!==d&&b!==d&&d%2===0)c++;const z=k*(k-1);return{q:`用 0, 1, 2, …, ${k} 組成數字不重複的三位<b>偶數</b>，共有幾個？`,ans:[c,1],steps:[`個位是 0：${k} × ${k-1} ＝ ${z} 個`,`個位是非 0 偶數（${Math.floor(k/2)} 種）：百位 ${k-1} 種、十位 ${k-1} 種，共 ${c-z} 個`,`合計 <b>${c}</b> 個`]}},
+   ()=>{const p=[[2,rnd(1,5)],[3,rnd(1,3)],[5,rnd(0,2)]];const n=p.reduce((s,[b,e])=>s*b**e,1);const ev=p[0][1]*(p[1][1]+1)*(p[2][1]+1);return{q:`${n} 的正因數中，偶數有幾個？`,ans:[ev,1],steps:[`${n} ＝ ${p.filter(x=>x[1]).map(([b,e])=>e>1?`${b}<sup>${e}</sup>`:b).join(' × ')}`,`偶數因數 2 的次方至少 1：${p[0][1]} 種；其他 (${p[1][1]+1})(${p[2][1]+1})`,`＝ <b>${ev}</b>`]}}]}}),
+
+mkLesson({id:'m2_perm',unit:'排列組合',title:'排列',
+ goal:'會計算直線排列、相鄰與不相鄰、重複排列、有相同物的排列與環狀排列，並解捷徑問題。',
+ concept:`<div class="formula">P(<i>n</i>, <i>k</i>) ＝ <i>n</i>(<i>n</i>−1)…(<i>n</i>−<i>k</i>＋1) ＝ ${fr('<i>n</i>!','(<i>n</i>−<i>k</i>)!')}<small>從 <i>n</i> 個不同物中取 <i>k</i> 個排成一列</small></div>
+  ${tbl(['類型','方法','公式'],[['相鄰','把相鄰的人綁成一包，包內再排','(<i>n</i>−1)! × 2!'],['不相鄰','先排其他人，再把指定的人插空隙','(<i>n</i>−2)! × P(<i>n</i>−1, 2)'],['重複排列','每個位置都可以重複選','<i>n</i><sup><i>k</i></sup>'],['有相同物','總排列除以相同物的排列數',`${fr('<i>n</i>!','<i>p</i>!<i>q</i>!…')}`],['環狀排列','旋轉後相同的視為一種','(<i>n</i>−1)!']])}
+  <div class="tip"><b>重複排列看誰「選」誰：</b>3 封信投入 4 個郵筒，每封信選郵筒，所以是 4³，不是 3⁴。</div>`,
+ deep:`<div class="prose"><p><b>捷徑問題</b>：棋盤式街道從左下走到右上，要向右 <i>m</i> 步、向上 <i>n</i> 步，就是把 <i>m</i> 個「右」和 <i>n</i> 個「上」排成一列：${fr('(<i>m</i>＋<i>n</i>)!','<i>m</i>!<i>n</i>!')} 種。必經某點 → 分段相乘；不經某點 → 全部 − 必經。</p>
+  <p><b>為什麼環狀要除以 <i>n</i>？</b><i>n</i> 個人排一圈，每一種坐法旋轉 <i>n</i> 次都一樣，所以直線排列 <i>n</i>! 要除以 <i>n</i>，得 (<i>n</i>−1)!。</p>
+  <p><b>相鄰與不相鄰的關係</b>：甲乙不相鄰 ＝ 全部 − 甲乙相鄰。兩種方法可以互相驗算。</p></div>`,
+ ex:{q:'6 人排成一列，甲乙必須相鄰，有幾種排法？',steps:['甲乙綁成一包，和其他 4 人共 5 個單位：5! ＝ 120。','包內甲乙可交換：× 2。','答案是 <b>240</b>。']},
+ T:[['P(5, 2) ＝ 20',1,''],['0! ＝ 1',1,''],['n 人圍圓桌而坐有 n! 種坐法',0,'(n−1)! 種'],['3 封信投入 4 個郵筒有 3⁴ 種投法',0,'4³ 種'],['BOOK 的字母排列有 12 種',1,'4!／2!'],['甲乙不相鄰 ＝ 全部 − 甲乙相鄰',1,''],
+  ['捷徑向右 3 步、向上 2 步共 10 種走法',1,'5!／(3!2!)'],['P(n, n) ＝ n!',1,''],['5 人排一列，甲不排首位有 4 × 4! 種',1,''],['相鄰問題要用插空隙法',0,'相鄰用綁在一起；不相鄰才插空'],['n 個相同的球排一列只有 1 種排法',1,''],['P(n, k) ＝ n!／k!',0,'＝ n!／(n−k)!']],
+ gens:{1:[()=>{const n=rnd(4,10),k=rnd(2,Math.min(4,n));return{q:`從 ${n} 位同學中選出 ${k} 位，分別擔任${['班長、副班長','班長、副班長、學藝','班長、副班長、學藝、總務'][k-2]}，有幾種選法？`,ans:[nPk(n,k),1],steps:[`P(${n}, ${k}) ＝ ${Array.from({length:k},(_,i)=>n-i).join(' × ')}`,`＝ <b>${nPk(n,k)}</b>`]}},
+   ()=>{const n=rnd(2,6),k=rnd(2,5);return{q:`${k} 封不同的信投入 ${n} 個不同的郵筒（一個郵筒可放多封），有幾種投法？`,ans:[n**k,1],steps:[`每封信都有 ${n} 種選擇`,`${n}<sup>${k}</sup> ＝ <b>${n**k}</b>`]}}],
+  2:[()=>{const n=rnd(4,8);const adj=Math.random()<.5;const v=adj?2*fct(n-1):fct(n)-2*fct(n-1);return{q:`${n} 人排成一列，甲、乙兩人${adj?'必須相鄰':'<b>不</b>相鄰'}，有幾種排法？`,ans:[v,1],steps:adj?[`甲乙綁一起：${n-1}! × 2`,`＝ <b>${v}</b>`]:[`全部 ${n}! ＝ ${fct(n)}，相鄰 ${2*fct(n-1)}`,`${fct(n)} − ${2*fct(n-1)} ＝ <b>${v}</b>`]}},
+   ()=>{const W=pick([['BOOK'],['APPLE'],['BANANA'],['LETTER'],['SCHOOL'],['COFFEE'],['ERROR'],['TAIWAN'],['STATISTICS'],['PEPPER']])[0];const cnt={};for(const c of W)cnt[c]=(cnt[c]||0)+1;let v=fct(W.length);for(const c in cnt)v/=fct(cnt[c]);
+     return{q:`將 ${W} 的字母重新排列，共有幾種排法？`,ans:[v,1],steps:[`${W.length} 個字母，相同的有 ${Object.entries(cnt).filter(e=>e[1]>1).map(e=>`${e[0]} ${e[1]} 個`).join('、')}`,`${W.length}! ÷ (${Object.values(cnt).filter(x=>x>1).map(x=>x+'!').join(' × ')}) ＝ <b>${v}</b>`]}}],
+  3:[()=>{const m=rnd(2,6),n=rnd(2,5);const v=fct(m+n)/fct(m)/fct(n);return{q:`棋盤式街道，從 A 點走到 B 點需要向東 ${m} 段、向北 ${n} 段，只能向東或向北走，最短路徑有幾種？`,ans:[v,1],steps:[`把 ${m} 個「東」與 ${n} 個「北」排成一列`,`${m+n}!／(${m}!${n}!) ＝ <b>${v}</b>`]}},
+   ()=>{const n=rnd(4,8);const v=fct(n-1);const t=Math.random()<.5;if(t)return{q:`${n} 人圍著圓桌而坐，有幾種坐法？（旋轉後相同視為一種）`,ans:[v,1],steps:[`環狀排列 (${n}−1)!`,`＝ <b>${v}</b>`]};const w=2*fct(n-2);return{q:`${n} 人圍著圓桌而坐，甲乙兩人必須相鄰，有幾種坐法？`,ans:[w,1],steps:[`甲乙綁成一包，共 ${n-1} 單位環排 (${n-2})!，包內 2!`,`＝ <b>${w}</b>`]}}],
+  4:[()=>{const m=rnd(3,6),n=rnd(3,5);const px=rnd(1,m-1),py=rnd(1,n-1);const T=fct(m+n)/fct(m)/fct(n);const thr=fct(px+py)/fct(px)/fct(py)*fct(m-px+n-py)/fct(m-px)/fct(n-py);const avoid=Math.random()<.5;const v=avoid?T-thr:thr;
+     return{q:`棋盤式街道從 A(0, 0) 走到 B(${m}, ${n})，每次只能向右或向上走一段，${avoid?'<b>不</b>':'必須'}經過 P(${px}, ${py}) 的最短路徑有幾種？`,ans:[v,1],steps:[`A→P：${fct(px+py)/fct(px)/fct(py)} 種，P→B：${fct(m-px+n-py)/fct(m-px)/fct(n-py)} 種，經過 P 共 ${thr} 種`,avoid?`全部 ${T} − ${thr} ＝ <b>${v}</b>`:`答案是 <b>${v}</b>`]}},
+   ()=>{const b=rnd(2,4),g=rnd(2,4);if(g>b+1)LEVELS_RETRY();const v=fct(b)*nPk(b+1,g);return{q:`${b} 位男生、${g} 位女生排成一列，女生互不相鄰，有幾種排法？`,ans:[v,1],steps:[`先排男生 ${b}! ＝ ${fct(b)}，產生 ${b+1} 個空隙`,`女生插空 P(${b+1}, ${g}) ＝ ${nPk(b+1,g)}`,`${fct(b)} × ${nPk(b+1,g)} ＝ <b>${v}</b>`]}},
+   ()=>{const n=rnd(2,4);const v=fct(n-1)*2**n;return{q:`${n} 對夫妻圍圓桌而坐，每對夫妻都相鄰，有幾種坐法？`,ans:[v,1],steps:[`每對綁一包，${n} 包環排 (${n}−1)! ＝ ${fct(n-1)}`,`每包內可交換：2<sup>${n}</sup>`,`${fct(n-1)} × ${2**n} ＝ <b>${v}</b>`]}}]}}),
+
+mkLesson({id:'m2_comb',unit:'排列組合',title:'組合與二項式定理',
+ goal:'會計算組合數與有條件的選法、分組問題、重複組合（不定方程的解數），並用二項式定理求展開式的係數。',
+ concept:`<div class="formula">C(<i>n</i>, <i>k</i>) ＝ ${fr('<i>n</i>!','<i>k</i>!(<i>n</i>−<i>k</i>)!')} ＝ ${fr('P(<i>n</i>, <i>k</i>)','<i>k</i>!')}<small>從 <i>n</i> 個不同物取 <i>k</i> 個，不計順序</small></div>
+  <div class="prose"><ul><li>C(<i>n</i>, <i>k</i>) ＝ C(<i>n</i>, <i>n</i>−<i>k</i>)；C(<i>n</i>, <i>k</i>) ＝ C(<i>n</i>−1, <i>k</i>−1) ＋ C(<i>n</i>−1, <i>k</i>)（巴斯卡）。</li>
+  <li><b>重複組合</b>：<i>n</i> 類物品取 <i>k</i> 個（可重複）＝ H(<i>n</i>, <i>k</i>) ＝ C(<i>n</i>＋<i>k</i>−1, <i>k</i>)。也等於 <i>x</i><sub>1</sub> ＋ … ＋ <i>x<sub>n</sub></i> ＝ <i>k</i> 的<b>非負整數解</b>個數。</li>
+  <li><b>正整數解</b>：<i>x</i><sub>1</sub> ＋ … ＋ <i>x<sub>n</sub></i> ＝ <i>k</i> 的正整數解有 C(<i>k</i>−1, <i>n</i>−1) 個。</li></ul></div>
+  <div class="formula">(<i>a</i> ＋ <i>b</i>)<sup><i>n</i></sup> ＝ ∑ C(<i>n</i>, <i>r</i>) <i>a</i><sup><i>n</i>−<i>r</i></sup><i>b</i><sup><i>r</i></sup><small>一般項 C(<i>n</i>, <i>r</i>) <i>a</i><sup><i>n</i>−<i>r</i></sup><i>b</i><sup><i>r</i></sup>；係數和用 <i>x</i> ＝ 1 代入</small></div>
+  <div class="tip"><b>排列還是組合？</b>選出來之後交換位置會不會不一樣？會 → 排列；不會 → 組合。</div>`,
+ deep:`<div class="prose"><p><b>分組問題</b>：6 人分成 3 組、每組 2 人：C(6,2)C(4,2)C(2,2) ＝ 90，但三組沒有名字，交換組的順序算同一種，要再除以 3!，得 15。如果三組分別負責不同工作（有名字），就不用除。</p>
+  <p><b>重複組合的「隔板法」</b>：把 <i>k</i> 個相同的球分給 <i>n</i> 個人，等於 <i>k</i> 個球和 <i>n</i>−1 個隔板排成一列：C(<i>n</i>＋<i>k</i>−1, <i>k</i>)。</p>
+  <p><b>二項式係數的性質</b>：C(<i>n</i>,0) ＋ C(<i>n</i>,1) ＋ … ＋ C(<i>n</i>,<i>n</i>) ＝ 2<sup><i>n</i></sup>（每個元素選或不選）。</p></div>`,
+ ex:{q:'(x ＋ 2)⁵ 展開式中 x³ 的係數是多少？',steps:['一般項 C(5, r) x^(5−r) 2^r，x³ → r ＝ 2。','C(5, 2) × 2² ＝ 10 × 4。','答案是 <b>40</b>。']},
+ T:[['C(10, 3) ＝ C(10, 7)',1,''],['C(n, 0) ＋ C(n, 1) ＋ … ＋ C(n, n) ＝ 2ⁿ',1,''],['C(5, 2) ＝ 20',0,'＝ 10'],['x ＋ y ＋ z ＝ 5 的非負整數解有 21 個',1,'H(3,5) ＝ C(7,5)'],['x ＋ y ＋ z ＝ 5 的正整數解有 10 個',0,'C(4,2) ＝ 6'],['選班級代表 3 人（不分職務）是組合問題',1,''],
+  ['6 人平分成 3 組（不分組名）有 15 種',1,''],['(a ＋ b)⁶ 展開共有 6 項',0,'7 項'],['C(n, k) ＝ C(n−1, k−1) ＋ C(n−1, k)',1,''],['(x ＋ 1)ⁿ 的係數和為 2ⁿ',1,''],['H(n, k) ＝ C(n＋k−1, k)',1,''],['組合數一定比對應的排列數大',0,'C ≤ P']],
+ gens:{1:[()=>{const n=rnd(5,15),k=rnd(2,5);return{q:`從 ${n} 人中選出 ${k} 人組成小組（不分職務），有幾種選法？`,ans:[nCk(n,k),1],steps:[`C(${n}, ${k}) ＝ P(${n}, ${k})／${k}!`,`＝ <b>${nCk(n,k)}</b>`]}}],
+  2:[()=>{const b=rnd(3,8),g=rnd(3,7),k=rnd(3,5);const t=rnd(0,2);let v,st;if(t===0){v=nCk(b+g,k)-nCk(b,k);st=[`全部 C(${b+g}, ${k}) ＝ ${nCk(b+g,k)}，全男生 C(${b}, ${k}) ＝ ${nCk(b,k)}`,`${nCk(b+g,k)} − ${nCk(b,k)} ＝ <b>${v}</b>`]}else if(t===1){const j=rnd(1,k-1);v=nCk(b,k-j)*nCk(g,j);st=[`男 C(${b}, ${k-j}) ＝ ${nCk(b,k-j)}，女 C(${g}, ${j}) ＝ ${nCk(g,j)}`,`相乘 ＝ <b>${v}</b>`];return{q:`${b} 男 ${g} 女中選出 ${k} 人，恰好 ${j} 位女生，有幾種選法？`,ans:[v,1],steps:st}}else{v=nCk(b+g-1,k-1);st=[`甲一定入選，從其餘 ${b+g-1} 人選 ${k-1} 人`,`C(${b+g-1}, ${k-1}) ＝ <b>${v}</b>`];return{q:`${b+g} 人中選出 ${k} 人，甲一定要入選，有幾種選法？`,ans:[v,1],steps:st}}
+     return{q:`${b} 男 ${g} 女中選出 ${k} 人，至少要有 1 位女生，有幾種選法？`,ans:[v,1],steps:st}}],
+  3:[()=>{const n=rnd(3,5),k=rnd(5,12);const pos=Math.random()<.5;const v=pos?nCk(k-1,n-1):nCk(n+k-1,k);const vars=['x','y','z','w','u'].slice(0,n).map(c=>`<i>${c}</i>`).join(' ＋ ');
+     return{q:`方程式 ${vars} ＝ ${k} 的${pos?'正':'非負'}整數解有幾組？`,ans:[v,1],steps:pos?['每個變數先給 1，剩下的做非負分配；或直接 C(k−1, n−1)',`C(${k-1}, ${n-1}) ＝ <b>${v}</b>`]:[`H(${n}, ${k}) ＝ C(${n+k-1}, ${k})`,`＝ <b>${v}</b>`]}},
+   ()=>{const g=pick([[6,2],[6,3],[8,2],[8,4],[9,3],[4,2],[10,5],[12,4]]);const[n,s]=g;const m=n/s;let v=fct(n)/fct(s)**m/fct(m);return{q:`${n} 個人平均分成 ${m} 組（每組 ${s} 人，組別沒有名稱），有幾種分法？`,ans:[v,1],steps:[`依序選 C(${n},${s})…，再除以 ${m}!（組別無名稱）`,`${n}!／((${s}!)<sup>${m}</sup> × ${m}!) ＝ <b>${v}</b>`]}}],
+  4:[()=>{const n=rnd(4,8),a=nz(-3,3),b=nz(-3,4),r=rnd(1,n-1);const c=nCk(n,r)*a**(n-r)*b**r;const ax=a===1?'':a===-1?'−':a;return{q:`(${ax}<i>x</i> ${b>0?'＋':'−'} ${Math.abs(b)})<sup>${n}</sup> 展開式中 <i>x</i><sup>${n-r}</sup> 項的係數是多少？`,ans:[c,1],steps:[`一般項 C(${n}, r)(${num(a)}x)<sup>${n}−r</sup>(${num(b)})<sup>r</sup>，取 r ＝ ${r}`,`C(${n}, ${r}) × ${par(a)}<sup>${n-r}</sup> × ${par(b)}<sup>${r}</sup> ＝ <b>${num(c)}</b>`]}},
+   ()=>{const n=rnd(4,9),a=nz(-2,3),b=nz(-3,3);const v=(a+b)**n;return{q:`(${a===1?'':a===-1?'−':a}<i>x</i> ${b>0?'＋':'−'} ${Math.abs(b)})<sup>${n}</sup> 展開後各項係數的總和是多少？`,ans:[v,1],steps:['以 x ＝ 1 代入',`(${num(a)} ${b>0?'＋':'−'} ${Math.abs(b)})<sup>${n}</sup> ＝ <b>${num(v)}</b>`]}}]}}),
+
+/* ---------------- 機率 ---------------- */
+mkLesson({id:'m2_prob',unit:'機率',title:'古典機率',
+ goal:'了解樣本空間與事件，用古典機率公式計算擲骰、抽球、排列的機率，並善用餘事件。',
+ concept:`<div class="prose"><p><b>樣本空間 S</b>：所有可能結果的集合；<b>事件</b>：樣本空間的子集合。若每個結果出現的機會<b>相等</b>：</p></div>
+  <div class="formula">P(A) ＝ ${fr('n(A)','n(S)')}<small>0 ≤ P(A) ≤ 1；P(A′) ＝ 1 − P(A)；P(A ∪ B) ＝ P(A) ＋ P(B) − P(A ∩ B)</small></div>
+  <div class="prose"><ul><li><b>互斥事件</b>：A ∩ B ＝ ∅，P(A ∪ B) ＝ P(A) ＋ P(B)。</li><li><b>「至少一個」</b>常用餘事件：1 − P(一個都沒有)。</li></ul></div>
+  <div class="tip"><b>常見錯誤：</b>擲兩顆骰子，「點數和為 7」有 6 種（1+6、6+1…），要把兩顆骰子看成不同，樣本空間是 36。</div>`,
+ deep:`<div class="prose"><p><b>為什麼兩顆骰子要當成不同？</b>如果把 (1,2) 和 (2,1) 當同一種，樣本空間只剩 21 種，但這 21 種出現的機會不相等（(1,1) 只有一種方式，(1,2) 有兩種），就不能用古典機率公式。把骰子看成不同，36 種才是「等可能」的。</p>
+  <p><b>抽球的兩種算法</b>：一次抽 2 顆用組合；一顆一顆抽（不放回）用排列。只要分子分母用同一種方法，答案相同。</p>
+  <p><b>排列中的機率</b>：<i>n</i> 人排一列，甲乙相鄰的機率 ＝ 2(<i>n</i>−1)!／<i>n</i>! ＝ 2／<i>n</i>。這類題用「對稱性」常可以直接看出答案。</p></div>`,
+ ex:{q:'擲兩顆公正骰子，點數和為 8 的機率？',steps:['(2,6)(3,5)(4,4)(5,3)(6,2) 共 5 種。','樣本空間 36。',`機率 ＝ <b>${M(fr(5,36))}</b>。`]},
+ T:[['機率一定介於 0 與 1 之間',1,''],['P(A′) ＝ 1 − P(A)',1,''],['擲兩顆骰子點數和為 7 的機率是 1／6',1,''],['擲兩顆骰子點數和最可能是 6',0,'是 7'],['互斥事件 P(A∪B) ＝ P(A) ＋ P(B)',1,''],['擲一枚硬幣三次，至少一次正面的機率是 7／8',1,''],
+  ['擲兩顆骰子的樣本空間有 21 個等可能結果',0,'36 個'],['P(A∪B) ＝ P(A) ＋ P(B) 對任何事件都成立',0,''],['n 人排一列，甲乙相鄰的機率是 2／n',1,''],['連擲硬幣已經出現 5 次正面，下一次出現反面機率較大',0,'仍是 1／2'],['不可能事件的機率為 0',1,''],['抽球問題分子分母要用同一種計數方式',1,'']],
+ gens:{1:[()=>{const s=rnd(2,12);const c=6-Math.abs(7-s);const r=R(c,36);return{q:`擲兩顆公正骰子，點數和為 ${s} 的機率是多少？`,ans:r,steps:[`點數和為 ${s} 有 ${c} 種`,`${c}／36`,fin(r)]}},
+   ()=>{const r=rnd(2,7),w=rnd(2,7);const v=R(r,r+w);return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，任取一顆是紅球的機率？`,ans:v,steps:[`${r}／${r+w}`,fin(v)]}}],
+  2:[()=>{const r=rnd(2,7),w=rnd(2,7);const t=rnd(0,2);const T=nCk(r+w,2);let n,lab;if(t===0){n=nCk(r,2);lab='兩顆都是紅球'}else if(t===1){n=r*w;lab='一紅一白'}else{n=nCk(r,2)+nCk(w,2);lab='兩顆同色'}const v=R(n,T);
+     return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，一次取出 2 顆，${lab}的機率？`,ans:v,steps:[`樣本空間 C(${r+w}, 2) ＝ ${T}`,`${lab}：${n} 種`,fin(v)]}}],
+  3:[()=>{const n=rnd(2,4),f=rnd(1,6);const v=R(6**n-5**n,6**n);return{q:`擲 ${n} 顆公正骰子，至少出現一個 ${f} 點的機率？`,ans:v,steps:[`餘事件：都不是 ${f} 點 ＝ (5／6)<sup>${n}</sup>`,`1 − ${5**n}／${6**n}`,fin(v)]}},
+   ()=>{const n=rnd(3,6);const v=R(2**n-1,2**n);return{q:`擲 ${n} 枚公正硬幣，至少出現一枚正面的機率？`,ans:v,steps:[`餘事件：全部反面 ＝ 1／${2**n}`,`1 − 1／${2**n}`,fin(v)]}},
+   ()=>{const r=rnd(2,6),w=rnd(2,6),k=rnd(2,3);if(k>w)LEVELS_RETRY();const v=R(nCk(r+w,k)-nCk(w,k),nCk(r+w,k));return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，一次取出 ${k} 顆，至少有一顆紅球的機率？`,ans:v,steps:[`餘事件：全白 C(${w}, ${k}) ＝ ${nCk(w,k)}，全部 C(${r+w}, ${k}) ＝ ${nCk(r+w,k)}`,`1 − ${nCk(w,k)}／${nCk(r+w,k)}`,fin(v)]}}],
+  4:[()=>{const n=rnd(4,8);const t=rnd(0,2);if(t===0){const v=R(2,n);return{q:`${n} 人隨機排成一列，甲乙兩人相鄰的機率？`,ans:v,steps:[`相鄰 2 × ${n-1}! ／ ${n}!`,fin(v)]}}if(t===1){const v=R(1,2);return{q:`${n} 人隨機排成一列，甲排在乙左邊（不一定相鄰）的機率？`,ans:v,steps:['甲在乙左邊與乙在甲左邊對稱',fin(v)]}}const v=R(n-2,n*(n-1));return{q:`${n} 人隨機排成一列，甲排第一位且乙不排最後一位的機率？`,ans:v,steps:[`甲排第一：${fct(n-1)} 種；其中乙排最後 ${fct(n-2)} 種`,`(${fct(n-1)} − ${fct(n-2)})／${n}!`,fin(v)]}},
+   ()=>{const n=rnd(3,4);let c=0;for(let i=0;i<6**n;i++){const d=[];let x=i;for(let j=0;j<n;j++){d.push(x%6);x=Math.floor(x/6)}if(new Set(d).size===n)c++}const v=R(c,6**n);return{q:`擲 ${n} 顆公正骰子，點數全部不同的機率？`,ans:v,steps:[`全不同：P(6, ${n}) ＝ ${nPk(6,n)}`,`${nPk(6,n)}／6<sup>${n}</sup>`,fin(v)]}}]}}),
+
+mkLesson({id:'m2_exp',unit:'機率',title:'數學期望值',
+ goal:'會計算隨機試驗的期望值，判斷遊戲是否公平，並用期望值做決策。',
+ concept:`<div class="formula">E ＝ <i>x</i><sub>1</sub><i>p</i><sub>1</sub> ＋ <i>x</i><sub>2</sub><i>p</i><sub>2</sub> ＋ … ＋ <i>x<sub>n</sub>p<sub>n</sub></i><small>每種結果的「獲得值 × 機率」加總；所有 <i>p<sub>i</sub></i> 的和為 1</small></div>
+  <div class="prose"><ul><li>期望值是「長期平均」：玩很多次時，平均每次得到的值。</li><li><b>公平遊戲</b>：期望值（扣掉成本後）為 0。</li><li>期望值的性質：E(<i>aX</i> ＋ <i>b</i>) ＝ <i>a</i>E(<i>X</i>) ＋ <i>b</i>；E(<i>X</i> ＋ <i>Y</i>) ＝ E(<i>X</i>) ＋ E(<i>Y</i>)。</li></ul></div>
+  <div class="tip"><b>常見錯誤：</b>付錢參加的遊戲，損失要記成負值；或者算完獎金期望值再減去成本。</div>`,
+ deep:`<div class="prose"><p><b>期望值不一定是可能出現的值</b>：擲一顆骰子期望值 3.5，但不可能擲出 3.5 點。它描述的是長期平均。</p>
+  <p><b>期望值的可加性很好用</b>：擲 10 枚硬幣，正面個數的期望值不用列出全部分布，每一枚期望 0.5 個正面，10 枚就是 5 個。從袋中取 3 顆球，紅球個數的期望值 ＝ 3 × （紅球比例）。</p>
+  <p><b>彩券為什麼長期會輸？</b>彩券的獎金總額小於銷售總額，所以每張彩券的期望獎金低於售價，期望淨值是負的。</p></div>`,
+ ex:{q:'擲一顆公正骰子，擲出 k 點得 k 元，期望值？',steps:['E ＝ (1 ＋ 2 ＋ … ＋ 6) × 1／6。','＝ 21／6。','答案是 <b>3.5 元</b>。']},
+ T:[['擲一顆骰子點數期望值是 3.5',1,''],['期望值一定是可能出現的結果',0,''],['公平遊戲的期望淨值為 0',1,''],['擲 10 枚硬幣，正面數的期望值是 5',1,''],['E(2X ＋ 3) ＝ 2E(X) ＋ 3',1,''],['期望值就是最可能出現的值',0,'是長期平均'],
+  ['擲兩顆骰子點數和的期望值是 7',1,''],['期望值可以是負數',1,''],['彩券每張的期望獎金通常高於售價',0,''],['E(X ＋ Y) ＝ E(X) ＋ E(Y)',1,''],['各結果機率的總和為 1',1,''],['期望值與機率無關',0,'']],
+ gens:{1:[()=>{const k=rnd(2,4);let ps=[],vs=[];let rem=12;for(let i=0;i<k-1;i++){const p=rnd(1,rem-(k-1-i));ps.push(p);rem-=p}ps.push(rem);vs=ps.map(()=>pick([0,10,20,50,100,-10,-20,30]));const e=R(ps.reduce((s,p,i)=>s+p*vs[i],0),12);
+     return{q:`某遊戲的結果：${ps.map((p,i)=>`得 ${num(vs[i])} 元的機率 ${rFmt(R(p,12))}`).join('，')}。玩一次的期望值是多少元？`,ans:e,steps:[`E ＝ ${ps.map((p,i)=>`${par(vs[i])} × ${rFmt(R(p,12))}`).join(' ＋ ')}`,fin(e)]}}],
+  2:[()=>{const r=rnd(2,6),w=rnd(2,6),k=rnd(2,Math.min(4,r+w-1));const e=R(k*r,r+w);return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，一次取出 ${k} 顆，取到紅球個數的期望值？`,ans:e,steps:[`每一顆是紅球的機率 ${r}／${r+w}，可加性`,`E ＝ ${k} × ${r}／${r+w}`,fin(e)]}},
+   ()=>{const a=rnd(1,5),b=rnd(-3,10),n=rnd(2,4);const e=R(a*7*n+2*b,2);return{q:`擲 ${n} 顆公正骰子，若點數和為 S，可得 ${a===1?'':a}S ${b>=0?'＋':'−'} ${Math.abs(b)} 元，期望值是多少元？`,ans:e,steps:[`E(S) ＝ ${n} × 3.5 ＝ ${dec(3.5*n)}`,`E ＝ ${a} × ${dec(3.5*n)} ${b>=0?'＋':'−'} ${Math.abs(b)}`,fin(e)]}}],
+  3:[()=>{const w7=rnd(3,12)*10,wd=rnd(2,10)*10,cost=rnd(1,6)*10;const e=R(6*w7+6*wd-36*cost,36);/* 點數和 7 與 雙同點互斥 */return{q:`擲兩顆公正骰子：點數和為 7 得 ${w7} 元，兩顆點數相同得 ${wd} 元，其他情形不得錢。每玩一次要付 ${cost} 元，玩一次的期望淨值是多少元？`,ans:e,steps:[`和為 7 有 6 種，點數相同有 6 種，兩者互斥`,`E ＝ ${w7} × 6／36 ＋ ${wd} × 6／36 − ${cost}`,fin(e)]}}],
+  4:[()=>{const r=rnd(1,3),w=rnd(2,5);const tot=r+w;const e=R(tot+1,r+1);const p1=R(r,tot);return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，每次取一顆不放回，直到取到紅球為止。取球次數的期望值？`,ans:e,steps:[`第 1 次就取到紅球的機率 ${rFmt(p1)}；第 k 次才取到 ＝ 前 k−1 次都白、第 k 次紅`,`把 ${w} 顆白球看成被 ${r} 顆紅球分成 ${r+1} 段，第一顆紅球前平均有 ${w}／${r+1} 顆白球`,`期望次數 ＝ ${w}／${r+1} ＋ 1 ＝ ${rFmt(e)}`,fin(e)]}},
+   ()=>{const n=rnd(3,6),a=rnd(2,6)*10,b=rnd(1,5)*10;if(a===b)LEVELS_RETRY();const e=R(n*(a+b),2);return{q:`擲 ${n} 枚公正硬幣，每出現一枚正面得 ${a} 元，每出現一枚反面得 ${b} 元，期望值是多少元？`,ans:e,steps:[`每一枚的期望 ＝ ${a} × ½ ＋ ${b} × ½ ＝ ${dec((a+b)/2)}`,`× ${n}`,fin(e)]}}]}}),
+
+/* ---------------- 數據分析 ---------------- */
+mkLesson({id:'m2_stat1',unit:'數據分析',title:'一維數據分析',
+ goal:'會求平均數、中位數、百分位數與標準差，並掌握資料線性變換時各統計量的變化。',
+ concept:`<div class="prose"><ul><li><b>集中趨勢</b>：平均數、中位數（排序後最中間）、眾數。</li><li><b>離散程度</b>：全距、四分位距（IQR ＝ Q₃ − Q₁）、標準差。</li></ul></div>
+  <div class="formula">σ ＝ √(${fr(1,'<i>n</i>')}∑(<i>x<sub>i</sub></i> − μ)²) ＝ √(${fr(1,'<i>n</i>')}∑<i>x<sub>i</sub></i>² − μ²)<small>變異數 ＝ 平方的平均 − 平均的平方</small></div>
+  <div class="prose"><p><b>百分位數</b>（第 <i>k</i> 百分位數 P<sub><i>k</i></sub>，資料由小到大排）：算 <i>n</i> × <i>k</i>%，若不是整數，取下一個整數那一筆；若是整數 <i>m</i>，取第 <i>m</i> 筆與第 <i>m</i>＋1 筆的平均。Q₁ ＝ P₂₅、Q₃ ＝ P₇₅。</p>
+  <p><b>線性變換</b> <i>y</i> ＝ <i>ax</i> ＋ <i>b</i>：平均 μ<sub><i>y</i></sub> ＝ <i>a</i>μ<sub><i>x</i></sub> ＋ <i>b</i>；標準差 σ<sub><i>y</i></sub> ＝ |<i>a</i>|σ<sub><i>x</i></sub>（加減常數不影響離散程度）。</p></div>
+  <div class="tip"><b>常見錯誤：</b>每個分數都加 5 分，標準差<b>不變</b>；每個分數都乘 1.2，標準差也乘 1.2。</div>`,
+ deep:`<div class="prose"><p><b>平均數 vs 中位數</b>：平均數容易受極端值影響，中位數不會。例如薪資資料中有幾位高薪者，平均薪資會被拉高，中位數比較能代表「一般人」。右偏分布時通常平均數 ＞ 中位數。</p>
+  <p><b>標準差的意義</b>：資料離平均數的「典型距離」。全部資料都一樣時標準差為 0。</p>
+  <p><b>合併兩組資料</b>：先用 ∑<i>x</i>² ＝ <i>n</i>(σ² ＋ μ²) 求出各組的平方和，加起來再算整體的變異數。這是段考常見的壓軸題型。</p></div>`,
+ ex:{q:'資料 2, 4, 4, 6, 9 的平均數與中位數？',steps:['平均 ＝ 25 ÷ 5 ＝ 5。','排序後第 3 筆是 4。','平均數 <b>5</b>，中位數 4。']},
+ T:[['平均數容易受極端值影響',1,''],['每筆資料加 5，標準差也加 5',0,'標準差不變'],['每筆資料乘 2，標準差也乘 2',1,''],['資料全部相同時標準差為 0',1,''],['中位數一定等於平均數',0,''],['變異數 ＝ 平方的平均 − 平均的平方',1,''],
+  ['每筆資料乘 −1，標準差變為負數',0,'標準差 ＝ |a|σ'],['四分位距 ＝ Q₃ − Q₁',1,''],['標準差可能是負數',0,''],['偶數筆資料的中位數是中間兩筆的平均',1,''],['每筆資料加 5，平均數也加 5',1,''],['右偏分布通常平均數大於中位數',1,'']],
+ gens:{1:[()=>{const n=pick([5,6,7,8]);const a=Array.from({length:n},()=>rnd(1,30)).sort((x,y)=>x-y);const ask=Math.random()<.5;const S=a.reduce((s,x)=>s+x,0);const med=n%2?R(a[(n-1)/2],1):R(a[n/2-1]+a[n/2],2);const mean=R(S,n);
+     return{q:`資料：${listStr(shuffle(a))}。求${ask?'中位數':'平均數'}。`,ans:ask?med:mean,steps:ask?[`排序：${listStr(a)}`,fin(med)]:[`總和 ${S}，共 ${n} 筆`,fin(mean)]}}],
+  2:[()=>{const d=pick(DEV4),k=rnd(1,3),m=rnd(10,60);const a=d.map(x=>m+k*x);const s=Math.sqrt(d.reduce((t,x)=>t+x*x,0)/5)*k;return{q:`資料：${listStr(shuffle(a))}。求標準差。`,ans:[s,1],steps:[`平均 ＝ ${m}，離差 ${listStr(d.map(x=>x*k))}`,`離差平方和 ${d.reduce((t,x)=>t+x*x,0)*k*k}，÷ 5 ＝ ${s*s}`,`σ ＝ <b>${s}</b>`]}},
+   ()=>{const n=rnd(10,24),k=pick([25,75]);const a=Array.from({length:n},()=>rnd(10,99)).sort((x,y)=>x-y);const t=n*k/100;const v=Number.isInteger(t)?R(a[t-1]+a[t],2):R(a[Math.ceil(t)-1],1);
+     return{q:`${n} 筆資料由小到大排列為：${listStr(a)}。求第 ${k} 百分位數（${k===25?'Q₁':'Q₃'}）。`,ans:v,steps:[`${n} × ${k}% ＝ ${dec(t)}`,Number.isInteger(t)?`為整數，取第 ${t} 與第 ${t+1} 筆的平均`:`不是整數，取第 ${Math.ceil(t)} 筆`,fin(v)]}}],
+  3:[()=>{const m=rnd(40,80),s=rnd(4,15),a=pick([2,3,-1,-2,0.5,1.5]),b=rnd(-20,30);const my=a*m+b,sy=Math.abs(a)*s;if(!exact2(my)||!exact2(sy))LEVELS_RETRY();const ask=Math.random()<.5;
+     return{q:`某次考試平均 ${m} 分、標準差 ${s} 分。將每人分數 x 調整為 y ＝ ${dec(a)}x ${b>=0?'＋':'−'} ${Math.abs(b)}，調整後的${ask?'平均':'標準差'}是多少？`,ans:RD(ask?my:sy),steps:[ask?`μ<sub>y</sub> ＝ ${dec(a)} × ${m} ${b>=0?'＋':'−'} ${Math.abs(b)}`:`σ<sub>y</sub> ＝ |${dec(a)}| × ${s}（加減常數不影響）`,`＝ <b>${dec(ask?my:sy)}</b>`]}}],
+  4:[()=>{const n1=rnd(2,6)*5,n2=rnd(2,6)*5,m1=rnd(50,80),m2=rnd(50,80),s1=rnd(2,10),s2=rnd(2,10);const N=n1+n2;const sum2=n1*(s1*s1+m1*m1)+n2*(s2*s2+m2*m2);const M=R(n1*m1+n2*m2,N);/* var = sum2/N - M^2 */const v=R(sum2*M[1]*M[1]-N*M[0]*M[0],N*M[1]*M[1]);
+     return{q:`甲班 ${n1} 人平均 ${m1} 分、標準差 ${s1} 分；乙班 ${n2} 人平均 ${m2} 分、標準差 ${s2} 分。兩班合併後的<b>變異數</b>是多少？`,ans:v,steps:[`∑x² ＝ ${n1}(${s1}² ＋ ${m1}²) ＋ ${n2}(${s2}² ＋ ${m2}²) ＝ ${sum2}`,`合併平均 ＝ ${rFmt(M)}`,`變異數 ＝ ${sum2}／${N} − (${rFmt(M)})²`,fin(v)]}}]}}),
+
+mkLesson({id:'m2_stat2',unit:'數據分析',title:'二維數據：相關係數與迴歸直線',
+ goal:'會判讀散布圖、計算相關係數與最適直線（迴歸直線），並了解資料變換對相關係數的影響。',
+ concept:`<div class="formula"><i>r</i> ＝ ${fr('∑(<i>x<sub>i</sub></i> − μ<sub><i>x</i></sub>)(<i>y<sub>i</sub></i> − μ<sub><i>y</i></sub>)','√(∑(<i>x<sub>i</sub></i> − μ<sub><i>x</i></sub>)² · ∑(<i>y<sub>i</sub></i> − μ<sub><i>y</i></sub>)²)')}<small>−1 ≤ <i>r</i> ≤ 1</small></div>
+  <div class="prose"><ul><li><i>r</i> ＞ 0 正相關，<i>r</i> ＜ 0 負相關；|<i>r</i>| 越接近 1，點越集中在一條直線附近。</li><li><i>r</i> ＝ 0 只代表沒有<b>線性</b>相關，可能有其他關係（例如拋物線）。</li></ul></div>
+  <div class="formula">迴歸直線：<i>y</i> − μ<sub><i>y</i></sub> ＝ <i>m</i>(<i>x</i> − μ<sub><i>x</i></sub>)，<i>m</i> ＝ <i>r</i> · ${fr('σ<sub><i>y</i></sub>','σ<sub><i>x</i></sub>')}<small>迴歸直線一定通過平均點 (μ<sub><i>x</i></sub>, μ<sub><i>y</i></sub>)</small></div>
+  <div class="tip"><b>常見錯誤：</b>相關不等於因果。冰淇淋銷量和溺水人數正相關，是因為都和天氣熱有關。</div>`,
+ deep:`<div class="prose"><p><b>資料變換對 r 的影響</b>：<i>x′</i> ＝ <i>ax</i> ＋ <i>b</i>、<i>y′</i> ＝ <i>cy</i> ＋ <i>d</i>，則 <i>r′</i> ＝ <i>r</i>（<i>ac</i> ＞ 0）或 −<i>r</i>（<i>ac</i> ＜ 0）。單位換算（公分換公尺、攝氏換華氏）不會改變相關的強度。</p>
+  <p><b>迴歸直線斜率和 r 同號</b>：因為 σ 都是正的，所以 <i>m</i> 的正負和 <i>r</i> 一樣。</p>
+  <p><b>最小平方法</b>：迴歸直線是讓所有點到直線的「鉛直距離平方和」最小的直線，所以也叫最適直線。用它預測時，只適合在原資料範圍附近，外插可能誤差很大。</p></div>`,
+ ex:{q:'r ＝ 0.6，σx ＝ 5，σy ＝ 10，μx ＝ 20，μy ＝ 50，求 y 對 x 的迴歸直線在 x ＝ 25 的預測值。',steps:['m ＝ 0.6 × 10／5 ＝ 1.2。','y ＝ 50 ＋ 1.2 × (25 − 20)。','答案是 <b>56</b>。']},
+ T:[['相關係數介於 −1 與 1 之間',1,''],['r ＝ 0 表示兩變數完全沒有關係',0,'只是沒有線性關係'],['迴歸直線一定通過 (μx, μy)',1,''],['迴歸直線斜率與 r 同號',1,''],['相關係數高就代表有因果關係',0,''],['x 的單位從公分換成公尺，r 不變',1,''],
+  ['x 全部乘以 −2，r 變號',1,''],['y 全部加 10，r 也加 10',0,'r 不變'],['|r| 越大，點越集中在直線附近',1,''],['r ＝ −0.9 比 r ＝ 0.5 的線性關係弱',0,'|−0.9| 較大，關係較強'],['所有點都在斜率為正的直線上時 r ＝ 1',1,''],['迴歸直線適合用來做遠超出資料範圍的預測',0,'']],
+ gens:{1:[()=>{const mx=rnd(10,60),my=rnd(20,90),m=pick([0.5,1.5,2,-0.5,-1,-2,1.2,0.8,3]),x=mx+rnd(-10,10);const y=my+m*(x-mx);return{q:`y 對 x 的迴歸直線斜率為 ${dec(m)}，μ<sub>x</sub> ＝ ${mx}、μ<sub>y</sub> ＝ ${my}。當 x ＝ ${x} 時，預測值 y 是多少？`,ans:RD(y),steps:[`y − ${my} ＝ ${dec(m)}(x − ${mx})`,`y ＝ ${my} ＋ ${dec(m)} × ${par(x-mx)} ＝ <b>${dec(y)}</b>`]}}],
+  2:[()=>{const r=pick([0.4,0.5,0.6,0.8,-0.4,-0.6,-0.8,0.9,-0.5]),sx=pick([2,4,5,8,10]),sy=pick([3,5,6,10,12,15]);const m=r*sy/sx;if(!exact2(m))LEVELS_RETRY();return{q:`r ＝ ${dec(r)}，σ<sub>x</sub> ＝ ${sx}，σ<sub>y</sub> ＝ ${sy}，y 對 x 的迴歸直線斜率是多少？`,ans:RD(m),steps:[`m ＝ r × σ<sub>y</sub>／σ<sub>x</sub> ＝ ${dec(r)} × ${sy}／${sx}`,`＝ <b>${dec(m)}</b>`]}}],
+  3:[()=>{const d=pick(DEV4),k=rnd(1,2),mx=rnd(5,20),my=rnd(10,40);const e=shuffle(d);const sxy=d.reduce((s,x,i)=>s+x*e[i],0),sxx=d.reduce((s,x)=>s+x*x,0);const r=R(sxy,sxx);if(r[0]===0)LEVELS_RETRY();
+     return{q:`五筆資料 (x, y)：${d.map((x,i)=>`(${mx+k*x}, ${my+k*e[i]})`).join('、')}。求相關係數 r。`,ans:r,steps:[`μ<sub>x</sub> ＝ ${mx}，μ<sub>y</sub> ＝ ${my}；離差 x：${listStr(d.map(x=>x*k))}，y：${listStr(e.map(x=>x*k))}`,`∑dx·dy ＝ ${sxy*k*k}，∑dx² ＝ ∑dy² ＝ ${sxx*k*k}`,`r ＝ ${sxy*k*k}／${sxx*k*k}`,fin(r)]}}],
+  4:[()=>{const r=pick([0.3,0.45,0.6,0.75,0.8,-0.3,-0.6,-0.9]),a=nz(-4,4),b=rnd(-9,9),c=nz(-3,5),d=rnd(-9,9);const rr=a*c>0?r:-r;return{q:`x 與 y 的相關係數為 ${dec(r)}。令 x′ ＝ ${a}x ${b>=0?'＋':'−'} ${Math.abs(b)}、y′ ＝ ${c}y ${d>=0?'＋':'−'} ${Math.abs(d)}，則 x′ 與 y′ 的相關係數是多少？`,ans:RD(rr),steps:[`r 只受 a、c 的正負號影響：a × c ＝ ${a*c} ${a*c>0?'＞':'＜'} 0`,`r′ ＝ <b>${dec(rr)}</b>`]}},
+   ()=>{const d=pick(DEV4),mx=rnd(5,20),my=rnd(10,40);const e=shuffle(d);const sxy=d.reduce((s,x,i)=>s+x*e[i],0),sxx=d.reduce((s,x)=>s+x*x,0);const m=R(sxy,sxx);const x0=mx+rnd(1,4);const y=R(my*m[1]+m[0]*(x0-mx),m[1]);
+     return{q:`五筆資料 (x, y)：${d.map((x,i)=>`(${mx+x}, ${my+e[i]})`).join('、')}。用 y 對 x 的迴歸直線預測 x ＝ ${x0} 時的 y。`,ans:y,steps:[`μ<sub>x</sub> ＝ ${mx}，μ<sub>y</sub> ＝ ${my}`,`斜率 ＝ ∑dx·dy／∑dx² ＝ ${sxy}／${sxx}`,`y ＝ ${my} ＋ ${rFmt(m)} × ${x0-mx}`,fin(y)]}}]}})
+];
+
+MATH_LESSONS.push(...M2_LESSONS);
 const ALL_LESSONS=[...MATH_LESSONS,...CHEM_LESSONS,...BIO_LESSONS];
 const unitsOf=ls=>[...new Set(ls.map(l=>l.unit))];
 const mkTopics=ls=>{const u=unitsOf(ls),o={};ls.forEach(l=>{o[l.id]={ch:u.indexOf(l.unit),name:l.title,fromLesson:l.id}});return o};
 const CEEC_LIST='https://www.ceec.edu.tw/xmfile?xsmsid=0J052424829869345634';
 const SUBJ={
  math:{name:'數學',lessons:MATH_LESSONS,topics:MATH_TOPICS,chapters:MATH_CHAPTERS,tabs:['從頭學・數學','隨機練習','考古題・模擬考','題庫'],
-  sub:{learn:'高一數學依主題分類：數與式、坐標平面與直線、圓、多項式。每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
+  sub:{learn:'高一數學（上、下學期）依主題分類：數與式、直線與圓、多項式、三角比、數列與級數、排列組合、機率、數據分析。每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
   mockFrom:1,mockMin:50,mockDesc:'範圍是全部數學主題（暖身除外）'},
  chem:{name:'化學',lessons:CHEM_LESSONS,topics:mkTopics(CHEM_LESSONS),chapters:unitsOf(CHEM_LESSONS),tabs:['從頭學・化學','隨機練習','模擬考','題庫'],
   sub:{learn:'高一上基礎化學全冊 12 課：觀念、深入理解、例題，再用四級難度自己練。',prac:'化學 12 課隨機出題，難度可以自動調整。',past:'限時 50 分鐘的化學模擬段考，以及官方歷屆試題連結。',bank:'每個單元固定 100 題，八成是中等以上難度。題號固定，可以分次做完。'},
