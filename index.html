@@ -214,6 +214,32 @@ details summary{cursor:pointer;color:var(--blue);font-size:14px}
 #bank-stat{margin:0;font-size:14px;color:var(--ink)}
 #bank-stat .bar{height:6px;border-radius:3px;background:var(--grid);overflow:hidden;margin-top:6px}
 #bank-stat .bar i{display:block;height:100%;background:var(--ok)}
+.lesson-link .sec{font-family:var(--f-math);font-size:12px;font-weight:600;color:var(--blue);border:1px solid var(--blue);border-radius:3px;padding:0 4px;margin-right:6px;white-space:nowrap}
+/* scratch pad */
+:root{--padw:420px;--padh:60vh}
+body.pad-big{--padw:min(720px,60vw);--padh:85vh}
+.pad-fab{position:fixed;z-index:30;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));font:inherit;font-size:15px;font-weight:500;border:0;border-radius:999px;padding:10px 18px;background:var(--ink);color:var(--card);box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer}
+.pad-fab:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.pad{position:fixed;z-index:31;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);box-shadow:0 0 24px rgba(0,0,0,.14)}
+.pad[hidden]{display:none!important}
+@media (min-width:900px){.pad{top:0;right:0;bottom:0;width:var(--padw);border-width:0 0 0 1px;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}body.pad-open{padding-right:var(--padw)}}
+@media (max-width:899px){.pad{left:0;right:0;bottom:0;height:var(--padh);border-width:1px 0 0;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}body.pad-open{padding-bottom:var(--padh)}}
+.pad-bar,.pad-foot{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px}
+.pad-bar{border-bottom:1px solid var(--line)}.pad-foot{border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.pad-group{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.pt{font:inherit;font-size:13.5px;min-width:34px;height:34px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;cursor:pointer;display:inline-grid;place-items:center;padding:0 8px}
+.pt[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.pt:disabled{opacity:.4;cursor:default}
+.pt:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.ink-dot{width:16px;height:16px;border-radius:50%;display:block}
+.k-ink{background:var(--ink)}.k-blue{background:var(--blue)}.k-pen{background:var(--pen)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.pad-x{font-size:15px}
+#pad-canvas{flex:1;min-height:0;width:100%;display:block;touch-action:none;cursor:crosshair;background-color:var(--card);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.pad-opt{display:flex;align-items:center;gap:6px;cursor:pointer}
+.pad-pageno{font-variant-numeric:tabular-nums;padding:0 4px}
+@media print{.pad,.pad-fab{display:none}}
 /* ---- random practice (tab 2) ---- */
 .stats{display:flex;gap:10px;flex-wrap:wrap}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 14px;min-width:84px}
@@ -288,7 +314,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
     <div class="learn">
       <nav class="path" aria-label="課程路線">
         <h2>學習路線</h2>
-        <p>建議照順序學。每課有四個難度，隨時都能切換。最難的 Lv4 是第一志願段考程度。每級答對 3 題得一顆星。</p>
+        <p id="path-note">建議照順序學。每課有四個難度，隨時都能切換。最難的 Lv4 是第一志願段考程度。每級答對 3 題得一顆星。</p>
         <ol id="path-list"></ol>
         <div class="overall" id="overall"></div>
       </nav>
@@ -365,6 +391,35 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
     </div>
   </div>
 </div>
+
+<button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
+<aside class="pad" id="pad" hidden aria-label="計算紙">
+  <div class="pad-bar">
+    <div class="pad-group" role="group" aria-label="筆">
+      <button type="button" class="pt" data-tool="pen" data-color="ink" aria-pressed="true" title="黑筆"><i class="ink-dot k-ink"></i><span class="sr">黑筆</span></button>
+      <button type="button" class="pt" data-tool="pen" data-color="blue" aria-pressed="false" title="藍筆"><i class="ink-dot k-blue"></i><span class="sr">藍筆</span></button>
+      <button type="button" class="pt" data-tool="pen" data-color="pen" aria-pressed="false" title="紅筆"><i class="ink-dot k-pen"></i><span class="sr">紅筆</span></button>
+      <button type="button" class="pt pt-text" data-tool="eraser" aria-pressed="false">橡皮擦</button>
+    </div>
+    <div class="pad-group">
+      <button type="button" class="pt pt-text" id="pad-undo">復原</button>
+      <button type="button" class="pt pt-text" id="pad-redo">重做</button>
+      <button type="button" class="pt pt-text" id="pad-clear">清空</button>
+      <button type="button" class="pt pt-text" id="pad-size">放大</button>
+      <button type="button" class="pt pt-text pad-x" id="pad-close" aria-label="關閉計算紙">✕</button>
+    </div>
+  </div>
+  <canvas id="pad-canvas" aria-label="手寫區，可用觸控筆、手指或滑鼠書寫"></canvas>
+  <div class="pad-foot">
+    <label class="pad-opt"><input type="checkbox" id="pad-penonly"> 只接受觸控筆（避免手掌誤觸）</label>
+    <div class="pad-group">
+      <button type="button" class="pt pt-text" id="pad-prev" aria-label="上一頁">‹</button>
+      <span id="pad-pageno" class="pad-pageno"></span>
+      <button type="button" class="pt pt-text" id="pad-next" aria-label="下一頁">›</button>
+      <button type="button" class="pt pt-text" id="pad-new">＋新頁</button>
+    </div>
+  </div>
+</aside>
 
 <script>
 /* ================= helpers ================= */
@@ -1043,7 +1098,7 @@ const MATH_TOPICS={
     hint:`配方成 ${M('<i>a</i>(<i>x</i> − <i>h</i>)<sup>2</sup> + <i>k</i>')}。`,
     sol:`${M(`<i>y</i> = ${lead}${sq(X,h)}${k===0?'':(k<0?' − ':' + ')+Math.abs(k)}`)}，開口${up?'向上':'向下'}，${up?'最小':'最大'}值 <b>${num(k)}</b>。`}}}
 };
-const MATH_CHAPTERS=['第一章　數與式','第二章　直線與圓','第三章　多項式函數'];
+const MATH_CHAPTERS=['第一章　數與式（1-1～1-4）','第二章　直線與圓（2-1～2-4）','第三章　多項式函數（3-1～3-3）'];
 /* ================= science helpers: multiple choice, banks, formulas ================= */
 const ABC='ABCDE';
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -2354,6 +2409,12 @@ function buildBank(l){if(BANK_CACHE[l.id])return BANK_CACHE[l.id];
   for(const lv of [4,3,2]){if(carry<=0)break;carry-=draw(lv,carry,carry*400)}}
  finally{Math.random=orig}
  out.sort((a,b)=>a.lv-b.lv);BANK_CACHE[l.id]=out;return out}
+/* ================= 南一版 section labels (math) ================= */
+const NANI_SEC={neg:['1-1','實數（國中銜接）'],coord:['2-1','直線方程式及其圖形（預備）'],dist:['2-1','直線方程式及其圖形（預備）'],mid:['2-1','直線方程式及其圖形（預備）'],
+ slope:['2-1','直線方程式及其圖形'],line:['2-1','直線方程式及其圖形'],perp:['2-2','直線方程式的應用'],pdist:['2-2','直線方程式的應用'],circle:['2-3','圓方程式'],cline:['2-4','圓與直線的關係']};
+for(const l of MATH_LESSONS){const x=NANI_SEC[l.id];if(x){l.sec=x[0];l.secName=x[1]}}
+{const T={abs:'1-2',root:'1-1',mult:'1-1',rem:'3-1',quad:'3-2'};for(const k in MATH_TOPICS){const t=MATH_TOPICS[k],sec=t.fromLesson?(NANI_SEC[t.fromLesson]||[])[0]:T[k];if(sec)t.name=sec+' '+t.name}}
+const secTitle=l=>l.sec?`${l.sec} ${l.title}`:l.title;
 /* ================= subjects ================= */
 const ALL_LESSONS=[...MATH_LESSONS,...CHEM_LESSONS,...BIO_LESSONS];
 const unitsOf=ls=>[...new Set(ls.map(l=>l.unit))];
@@ -2437,7 +2498,7 @@ const stars=o=>o.c.filter(v=>v>=NEED).length;
 function renderPath(){
   $('path-list').innerHTML=LESSONS.map((l,i)=>{const o=lvOf(l.id),st=stars(o),done=st>0;
     const cnt=st===MAXLV?'精通':'★'.repeat(st)+'☆'.repeat(MAXLV-st);
-    return `<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.title}</span><span class="cnt">${cnt}</span></button></li>`}).join('');
+    return `<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.sec?`<span class="sec">${l.sec}</span>`:''}${l.title}</span><span class="cnt">${cnt}</span></button></li>`}).join('');
   const s=LESSONS.reduce((a,l)=>a+stars(lvOf(l.id)),0),T=LESSONS.length*MAXLV;
   $('overall').innerHTML=`星星 ${s} / ${T}（每級答對 3 題得一顆）<div class="bar"><i style="width:${s/T*100}%"></i></div>`;
 }
@@ -2449,7 +2510,7 @@ function openLesson(id,scroll){
   const i=LESSONS.findIndex(l=>l.id===id),l=LESSONS[i],ex=l.example;
   $('lesson').innerHTML=`
    <section>
-     <p class="eyebrow">${SUBJ[S.subject].name}・${(l.unit||'第二章 直線與圓').replace('　',' ')}・第 ${i+1} 課 / 共 ${LESSONS.length} 課</p>
+     <p class="eyebrow">${SUBJ[S.subject].name}・${l.sec?`南一版 ${l.sec} ${l.secName}`:(l.unit||'').replace('　',' ')}・第 ${i+1} 課 / 共 ${LESSONS.length} 課</p>
      <h2>${l.title}</h2>
      <p class="goal"><b>學完你會：</b>${l.goal}</p>
    </section>
@@ -2649,7 +2710,7 @@ function startMock(){
   const SJ=SUBJ[S.subject],pool=shuffle(LESSONS.slice(SJ.mockFrom));
   mock={items:MOCK_LV.map((lv,i)=>{const l=pool[i%pool.length];return{l,p:genLv(l,lv)}}),end:Date.now()+SJ.mockMin*60000,done:false};
   $('mock').innerHTML=`<div class="mockbar"><span>剩餘時間 <span class="timer" id="mock-time"></span></span><button class="btn btn-primary" type="button" id="mock-submit">交卷</button></div>
-   <ol class="mocklist">${mock.items.map((it,i)=>`<li class="pitem" id="mi-${i}"><div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${it.p.lv}">Lv${it.p.lv}</span> <span class="fmt">${it.l.title}</span><br>${it.p.q}</div>${it.p.fig||''}</div>
+   <ol class="mocklist">${mock.items.map((it,i)=>`<li class="pitem" id="mi-${i}"><div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${it.p.lv}">Lv${it.p.lv}</span> <span class="fmt">${secTitle(it.l)}</span><br>${it.p.q}</div>${it.p.fig||''}</div>
      <div class="answer-row">${answerUI(it.p,'mq-'+i)}</div><div id="mr-${i}"></div></li>`).join('')}</ol>
    <div><button class="btn btn-primary" type="button" id="mock-submit2">交卷</button></div>`;
   $('mock-submit').onclick=$('mock-submit2').onclick=submitMock;
@@ -2673,7 +2734,7 @@ let bankL=null,bankLv=0,bankPage=0;const PER=10;
 function bankRes(){S.bankRes=S.bankRes||{};return S.bankRes[bankL]||(S.bankRes[bankL]={})}
 function bankInit(){S.bankCur=S.bankCur||{};let c=S.bankCur[S.subject];if(!c||!LESSONS.find(l=>l.id===c))c=LESSONS[0].id;bankL=c;bankLv=0;bankPage=0}
 function renderBankUnits(){$('bank-units').innerHTML=LESSONS.map((l,i)=>{const B=BANK_CACHE[l.id],r=(S.bankRes||{})[l.id]||{},n=Object.values(r).filter(v=>v===1).length;
-  return `<button type="button" class="chip" data-bl="${l.id}" aria-pressed="${l.id===bankL}">${i+1}. ${l.title}${n?` <small>${n}✓</small>`:''}</button>`}).join('')}
+  return `<button type="button" class="chip" data-bl="${l.id}" aria-pressed="${l.id===bankL}">${l.sec?l.sec+' ':(i+1)+'. '}${l.title}${n?` <small>${n}✓</small>`:''}</button>`}).join('')}
 function bankStat(){const l=lessonById(bankL),B=buildBank(l),res=bankRes(),mid=B.filter(p=>p.lv>=2).length,done=Object.keys(res).length,right=Object.values(res).filter(v=>v===1).length;
   $('bank-stat').innerHTML=`<b>${l.title}</b>：共 ${B.length} 題，中等以上（Lv2～Lv4）${mid} 題，佔 ${Math.round(mid/B.length*100)}%。已作答 ${done} 題，答對 ${right} 題。<div class="bar"><i style="width:${right/B.length*100}%"></i></div>`}
 function renderBank(){const B=buildBank(lessonById(bankL)),res=bankRes();
@@ -2766,6 +2827,67 @@ $('reset-area').addEventListener('click',e=>{
 function restoreReset(){$('reset-area').innerHTML='<button class="linkbtn" id="reset" type="button">清除所有紀錄</button>'}
 
 $('diff').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;S.diff=b.dataset.d;save();renderDiff();if(!answered&&cur.retryIdx===null)newProblem()});
+/* ---------- handwriting scratch pad ---------- */
+(function(){
+ const KEYP='hs-dojo-pad-v1',cv=$('pad-canvas'),ctx=cv.getContext('2d'),panel=$('pad'),fab=$('pad-fab');
+ const P={pages:[[]],cur:0,undo:[],redo:[],tool:'pen',color:'ink',penOnly:false,sawPen:false,big:false};
+ try{const r=JSON.parse(localStorage.getItem(KEYP)||'null');if(r&&Array.isArray(r.pages)&&r.pages.length){P.pages=r.pages;P.cur=Math.min(r.cur||0,r.pages.length-1);P.penOnly=!!r.penOnly}}catch(e){}
+ let saveT=null;const persist=()=>{clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEYP,JSON.stringify({pages:P.pages,cur:P.cur,penOnly:P.penOnly}))}catch(e){}},400)};
+ const page=()=>P.pages[P.cur];
+ const col=k=>getComputedStyle(document.documentElement).getPropertyValue(k==='blue'?'--blue':k==='pen'?'--pen':'--ink').trim()||'#17233A';
+ let dpr=1,W=0,H=0;
+ function fit(){const r=cv.getBoundingClientRect();dpr=window.devicePixelRatio||1;W=r.width;H=r.height;if(!W||!H)return;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);redraw()}
+ const wOf=(s,p)=>s.w*(0.35+0.9*p);
+ function seg(s,a,b){ctx.strokeStyle=col(s.c);ctx.lineWidth=wOf(s,(a[2]+b[2])/2);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke()}
+ function drawStroke(s){const p=s.pts;ctx.lineCap='round';ctx.lineJoin='round';
+  if(p.length===1){ctx.fillStyle=col(s.c);ctx.beginPath();ctx.arc(p[0][0],p[0][1],wOf(s,p[0][2])/2,0,Math.PI*2);ctx.fill();return}
+  for(let i=1;i<p.length;i++)seg(s,p[i-1],p[i])}
+ function redraw(){ctx.clearRect(0,0,W,H);for(const s of page())drawStroke(s);updateUI()}
+ function snap(){P.undo.push({cur:P.cur,strokes:page().slice()});if(P.undo.length>100)P.undo.shift();P.redo=[]}
+ function updateUI(){$('pad-pageno').textContent=`第 ${P.cur+1} / ${P.pages.length} 頁`;$('pad-prev').disabled=P.cur===0;$('pad-next').disabled=P.cur>=P.pages.length-1;
+  $('pad-undo').disabled=!P.undo.length;$('pad-redo').disabled=!P.redo.length;$('pad-penonly').checked=P.penOnly;
+  panel.querySelectorAll('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===P.tool&&(P.tool==='eraser'||b.dataset.color===P.color)));
+  $('pad-size').textContent=P.big?'縮小':'放大'}
+ const pos=e=>{const r=cv.getBoundingClientRect();return[Math.round((e.clientX-r.left)*10)/10,Math.round((e.clientY-r.top)*10)/10,e.pointerType==='pen'?(e.pressure||0.5):0.5]};
+ let cur=null;
+ function eraseAt(x,y){const R=12,pg=page();let hit=false;for(let i=pg.length-1;i>=0;i--){if(pg[i].pts.some(p=>Math.hypot(p[0]-x,p[1]-y)<R+pg[i].w)){pg.splice(i,1);hit=true}}if(hit){redraw();persist()}}
+ cv.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='pen'&&!P.sawPen){P.sawPen=true;P.penOnly=true;updateUI();persist()}
+  if(P.penOnly&&e.pointerType==='touch')return;
+  if(e.button!==0&&e.button!==5&&e.pointerType==='mouse')return;
+  e.preventDefault();cv.setPointerCapture(e.pointerId);snap();
+  const erase=P.tool==='eraser'||e.button===5||(e.buttons&32);const p=pos(e);
+  if(erase){cur={id:e.pointerId,erase:true};eraseAt(p[0],p[1]);updateUI();return}
+  const s={c:P.color,w:2.6,pts:[p]};page().push(s);cur={id:e.pointerId,s};drawStroke(s);updateUI()});
+ cv.addEventListener('pointermove',e=>{if(!cur||e.pointerId!==cur.id)return;e.preventDefault();
+  const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+  for(const ev of (evs.length?evs:[e])){const p=pos(ev);if(cur.erase){eraseAt(p[0],p[1]);continue}
+   const pts=cur.s.pts,last=pts[pts.length-1];if(Math.hypot(p[0]-last[0],p[1]-last[1])<0.8)continue;pts.push(p);ctx.lineCap='round';seg(cur.s,last,p)}});
+ const end=e=>{if(!cur||e.pointerId!==cur.id)return;cur=null;persist();updateUI()};
+ cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+ cv.addEventListener('contextmenu',e=>e.preventDefault());
+ panel.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.tool){P.tool=b.dataset.tool;if(b.dataset.color)P.color=b.dataset.color;updateUI();return}
+  switch(b.id){
+   case 'pad-undo':{const u=P.undo.pop();if(!u)break;P.redo.push({cur:u.cur,strokes:P.pages[u.cur].slice()});P.pages[u.cur]=u.strokes;P.cur=u.cur;redraw();persist();break}
+   case 'pad-redo':{const r=P.redo.pop();if(!r)break;P.undo.push({cur:r.cur,strokes:P.pages[r.cur].slice()});P.pages[r.cur]=r.strokes;P.cur=r.cur;redraw();persist();break}
+   case 'pad-clear':if(!page().length)break;snap();P.pages[P.cur]=[];redraw();persist();break;
+   case 'pad-prev':if(P.cur>0){P.cur--;redraw();persist()}break;
+   case 'pad-next':if(P.cur<P.pages.length-1){P.cur++;redraw();persist()}break;
+   case 'pad-new':P.pages.splice(P.cur+1,0,[]);P.cur++;redraw();persist();break;
+   case 'pad-size':P.big=!P.big;document.body.classList.toggle('pad-big',P.big);requestAnimationFrame(fit);break;
+   case 'pad-close':close();break}});
+ $('pad-penonly').addEventListener('change',e=>{P.penOnly=e.target.checked;persist()});
+ function open(){panel.hidden=false;document.body.classList.add('pad-open');fab.setAttribute('aria-expanded','true');fab.hidden=true;requestAnimationFrame(fit)}
+ function close(){panel.hidden=true;document.body.classList.remove('pad-open');fab.setAttribute('aria-expanded','false');fab.hidden=false;fab.focus()}
+ fab.addEventListener('click',open);
+ document.addEventListener('keydown',e=>{if(panel.hidden)return;if(e.key==='Escape')close();
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();$(e.shiftKey?'pad-redo':'pad-undo').click()}});
+ if(window.ResizeObserver)new ResizeObserver(()=>{if(!panel.hidden)fit()}).observe(cv);
+ window.addEventListener('resize',()=>{if(!panel.hidden)fit()});
+ try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!panel.hidden)redraw()})}catch(e){}
+ new MutationObserver(()=>{if(!panel.hidden)redraw()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
 bankInit();renderSubjects();renderPast();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab||'learn');
 }
 </script>
