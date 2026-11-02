@@ -410,7 +410,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v12・2026/11/02 23:29</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v13・2026/11/02 23:45</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -2428,6 +2428,231 @@ function buildBank(l){if(BANK_CACHE[l.id])return BANK_CACHE[l.id];
   for(const lv of [4,3,2]){if(carry<=0)break;carry-=draw(lv,carry,carry*400)}}
  finally{Math.random=orig}
  out.sort((a,b)=>a.lv-b.lv);BANK_CACHE[l.id]=out;return out}
+/* ================= generic lesson builder (new subjects & sections) ================= */
+function retryWrap(f){return()=>{for(let i=0;i<80;i++){try{return f()}catch(e){if(e.message!=='retry')throw e}}throw new Error('generator failed')}}
+const DEF_NOTES={2:'這一級加入應用與判斷題，需要真的理解觀念才答得對。',3:'這一級要把幾個觀念串在一起，並出現「正確的有幾項」這種段考題型。',4:'段考多選題與壓軸題：每個選項都要獨立判斷，全對才算對。'};
+function mkLesson(o){
+ const L={id:o.id,subj:o.subj,unit:o.unit,title:o.title,goal:o.goal,concept:()=>o.concept,deep:o.deep?()=>o.deep:null,example:o.ex,notes:Object.assign({},DEF_NOTES,o.notes||{})};
+ if(o.sec){L.sec=o.sec;L.secName=o.secName}
+ const g=o.gens||{},pg=o.P?pairsGen(o.P):null,s2=o.S2&&o.S2.length?bank(o.S2):null,s3=o.S3&&o.S3.length?bank(o.S3):null,st=o.T?stmGens(o.T):null;
+ const lvl=(...arr)=>{const a=arr.filter(x=>x&&x[0]);return retryWrap(mixW(...a))};
+ const G=(n,w)=>(g[n]||[]).map(f=>[f,w]);
+ L.levels=[
+  lvl(pg&&[pg,2],...G(1,2)),
+  lvl(s2&&[s2,2],st&&[st.right,1],st&&[st.wrong,1],...G(2,3)),
+  lvl(s3&&[s3,2],st&&[st.count,1],...G(3,3)),
+  lvl(st&&[st.multi,2],...G(4,3))];
+ return L}
+/* ================= 數學 1：第一章、第三章 ================= */
+const sup=n=>`<sup>${n}</sup>`;
+const isSq=n=>Number.isInteger(Math.sqrt(n));
+const ovl=s=>`<span style="text-decoration:overline">${s}</span>`;
+const pw=(b,e)=>`${b}${sup(e)}`;
+function polyStr(cs){/* cs: coefficients high→low */const n=cs.length-1;return poly(cs.map((c,i)=>{const d=n-i;return[c,d===0?'':d===1?X:`<i>x</i>${sup(d)}`]}))}
+const evalP=(cs,x)=>cs.reduce((a,c)=>a*x+c,0);
+const L2=0.3010,L3=0.4771;
+
+const M11=mkLesson({id:'m11',sec:'1-1',secName:'實數',title:'實數：有理數、無理數與根式',
+ goal:'分辨有理數與無理數，會把循環小數化成分數，熟練根式化簡、分母有理化，並認識算幾不等式。',
+ concept:`<div class="prose"><p>數系由小到大：<b>自然數 ⊂ 整數 ⊂ 有理數 ⊂ 實數</b>。</p>
+  <ul><li><b>有理數</b>：可以寫成 ${M(fr('<i>p</i>','<i>q</i>'))}（<i>p</i>、<i>q</i> 是整數，<i>q</i> ≠ 0）。寫成小數一定是<b>有限小數</b>或<b>循環小數</b>。</li>
+  <li><b>無理數</b>：不能寫成分數，小數是<b>不循環的無限小數</b>，例如 ${M(rt(2))}、${M(rt(3))}、π。</li>
+  <li>實數和數線上的點一一對應。</li></ul>
+  <p><b>循環小數化分數</b>：${M(`0.${ovl(3)} = ${fr(3,9)} = ${fr(1,3)}`)}；${M(`0.${ovl(12)} = ${fr(12,99)}`)}；${M(`0.1${ovl(6)} = ${fr('16 − 1',90)} = ${fr(15,90)} = ${fr(1,6)}`)}（循環幾位就放幾個 9，不循環的部分放 0）。</p>
+  <p><b>分母有理化</b>：分母是 ${M(`${rt('<i>a</i>')} − ${rt('<i>b</i>')}`)} 時，上下同乘 ${M(`${rt('<i>a</i>')} + ${rt('<i>b</i>')}`)}，利用 ${M('(<i>x</i> − <i>y</i>)(<i>x</i> + <i>y</i>) = <i>x</i><sup>2</sup> − <i>y</i><sup>2</sup>')} 消掉根號。</p></div>
+  <div class="formula">${M(`${fr('1',`${rt(5)} − ${rt(3)}`)} = ${fr(`${rt(5)} + ${rt(3)}`,'(√5)<sup>2</sup> − (√3)<sup>2</sup>')} = ${fr(`${rt(5)} + ${rt(3)}`,2)}`)}<small>平方差公式是分母有理化的核心</small></div>
+  <div class="tip"><b>常見錯誤：</b>${M(`${rt(2)} + ${rt(3)} ≠ ${rt(5)}`)}。根號只有在相乘時可以合併：${M(`${rt(2)} × ${rt(3)} = ${rt(6)}`)}。</div>`,
+ deep:`<div class="prose"><p><b>為什麼 ${M(rt(2))} 不是有理數？</b>用反證法：假設 ${M(`${rt(2)} = ${fr('<i>p</i>','<i>q</i>')}`)} 且已約到最簡。兩邊平方得 <i>p</i>² ＝ 2<i>q</i>²，所以 <i>p</i>² 是偶數，<i>p</i> 也是偶數，設 <i>p</i> ＝ 2<i>k</i>，代回得 <i>q</i>² ＝ 2<i>k</i>²，<i>q</i> 也是偶數。<i>p</i>、<i>q</i> 都是偶數，和「最簡分數」矛盾。</p>
+  <p><b>整數部分與小數部分</b>：${M(rt(7))} 介於 2 和 3 之間，整數部分 <i>a</i> ＝ 2，小數部分 <i>b</i> ＝ ${M(`${rt(7)} − 2`)}。常考 <i>b</i>(<i>b</i> ＋ 4)：因為 <i>b</i> ＋ 2 ＝ ${M(rt(7))}，(<i>b</i> ＋ 2)² ＝ 7，展開得 <i>b</i>² ＋ 4<i>b</i> ＝ 3。</p>
+  <p><b>算幾不等式</b>：<i>a</i>、<i>b</i> ＞ 0 時，${M(`${fr('<i>a</i> + <i>b</i>',2)} ≥ ${rt('<i>a</i><i>b</i>')}`)}，<i>a</i> ＝ <i>b</i> 時等號成立。證明：${M(`(${rt('<i>a</i>')} − ${rt('<i>b</i>')})<sup>2</sup> ≥ 0`)} 展開就得到。用途：「和固定，積最大」、「積固定，和最小」。</p></div>`,
+ ex:{q:`把 ${M(`0.2${ovl(7)}`)} 化成最簡分數。`,steps:['循環的是 7（一位），不循環的是 2（一位）：分母放一個 9、一個 0 → 90。','分子 ＝ 整串數字 27 − 不循環部分 2 ＝ 25。',`${M(`${fr(25,90)} = ${fr(5,18)}`)}，答案是 <b>5/18</b>。`]},
+ notes:{2:'分母有理化與根式運算：利用平方差公式消去根號。',3:'整數部分、小數部分與雙重根式。',4:'算幾不等式：和固定時積最大，積固定時和最小。'},
+ gens:{
+  1:[()=>{const t=rnd(0,2);
+     if(t===0){const d=rnd(1,8),r=R(d,9);return{q:`把 ${M(`0.${ovl(d)}`)} 化成最簡分數。`,ans:r,steps:[`循環一位，分母放 9：${M(fr(d,9))}`,`約分後答案是 <b>${M(rFmt(r))}</b>`]}}
+     if(t===1){let ab;do{ab=rnd(10,98)}while(ab%11===0);const r=R(ab,99);return{q:`把 ${M(`0.${ovl(ab)}`)} 化成最簡分數。`,ans:r,steps:[`循環兩位，分母放 99：${M(fr(ab,99))}`,`約分後答案是 <b>${M(rFmt(r))}</b>`]}}
+     const a=rnd(1,9);let b;do{b=rnd(0,9)}while(b===a);const r=R(10*a+b-a,90);return{q:`把 ${M(`0.${a}${ovl(b)}`)} 化成最簡分數。`,ans:r,steps:[`循環一位、不循環一位，分母 90；分子 ＝ ${10*a+b} − ${a} ＝ ${10*a+b-a}`,`${M(`${fr(10*a+b-a,90)} = ${rFmt(r)}`)}，答案是 <b>${M(rFmt(r))}</b>`]}},
+   ()=>{const S=[[`${rt(4)}`,1],[`${rt(8)}`,0],['π',0],[`0.${ovl(3)}`,1],[fr(22,7),1],[`${rt(2)} × ${rt(8)}`,1],[`${rt(2)} + ${rt(3)}`,0],['1.4142…（不循環的無限小數）',0],[`${rt(9)} − ${rt(4)}`,1],[`${rt(12)} ÷ ${rt(3)}`,1],[`${rt(5)} − 2`,0],['0.1010010001…（1 之間的 0 一次多一個）',0]];const askR=Math.random()<.5;
+     const good=S.filter(x=>!!x[1]===askR),bad=S.filter(x=>!!x[1]!==askR),r=pick(good);
+     return mc(`下列何者是<b>${askR?'有理數':'無理數'}</b>？`,M(r[0]),shuffle(bad).slice(0,3).map(x=>M(x[0])),[`${M(r[0])} ${askR?'可以寫成分數（或化簡後是整數、分數）':'是不循環的無限小數，不能寫成分數'}。`])}],
+  2:[()=>{let a,b;do{a=rnd(2,15);b=rnd(1,a-1)}while(isSq(a)||isSq(b)&&b>1);const k=a-b;
+     return{q:`化簡 ${M(fr(k,`${rt(a)} − ${b===1?1:rt(b)}`))}，結果寫成 ${M(`${rt('<i>m</i>')} + ${rt('<i>n</i>')}`)}${b===1?'（這裡 1 ＝ √1）':''}，<i>m</i> ＞ <i>n</i>，求 ${M('<i>m</i> + <i>n</i>')}。`,ans:[a+b,1],steps:[
+      `分子分母同乘 ${M(`${rt(a)} + ${rt(b)}`)}：分母 ${M(`(${rt(a)})<sup>2</sup> − (${rt(b)})<sup>2</sup> = ${a} − ${b} = ${k}`)}`,`${M(`${fr(`${k}(${rt(a)} + ${rt(b)})`,k)} = ${rt(a)} + ${rt(b)}`)}`,`<i>m</i> ＝ ${a}、<i>n</i> ＝ ${b}，答案是 <b>${a+b}</b>`]}},
+   ()=>{let a,b;do{a=rnd(2,12);b=rnd(2,12)}while(a===b||isSq(a*b));return{q:`${M(`(${rt(a)} + ${rt(b)})<sup>2</sup> = <i>p</i> + 2${rt('<i>q</i>')}`)}，求 ${M('<i>p</i> + <i>q</i>')}。`,ans:[a+b+a*b,1],steps:[`展開：${M(`(${rt(a)})<sup>2</sup> + 2${rt(a)}${rt(b)} + (${rt(b)})<sup>2</sup> = ${a+b} + 2${rt(a*b)}`)}`,`<i>p</i> ＝ ${a+b}、<i>q</i> ＝ ${a*b}，答案是 <b>${a+b+a*b}</b>`]}},
+   ()=>{let a,b;do{a=rnd(2,9);b=rnd(2,30)}while(isSq(b)||a*a===b);return{q:`計算 ${M(`(${a} + ${rt(b)})(${a} − ${rt(b)})`)}。`,ans:[a*a-b,1],steps:[`平方差：${M(`${a}<sup>2</sup> − (${rt(b)})<sup>2</sup> = ${a*a} − ${b}`)}`,`答案是 <b>${num(a*a-b)}</b>`]}}],
+  3:[()=>{let n;do{n=rnd(3,80)}while(isSq(n));const a=Math.floor(Math.sqrt(n));
+     return{q:`${M(rt(n))} 的整數部分為 <i>a</i>、小數部分為 <i>b</i>，求 ${M(`<i>b</i>(<i>b</i> + ${2*a})`)}。`,ans:[n-a*a,1],steps:[`${M(`${a}<sup>2</sup> = ${a*a} &lt; ${n} &lt; ${(a+1)**2} = ${a+1}<sup>2</sup>`)}，所以 <i>a</i> ＝ ${a}，<i>b</i> ＝ ${M(`${rt(n)} − ${a}`)}`,`<i>b</i> ＋ ${a} ＝ ${M(rt(n))}，平方：${M(`<i>b</i><sup>2</sup> + ${2*a}<i>b</i> + ${a*a} = ${n}`)}`,`${M(`<i>b</i>(<i>b</i> + ${2*a}) = ${n} − ${a*a}`)} ＝ <b>${n-a*a}</b>`]}},
+   ()=>{let a,b;do{a=rnd(2,12);b=rnd(1,a-1)}while(isSq(a*b)&&a*b>0);const m=a+b,n=a*b;
+     return{q:`${M(`${rt(`${m} + 2${rt(n)}`)} = ${rt('<i>a</i>')} + ${rt('<i>b</i>')}`)}（<i>a</i> ＞ <i>b</i> ＞ 0，<i>a</i>、<i>b</i> 為整數），求 <i>a</i>。`,ans:[a,1],steps:[`${M(`(${rt('<i>a</i>')} + ${rt('<i>b</i>')})<sup>2</sup> = <i>a</i> + <i>b</i> + 2${rt('<i>a</i><i>b</i>')}`)}，所以要找 <i>a</i> ＋ <i>b</i> ＝ ${m}、<i>a</i><i>b</i> ＝ ${n}`,`兩數為 ${a} 和 ${b}，答案是 <b>${a}</b>`]}}],
+  4:[()=>{const p=rnd(1,4),q=rnd(1,4),S=2*p*q*rnd(1,3);const v=R(S*S,4*p*q);
+     return{q:`<i>x</i>、<i>y</i> 為正數，且 ${M(`${p===1?'':p}<i>x</i> + ${q===1?'':q}<i>y</i> = ${S}`)}，求 <i>x</i><i>y</i> 的最大值。`,ans:v,steps:[`算幾不等式：${M(`${fr(`${p===1?'':p}<i>x</i> + ${q===1?'':q}<i>y</i>`,2)} ≥ ${rt(`${p*q===1?'':p*q}<i>x</i><i>y</i>`)}`)}`,`${M(`${S/2} ≥ ${rt(`${p*q===1?'':p*q}<i>x</i><i>y</i>`)}`)} ⇒ ${M(`${p*q===1?'':p*q}<i>x</i><i>y</i> ≤ ${S*S/4}`)}，等號在 ${M(`${p===1?'':p}<i>x</i> = ${q===1?'':q}<i>y</i> = ${S/2}`)}`,`<i>x</i><i>y</i> 最大值 ＝ <b>${M(rFmt(v))}</b>`]}},
+   ()=>{const k=pick([4,9,16,25,36,49,64]),c=rnd(1,3);return{q:`<i>x</i> ＞ 0，求 ${M(`${c===1?'':c}<i>x</i> + ${fr(c*k,'<i>x</i>')}`)} 的最小值。`,ans:[2*c*Math.sqrt(k),1],steps:[`提出 ${c}：${M(`${c}(<i>x</i> + ${fr(k,'<i>x</i>')})`)}`,`算幾：${M(`<i>x</i> + ${fr(k,'<i>x</i>')} ≥ 2${rt(k)} = ${2*Math.sqrt(k)}`)}，等號在 <i>x</i> ＝ ${Math.sqrt(k)}`,`最小值 ＝ ${c} × ${2*Math.sqrt(k)} ＝ <b>${2*c*Math.sqrt(k)}</b>`]}}]}});
+
+const M12=mkLesson({id:'m12',sec:'1-2',secName:'絕對值',title:'絕對值與數線',
+ goal:'理解絕對值是數線上的距離，會解絕對值方程式與不等式，並用分點公式找數線上的點。',
+ concept:`<div class="prose"><p><b>絕對值的意義</b>：${M('|<i>a</i>|')} 是數線上 <i>a</i> 到原點的距離；${M('|<i>a</i> − <i>b</i>|')} 是 <i>a</i> 到 <i>b</i> 的距離。</p>
+  <ul><li>${M('|<i>x</i>| = <i>x</i>')}（<i>x</i> ≥ 0），${M('|<i>x</i>| = −<i>x</i>')}（<i>x</i> &lt; 0）。</li>
+  <li>${M('|<i>x</i> − <i>a</i>| = <i>r</i>')} ⇔ <i>x</i> ＝ <i>a</i> ± <i>r</i>（<i>r</i> ≥ 0）。</li>
+  <li>${M('|<i>x</i> − <i>a</i>| ≤ <i>r</i>')} ⇔ ${M('<i>a</i> − <i>r</i> ≤ <i>x</i> ≤ <i>a</i> + <i>r</i>')}（到 <i>a</i> 的距離不超過 <i>r</i>）。</li>
+  <li>${M('|<i>x</i> − <i>a</i>| ≥ <i>r</i>')} ⇔ ${M('<i>x</i> ≤ <i>a</i> − <i>r</i>')} 或 ${M('<i>x</i> ≥ <i>a</i> + <i>r</i>')}。</li></ul></div>
+  <div class="formula">分點公式：P 在 AB 上且 AP : PB ＝ <i>m</i> : <i>n</i>，則 ${M(`P = ${fr('<i>n</i>a + <i>m</i>b','<i>m</i> + <i>n</i>')}`)}<small>靠近誰，誰的權重就大（交叉相乘）</small></div>
+  <div class="tip"><b>常見錯誤：</b>${M('|<i>x</i> − 3| ≥ 2')} 的解是兩段（<i>x</i> ≤ 1 或 <i>x</i> ≥ 5），不能寫成 1 ≥ <i>x</i> ≥ 5。</div>`,
+ deep:`<div class="prose"><p><b>為什麼 ${M('|<i>x</i> − <i>a</i>| ≤ <i>r</i>')} 是一段區間？</b>用距離想：數線上和 <i>a</i> 距離不超過 <i>r</i> 的點，就是以 <i>a</i> 為中心、左右各延伸 <i>r</i> 的線段。反過來，看到區間 [<i>p</i>, <i>q</i>] 也能寫成絕對值：中心 (<i>p</i> ＋ <i>q</i>)/2，半徑 (<i>q</i> − <i>p</i>)/2。</p>
+  <p><b>距離和的最小值</b>：${M('|<i>x</i> − <i>a</i>| + |<i>x</i> − <i>b</i>|')} 是 <i>x</i> 到兩點的距離和，<i>x</i> 在兩點之間時最小，等於 |<i>a</i> − <i>b</i>|。三個點時，<i>x</i> 取中間那一點最小。</p>
+  <p><b>分點公式的由來</b>：AP : PB ＝ <i>m</i> : <i>n</i>，代表 P 從 A 走了全長的 <i>m</i>/(<i>m</i> ＋ <i>n</i>)：P ＝ <i>a</i> ＋ (<i>b</i> − <i>a</i>) × <i>m</i>/(<i>m</i> ＋ <i>n</i>)，整理就是 (<i>n</i>a ＋ <i>m</i>b)/(<i>m</i> ＋ <i>n</i>)。</p></div>`,
+ ex:{q:`解 ${M('|2<i>x</i> − 3| &lt; 5')}，並求整數解的個數。`,steps:[`${M('−5 &lt; 2<i>x</i> − 3 &lt; 5')}`,`各加 3：${M('−2 &lt; 2<i>x</i> &lt; 8')}，除以 2：${M('−1 &lt; <i>x</i> &lt; 4')}`,'整數解 0、1、2、3，共 <b>4</b> 個。']},
+ notes:{2:'絕對值不等式與分點公式。',3:'距離的觀點：兩個絕對值相等、距離和。',4:'三點距離和的最小值與分段討論。'},
+ gens:{
+  1:[()=>{const a=rnd(-9,9),r=rnd(1,8),askBig=Math.random()<.5;return{q:`方程式 ${M(`|<i>x</i> ${a<0?'+ '+(-a):a>0?'− '+a:''}| = ${r}`)} 的兩個解中，${askBig?'較大':'較小'}的是多少？`,ans:[askBig?a+r:a-r,1],steps:[`到 ${num(a)} 的距離是 ${r}：<i>x</i> ＝ ${num(a)} ± ${r}`,`兩解 ${num(a-r)}、${num(a+r)}，答案是 <b>${num(askBig?a+r:a-r)}</b>`]}},
+   ()=>{const a=rnd(-9,9),b=rnd(-9,9),c=rnd(-9,9),d=rnd(-9,9),v=Math.abs(a-b)-Math.abs(c-d);return{q:`計算 ${M(`|${num(a)} − ${par(b)}| − |${num(c)} − ${par(d)}|`)}。`,ans:[v,1],steps:[`先算絕對值裡面：${num(a-b)}、${num(c-d)}`,`${Math.abs(a-b)} − ${Math.abs(c-d)} ＝ <b>${num(v)}</b>`]}}],
+  2:[()=>{const a=nz(1,3),b=rnd(-6,6),c=rnd(1,9),strict=Math.random()<.5;const lo=(b-c)/a,hi=(b+c)/a;let cnt=0;for(let x=Math.ceil(lo-1);x<=Math.floor(hi+1);x++){if(strict?(Math.abs(a*x-b)<c):(Math.abs(a*x-b)<=c))cnt++}
+     return{q:`滿足 ${M(`|${a===1?'':a}<i>x</i> ${b<0?'+ '+(-b):b>0?'− '+b:''}| ${strict?'&lt;':'≤'} ${c}`)} 的整數 <i>x</i> 有幾個？`,ans:[cnt,1],steps:[`${M(`${-c} ${strict?'&lt;':'≤'} ${a===1?'':a}<i>x</i> ${b<0?'+ '+(-b):b>0?'− '+b:''} ${strict?'&lt;':'≤'} ${c}`)}`,`${M(`${rFmt(R(b-c,a))} ${strict?'&lt;':'≤'} <i>x</i> ${strict?'&lt;':'≤'} ${rFmt(R(b+c,a))}`)}`,`數一數整數，共 <b>${cnt}</b> 個`]}},
+   ()=>{const a=rnd(-8,2),b=a+rnd(3,12),m=rnd(1,4),n=rnd(1,4),P=R(n*a+m*b,m+n);return{q:`數線上 A(${num(a)})、B(${num(b)})，點 P 在線段 AB 上且 AP : PB ＝ ${m} : ${n}，P 的坐標是多少？`,ans:P,steps:[`分點公式：${M(`P = ${fr(`${n} × ${par(a)} + ${m} × ${par(b)}`,`${m} + ${n}`)}`)}`,`${M(`= ${fr(num(n*a+m*b),m+n)} = ${rFmt(P)}`)}，答案是 <b>${M(rFmt(P))}</b>`]}}],
+  3:[()=>{let a,b;do{a=rnd(-9,9);b=rnd(-9,9)}while(a===b);const v=R(a+b,2);return{q:`解 ${M(`|<i>x</i> − ${par(a)}| = |<i>x</i> − ${par(b)}|`)}。`,ans:v,steps:[`到 ${num(a)} 和到 ${num(b)} 的距離相等 → 兩點的中點`,`${M(`<i>x</i> = ${fr(`${num(a)} + ${par(b)}`,2)} = ${rFmt(v)}`)}，答案是 <b>${M(rFmt(v))}</b>`]}},
+   ()=>{const a=rnd(-8,3),b=a+rnd(2,9);return{q:`${M(`|<i>x</i> − ${par(a)}| + |<i>x</i> − ${par(b)}|`)} 的最小值是多少？`,ans:[b-a,1],steps:['看成數線上 <i>x</i> 到兩點的距離和。',`<i>x</i> 在 ${num(a)} 與 ${num(b)} 之間時最小，等於兩點距離 ${num(b)} − ${par(a)} ＝ <b>${b-a}</b>`]}}],
+  4:[()=>{const p=[...new Set([rnd(-8,8),rnd(-8,8),rnd(-8,8)])];if(p.length<3)LEVELS_RETRY();p.sort((u,v)=>u-v);const v=p[2]-p[0];const show=shuffle(p);
+     return{q:`${M(show.map(c=>`|<i>x</i> − ${par(c)}|`).join(' + '))} 的最小值是多少？`,ans:[v,1],steps:[`三個點 ${p.map(num).join('、')}，<i>x</i> 取中間那點 ${num(p[1])} 時最小`,`最小值 ＝ (${num(p[1])} − ${par(p[0])}) ＋ 0 ＋ (${num(p[2])} − ${par(p[1])}) ＝ <b>${v}</b>`]}},
+   ()=>{const a=rnd(-6,0),b=a+rnd(2,6),k=rnd(b-a+1,b-a+8),lo=R(a+b-k,2),hi=R(a+b+k,2);const askHi=Math.random()<.5;
+     return{q:`解 ${M(`|<i>x</i> − ${par(a)}| + |<i>x</i> − ${par(b)}| = ${k}`)}，${askHi?'較大':'較小'}的解是多少？`,ans:askHi?hi:lo,steps:[`距離和最小為 ${b-a} ＜ ${k}，所以解在兩點外側。`,`右側（<i>x</i> ＞ ${num(b)}）：2<i>x</i> − ${par(a+b)} ＝ ${k} ⇒ <i>x</i> ＝ ${rFmt(hi)}；左側（<i>x</i> ＜ ${num(a)}）：${par(a+b)} − 2<i>x</i> ＝ ${k} ⇒ <i>x</i> ＝ ${rFmt(lo)}`,`答案是 <b>${M(rFmt(askHi?hi:lo))}</b>`]}}]}});
+
+const M13=mkLesson({id:'m13',sec:'1-3',secName:'指數',title:'指數律與指數方程式',
+ goal:'熟練指數律（含零次方、負指數、分數指數），會化簡指數式並解簡單的指數方程式。',
+ concept:`${tbl(['規則','例子'],[[`${M('<i>a</i><sup><i>m</i></sup> × <i>a</i><sup><i>n</i></sup> = <i>a</i><sup><i>m</i>+<i>n</i></sup>')}`,`${M('2<sup>3</sup> × 2<sup>4</sup> = 2<sup>7</sup>')}`],[`${M('<i>a</i><sup><i>m</i></sup> ÷ <i>a</i><sup><i>n</i></sup> = <i>a</i><sup><i>m</i>−<i>n</i></sup>')}`,`${M('3<sup>5</sup> ÷ 3<sup>2</sup> = 3<sup>3</sup>')}`],[`${M('(<i>a</i><sup><i>m</i></sup>)<sup><i>n</i></sup> = <i>a</i><sup><i>mn</i></sup>')}`,`${M('(2<sup>3</sup>)<sup>2</sup> = 2<sup>6</sup>')}`],[`${M('<i>a</i><sup>0</sup> = 1')}（<i>a</i> ≠ 0）`,`${M('5<sup>0</sup> = 1')}`],[`${M(`<i>a</i><sup>−<i>n</i></sup> = ${fr(1,'<i>a</i><sup><i>n</i></sup>')}`)}`,`${M(`2<sup>−3</sup> = ${fr(1,8)}`)}`],[`${M(`<i>a</i><sup><i>m</i>/<i>n</i></sup> = (<sup><i>n</i></sup>√<i>a</i>)<sup><i>m</i></sup>`)}（<i>a</i> ＞ 0）`,`${M('8<sup>2/3</sup> = 2<sup>2</sup> = 4')}`]])}
+  <div class="prose"><p><b>解指數方程式</b>：把兩邊化成同一個底數，再比較指數。例如 ${M('4<sup><i>x</i></sup> = 8')} ⇒ ${M('2<sup>2<i>x</i></sup> = 2<sup>3</sup>')} ⇒ ${M(`<i>x</i> = ${fr(3,2)}`)}。</p></div>
+  <div class="tip"><b>常見錯誤：</b>${M('2<sup>3</sup> + 2<sup>3</sup> = 2<sup>4</sup>')}（不是 2<sup>6</sup>）；${M('(−8)<sup>1/3</sup>')} 這種負底數的分數指數，高中規定底數要大於 0。</div>`,
+ deep:`<div class="prose"><p><b>為什麼 <i>a</i><sup>0</sup> ＝ 1、<i>a</i><sup>−<i>n</i></sup> ＝ 1/<i>a</i><sup><i>n</i></sup>？</b>這是為了讓指數律 <i>a</i><sup><i>m</i></sup> ÷ <i>a</i><sup><i>n</i></sup> ＝ <i>a</i><sup><i>m</i>−<i>n</i></sup> 在 <i>m</i> ≤ <i>n</i> 時也成立：<i>a</i><sup>3</sup> ÷ <i>a</i><sup>3</sup> ＝ 1 必須等於 <i>a</i><sup>0</sup>；<i>a</i><sup>2</sup> ÷ <i>a</i><sup>5</sup> ＝ 1/<i>a</i><sup>3</sup> 必須等於 <i>a</i><sup>−3</sup>。</p>
+  <p><b>分數指數</b>：(<i>a</i><sup>1/<i>n</i></sup>)<sup><i>n</i></sup> ＝ <i>a</i><sup>1</sup> ＝ <i>a</i>，所以 <i>a</i><sup>1/<i>n</i></sup> 就是 <i>a</i> 的 <i>n</i> 次方根。</p>
+  <p><b>換元法</b>：${M('9<sup><i>x</i></sup> − 4·3<sup><i>x</i></sup> + 3 = 0')}，令 <i>t</i> ＝ 3<sup><i>x</i></sup> ＞ 0，變成 <i>t</i>² − 4<i>t</i> ＋ 3 ＝ 0，<i>t</i> ＝ 1 或 3，所以 <i>x</i> ＝ 0 或 1。記得 <i>t</i> 必須是正的。</p>
+  <p><b>對稱式</b>：若 ${M('<i>a</i><sup>1/2</sup> + <i>a</i><sup>−1/2</sup> = <i>k</i>')}，平方得 ${M('<i>a</i> + <i>a</i><sup>−1</sup> = <i>k</i><sup>2</sup> − 2')}，立方得 ${M('<i>a</i><sup>3/2</sup> + <i>a</i><sup>−3/2</sup> = <i>k</i><sup>3</sup> − 3<i>k</i>')}。</p></div>`,
+ ex:{q:`計算 ${M('27<sup>2/3</sup> × 9<sup>−1/2</sup>')}。`,steps:[`${M('27<sup>2/3</sup> = (3<sup>3</sup>)<sup>2/3</sup> = 3<sup>2</sup> = 9')}`,`${M(`9<sup>−1/2</sup> = (3<sup>2</sup>)<sup>−1/2</sup> = 3<sup>−1</sup> = ${fr(1,3)}`)}`,`${M(`9 × ${fr(1,3)} = 3`)}，答案是 <b>3</b>。`]},
+ notes:{2:'分數指數與負指數：先把底數寫成質數的次方。',3:'指數方程式：化成同底，或用換元法。',4:'對稱式與綜合題。'},
+ gens:{
+  1:[()=>{const b=pick([2,3,5]),a=rnd(2,6),c=rnd(2,6),d=rnd(1,a+c);const e=a+c-d;const v=e>=0?[b**e,1]:R(1,b**(-e));return{q:`計算 ${M(`${pw(b,a)} × ${pw(b,c)} ÷ ${pw(b,d)}`)}。`,ans:v,steps:[`同底相乘指數相加、相除指數相減：${M(`${b}<sup>${a} + ${c} − ${d}</sup> = ${pw(b,e)}`)}`,`答案是 <b>${M(rFmt(v))}</b>`]}},
+   ()=>{const b=pick([2,3,4,5,10]),n=rnd(1,3),v=R(1,b**n);return{q:`計算 ${M(pw(b,'−'+n))}。`,ans:v,steps:[`負指數：${M(`${b}<sup>−${n}</sup> = ${fr(1,pw(b,n))}`)}`,`答案是 <b>${M(rFmt(v))}</b>`]}}],
+  2:[()=>{const T=pick([[8,2,3],[27,3,3],[16,2,4],[32,2,5],[64,2,6],[81,3,4],[125,5,3],[25,5,2],[9,3,2],[4,2,2]]);const [N,b,k]=T;let m;do{m=nz(-3,3)}while(false);const n=pick([k,k]);const e=R(m*k,n),val=e[0]>=0?[b**e[0],1]:R(1,b**(-e[0]));if(e[1]!==1)LEVELS_RETRY();
+     return{q:`計算 ${M(`${N}<sup>${m<0?'−':''}${Math.abs(m)}/${n}</sup>`)}。`,ans:val,steps:[`${N} ＝ ${pw(b,k)}，${M(`(${pw(b,k)})<sup>${num(m)}/${n}</sup> = ${b}<sup>${num(m*k/n)}</sup>`)}`,`答案是 <b>${M(rFmt(val))}</b>`]}},
+   ()=>{const b=pick([2,3]),a=rnd(1,4),c=rnd(1,4);const v=(b**a)**2/(b**c);const ex=2*a-c;const val=ex>=0?[b**ex,1]:R(1,b**(-ex));return{q:`計算 ${M(`(${b**a})<sup>2</sup> ÷ ${b**c}`)} 寫成 ${M(`${b}<sup><i>k</i></sup>`)}，<i>k</i> ＝ ?`,ans:[ex,1],steps:[`${b**a} ＝ ${pw(b,a)}，${b**c} ＝ ${pw(b,c)}`,`${M(`${b}<sup>${2*a}</sup> ÷ ${b}<sup>${c}</sup> = ${b}<sup>${ex}</sup>`)}，<i>k</i> ＝ <b>${num(ex)}</b>`]}}],
+  3:[()=>{const T=pick([[2,4,8],[2,8,4],[3,9,27],[3,27,9],[2,4,32],[2,16,8],[5,25,125],[2,8,16]]);const [b,A,B]=T;const la=Math.round(Math.log(A)/Math.log(b)),lb=Math.round(Math.log(B)/Math.log(b));const c=rnd(-2,2);const v=R(lb-la*c,la);
+     return{q:`解 ${M(`${A}<sup><i>x</i>${c?(c>0?' + '+c:' − '+(-c)):''}</sup> = ${B}`)}。`,ans:v,steps:[`化成底數 ${b}：${M(`${b}<sup>${la}(<i>x</i>${c?(c>0?' + '+c:' − '+(-c)):''})</sup> = ${b}<sup>${lb}</sup>`)}`,`${M(`${la}(<i>x</i>${c?(c>0?' + '+c:' − '+(-c)):''}) = ${lb}`)} ⇒ <i>x</i> ＝ <b>${M(rFmt(v))}</b>`]}},
+   ()=>{const b=pick([2,3]);let p,q;do{p=rnd(0,3);q=rnd(0,3)}while(p===q);const s=b**p+b**q,pr=b**p*b**q;
+     return{q:`解 ${M(`${b*b}<sup><i>x</i></sup> − ${s}·${b}<sup><i>x</i></sup> + ${pr} = 0`)}，所有解的和是多少？`,ans:[p+q,1],steps:[`令 <i>t</i> ＝ ${b}<sup><i>x</i></sup> ＞ 0：${M(`<i>t</i><sup>2</sup> − ${s}<i>t</i> + ${pr} = 0`)} ⇒ (<i>t</i> − ${b**p})(<i>t</i> − ${b**q}) ＝ 0`,`${b}<sup><i>x</i></sup> ＝ ${b**p} 或 ${b**q} ⇒ <i>x</i> ＝ ${p} 或 ${q}`,`和 ＝ <b>${p+q}</b>`]}}],
+  4:[()=>{const k=rnd(3,7),t=pick(['sq','cube']);const v=t==='sq'?k*k-2:k**3-3*k;return{q:`已知 ${M('<i>a</i> &gt; 0')} 且 ${M(`<i>a</i><sup>1/2</sup> + <i>a</i><sup>−1/2</sup> = ${k}`)}，求 ${M(t==='sq'?'<i>a</i> + <i>a</i><sup>−1</sup>':'<i>a</i><sup>3/2</sup> + <i>a</i><sup>−3/2</sup>')}。`,ans:[v,1],steps:t==='sq'?[`兩邊平方：${M('<i>a</i> + 2 + <i>a</i><sup>−1</sup>')} ＝ ${k*k}`,`${M('<i>a</i> + <i>a</i><sup>−1</sup>')} ＝ ${k*k} − 2 ＝ <b>${v}</b>`]:[`立方和：${M('(<i>u</i> + <i>v</i>)<sup>3</sup> = <i>u</i><sup>3</sup> + <i>v</i><sup>3</sup> + 3<i>u</i><i>v</i>(<i>u</i> + <i>v</i>)')}，這裡 <i>u</i><i>v</i> ＝ 1`,`${M('<i>a</i><sup>3/2</sup> + <i>a</i><sup>−3/2</sup>')} ＝ ${k}<sup>3</sup> − 3 × ${k} ＝ <b>${v}</b>`]}},
+   ()=>{const b=pick([2,3]);const a=rnd(2,4);const v=b**a+b**(a+1)+b**(a+2);const sum=1+b+b*b;return{q:`若 ${M(`${b}<sup><i>x</i></sup> + ${b}<sup><i>x</i>+1</sup> + ${b}<sup><i>x</i>+2</sup> = ${v}`)}，求 <i>x</i>。`,ans:[a,1],steps:[`提出 ${b}<sup><i>x</i></sup>：${M(`${b}<sup><i>x</i></sup>(1 + ${b} + ${b*b}) = ${b}<sup><i>x</i></sup> × ${sum}`)}`,`${b}<sup><i>x</i></sup> ＝ ${v} ÷ ${sum} ＝ ${b**a} ＝ ${pw(b,a)}，<i>x</i> ＝ <b>${a}</b>`]}}]}});
+
+const M14=mkLesson({id:'m14',sec:'1-4',secName:'常用對數',title:'常用對數與應用',
+ goal:'理解 log 的意義與運算性質，會用 log 2、log 3 求其他對數值，並計算位數與小數點後第幾位。',
+ concept:`<div class="prose"><p><b>常用對數</b>：若 ${M('10<sup><i>y</i></sup> = <i>x</i>')}（<i>x</i> ＞ 0），就記作 ${M('<i>y</i> = log <i>x</i>')}。也就是「10 要幾次方才會等於 <i>x</i>」。例如 log 1000 ＝ 3、log 0.01 ＝ −2、log 1 ＝ 0。</p></div>
+  ${tbl(['性質','例子'],[['log <i>MN</i> ＝ log <i>M</i> ＋ log <i>N</i>','log 6 ＝ log 2 ＋ log 3'],['log (<i>M</i>/<i>N</i>) ＝ log <i>M</i> − log <i>N</i>','log 5 ＝ log 10 − log 2 ＝ 1 − log 2'],['log <i>M</i><sup><i>r</i></sup> ＝ <i>r</i> log <i>M</i>','log 8 ＝ 3 log 2']])}
+  <div class="prose"><p>常用數值：${M('log 2 ≈ 0.3010')}、${M('log 3 ≈ 0.4771')}，其他像 log 4、log 5、log 6、log 8、log 9 都能由它們算出來。</p>
+  <p><b>位數</b>：若 log <i>x</i> ＝ <i>n</i> ＋ <i>f</i>（<i>n</i> 是整數、0 ≤ <i>f</i> ＜ 1），則 <i>x</i> ＝ 10<sup><i>f</i></sup> × 10<sup><i>n</i></sup>，<i>x</i> ≥ 1 時是 <b><i>n</i> ＋ 1 位數</b>。</p></div>
+  <div class="tip"><b>常見錯誤：</b>log (<i>M</i> ＋ <i>N</i>) ≠ log <i>M</i> ＋ log <i>N</i>。log 只能把「乘」變「加」。</div>`,
+ deep:`<div class="prose"><p><b>為什麼 log 把乘法變加法？</b>設 <i>M</i> ＝ 10<sup><i>a</i></sup>、<i>N</i> ＝ 10<sup><i>b</i></sup>，則 <i>MN</i> ＝ 10<sup><i>a</i>+<i>b</i></sup>，所以 log <i>MN</i> ＝ <i>a</i> ＋ <i>b</i>。對數性質就是指數律換個方向寫。</p>
+  <p><b>小於 1 的數</b>：(1/2)<sup>20</sup> 的 log ＝ −20 × 0.3010 ＝ −6.02 ＝ −7 ＋ 0.98，所以它 ＝ 10<sup>0.98</sup> × 10<sup>−7</sup> ≈ 9.5 × 10<sup>−7</sup>，小數點後<b>第 7 位</b>開始出現不是 0 的數字。</p>
+  <p><b>首位數字</b>：看小數部分 <i>f</i>：10<sup><i>f</i></sup> 的整數部分就是首位數字。例如 <i>f</i> ＝ 0.48，介於 log 3 ＝ 0.4771 與 log 4 ＝ 0.6020 之間，首位數字是 3。</p>
+  <p><b>應用</b>：pH、地震規模、聲音分貝都用對數表示，因為它們的數量差距非常大。</p></div>`,
+ ex:{q:'2<sup>50</sup> 是幾位數？（log 2 ≈ 0.3010）',steps:['log 2<sup>50</sup> ＝ 50 × 0.3010 ＝ 15.05。','2<sup>50</sup> ＝ 10<sup>0.05</sup> × 10<sup>15</sup>，介於 10<sup>15</sup> 和 10<sup>16</sup> 之間。','所以是 <b>16</b> 位數。']},
+ notes:{2:'用 log 2、log 3 組合出其他對數值。',3:'位數：log 的整數部分加 1。',4:'小數點後第幾位開始不為 0、首位數字。'},
+ gens:{
+  1:[()=>{const k=rnd(-4,6),v=k;const show=k>=0?String(10**k):'0.'+'0'.repeat(-k-1)+'1';return{q:`求 log ${show}。`,ans:[v,1],steps:[`${show} ＝ 10<sup>${k}</sup>`,`log ${show} ＝ <b>${num(k)}</b>`]}},
+   ()=>{const T=pick([['log 2 ＋ log 5',1,'log 10'],['log 4 ＋ log 25',2,'log 100'],['log 50 ＋ log 2',2,'log 100'],['log 8 ＋ log 125',3,'log 1000'],['log 200 − log 2',2,'log 100'],['log 5 ＋ log 20',2,'log 100'],['log 0.5 ＋ log 0.2',-1,'log 0.1']]);return{q:`計算 ${T[0]}。`,ans:[T[1],1],steps:[`相加變相乘（相減變相除）：${T[0]} ＝ ${T[2]}`,`答案是 <b>${num(T[1])}</b>`]}}],
+  2:[()=>{const a=rnd(0,4),b=rnd(0,3);if(a+b===0)LEVELS_RETRY();const n=2**a*3**b,v=Math.round((a*L2+b*L3)*10000)/10000;const sh=rnd(-1,1);const N=sh>=0?n*10**sh:n/10;const vv=Math.round((v+sh)*10000)/10000;
+     return{q:`已知 log 2 ≈ 0.3010、log 3 ≈ 0.4771，求 log ${dec(N)}。`,ans:RD(vv),steps:[`${dec(N)} ＝ ${a?`2${a>1?sup(a):''}`:''}${a&&b?' × ':''}${b?`3${b>1?sup(b):''}`:''}${sh?` × 10${sh<0?sup('−1'):''}`:''}`,`log ${dec(N)} ＝ ${[a?`${a===1?'':a+' × '}0.3010`:'',b?`${b===1?'':b+' × '}0.4771`:'',sh?(sh>0?'1':'(−1)'):''].filter(Boolean).join(' ＋ ')} ＝ <b>${dec(vv)}</b>`]}},
+   ()=>{const t=pick([['5','1 − 0.3010',0.699],['0.5','−0.3010',-0.301],['1.5','0.4771 − 0.3010',0.1761],['2.5','1 − 2 × 0.3010',0.398],['15','0.4771 + 1 − 0.3010',1.1761],['0.25','−2 × 0.3010',-0.602],['45','2 × 0.4771 + 1 − 0.3010',1.6532]]);return{q:`已知 log 2 ≈ 0.3010、log 3 ≈ 0.4771，求 log ${t[0]}。`,ans:RD(t[2]),steps:[`把 ${t[0]} 拆成 2、3、10 的乘除`,`log ${t[0]} ＝ ${t[1]} ＝ <b>${dec(t[2])}</b>`]}}],
+  3:[()=>{const b=pick([2,3,6,12]);let n,lg,x;do{n=rnd(10,100);lg=b===2?n*L2:b===3?n*L3:b===6?n*(L2+L3):n*(2*L2+L3);x=lg-Math.floor(lg)}while(x<0.02||x>0.98);const d=Math.floor(lg)+1;
+     return{q:`${b}<sup>${n}</sup> 是幾位數？（log 2 ≈ 0.3010、log 3 ≈ 0.4771）`,ans:[d,1],steps:[`log ${b}<sup>${n}</sup> ＝ ${n} × log ${b} ≈ ${dec(Math.round(lg*10000)/10000)}`,`整數部分 ${Math.floor(lg)}，所以是 ${Math.floor(lg)} ＋ 1 ＝ <b>${d}</b> 位數`]}}],
+  4:[()=>{const b=pick([2,3]);let n,lg,x;do{n=rnd(5,60);lg=n*(b===2?L2:L3);x=lg-Math.floor(lg)}while(x<0.02||x>0.98);const pos=Math.ceil(lg);
+     return{q:`${M(`(${fr(1,b)})<sup>${n}</sup>`)} 化成小數後，從小數點後第幾位開始出現不為 0 的數字？（log 2 ≈ 0.3010、log 3 ≈ 0.4771）`,ans:[pos,1],steps:[`log ${M(`(${fr(1,b)})<sup>${n}</sup>`)} ＝ −${n} × log ${b} ≈ −${dec(Math.round(lg*10000)/10000)} ＝ −${pos} ＋ ${dec(Math.round((pos-lg)*10000)/10000)}`,`所以它 ＝ 10<sup>${dec(Math.round((pos-lg)*10000)/10000)}</sup> × 10<sup>−${pos}</sup>，10<sup>小數部分</sup> 介於 1 與 10 之間`,`從小數點後第 <b>${pos}</b> 位開始不為 0`]}},
+   ()=>{let n,lg,f;do{n=rnd(10,60);lg=n*L2;f=lg-Math.floor(lg)}while(Math.abs(f-L2)<0.01||Math.abs(f-L3)<0.01||Math.abs(f-2*L2)<0.01||Math.abs(f-(1-L2))<0.01||Math.abs(f-(L2+L3))<0.01||Math.abs(f-(3*L2))<0.01||Math.abs(f-2*L3)<0.01||f<0.01||f>0.99);
+     const bounds=[[0,1],[L2,2],[L3,3],[2*L2,4],[1-L2,5],[L2+L3,6],[3*L2,8],[2*L3,9]].sort((a,b)=>a[0]-b[0]);let d=1;for(const [v,dd] of bounds){if(f>=v)d=dd}
+     // digit 7 lies between log6 and log8: handle with log 7 unknown → avoid that band
+     if(f>L2+L3&&f<3*L2)LEVELS_RETRY();
+     return{q:`2<sup>${n}</sup> 的首位數字（最左邊那一位）是多少？（log 2 ≈ 0.3010、log 3 ≈ 0.4771）`,ans:[d,1],steps:[`log 2<sup>${n}</sup> ≈ ${dec(Math.round(lg*10000)/10000)}，小數部分 <i>f</i> ≈ ${dec(Math.round(f*10000)/10000)}`,`比較：log ${d} ≤ <i>f</i> ＜ log ${d===9?10:d+1}（log 4 ≈ 0.6020、log 5 ≈ 0.6990、log 6 ≈ 0.7781、log 8 ≈ 0.9030、log 9 ≈ 0.9542）`,`首位數字是 <b>${d}</b>`]}}]}});
+
+const M31=mkLesson({id:'m31',sec:'3-1',secName:'多項式的運算與應用',title:'多項式除法、餘式定理與因式定理',
+ goal:'會做多項式除法與綜合除法，熟練餘式定理、因式定理，並能求除以二次式的餘式。',
+ concept:`<div class="prose"><p><b>除法原理</b>：<i>f</i>(<i>x</i>) ＝ <i>g</i>(<i>x</i>) · <i>q</i>(<i>x</i>) ＋ <i>r</i>(<i>x</i>)，其中餘式 <i>r</i>(<i>x</i>) 的次數比除式 <i>g</i>(<i>x</i>) 小（或 <i>r</i> ＝ 0）。</p>
+  <ul><li><b>餘式定理</b>：<i>f</i>(<i>x</i>) 除以 <i>x</i> − <i>a</i> 的餘式 ＝ <i>f</i>(<i>a</i>)。除以 <i>ax</i> − <i>b</i> 的餘式 ＝ <i>f</i>(<i>b</i>/<i>a</i>)。</li>
+  <li><b>因式定理</b>：<i>x</i> − <i>a</i> 是 <i>f</i>(<i>x</i>) 的因式 ⇔ <i>f</i>(<i>a</i>) ＝ 0。</li>
+  <li><b>綜合除法</b>：除以 <i>x</i> − <i>a</i> 時，只寫係數，「下拉、乘 <i>a</i>、加」反覆做，最後一個數是餘式。</li></ul></div>
+  <div class="formula"><i>f</i>(<i>x</i>) ÷ (<i>x</i> − <i>a</i>)，餘式 ＝ <i>f</i>(<i>a</i>)<small>不必真的做除法</small></div>
+  <div class="tip"><b>常見錯誤：</b>除以 <i>x</i> ＋ 2 時要代 <i>x</i> ＝ −2；缺項（例如沒有 <i>x</i>² 項）在綜合除法時要補 0。</div>`,
+ deep:`<div class="prose"><p><b>餘式定理為什麼成立？</b><i>f</i>(<i>x</i>) ＝ (<i>x</i> − <i>a</i>)<i>q</i>(<i>x</i>) ＋ <i>r</i>，<i>r</i> 是常數。代 <i>x</i> ＝ <i>a</i>，前一項變 0，就剩 <i>f</i>(<i>a</i>) ＝ <i>r</i>。</p>
+  <p><b>除以二次式的餘式</b>：<i>f</i>(<i>x</i>) 除以 (<i>x</i> − <i>a</i>)(<i>x</i> − <i>b</i>) 的餘式是一次式 <i>px</i> ＋ <i>q</i>。代 <i>x</i> ＝ <i>a</i>、<i>b</i> 得 <i>pa</i> ＋ <i>q</i> ＝ <i>f</i>(<i>a</i>)、<i>pb</i> ＋ <i>q</i> ＝ <i>f</i>(<i>b</i>)，解聯立即可。</p>
+  <p><b>有理根檢驗</b>：整係數多項式 <i>a<sub>n</sub>x<sup>n</sup></i> ＋ … ＋ <i>a</i><sub>0</sub> 若有有理根 <i>p</i>/<i>q</i>（最簡），則 <i>p</i> 整除 <i>a</i><sub>0</sub>、<i>q</i> 整除 <i>a<sub>n</sub></i>。這讓我們可以有系統地找因式。</p></div>`,
+ ex:{q:`${M(`<i>f</i>(<i>x</i>) = 2${X3} − 3${X2} + <i>k</i><i>x</i> + 6`)} 有因式 <i>x</i> − 2，求 <i>k</i>。`,steps:['因式定理：<i>f</i>(2) ＝ 0。','2 × 8 − 3 × 4 ＋ 2<i>k</i> ＋ 6 ＝ 0 ⇒ 10 ＋ 2<i>k</i> ＝ 0。','<i>k</i> ＝ <b>−5</b>。']},
+ notes:{2:'因式定理：代入讓式子等於 0，解出未知係數。',3:'除以二次式：餘式是一次式，代兩個根列聯立。',4:'綜合應用：未知係數與餘式條件同時出現。'},
+ gens:{
+  1:[()=>{const cs=[nz(-3,3),rnd(-4,4),rnd(-5,5),rnd(-6,6)],a=nz(-3,3),v=evalP(cs,a);return{q:`${M(`<i>f</i>(<i>x</i>) = ${polyStr(cs)}`)} 除以 ${M(poly([[1,X],[-a,'']]))} 的餘式是多少？`,ans:[v,1],steps:[`餘式定理：餘式 ＝ <i>f</i>(${num(a)})`,`代入計算，答案是 <b>${num(v)}</b>`]}},
+   ()=>{const a=nz(-3,3),q=[1,rnd(-4,4),rnd(-5,5)],r=rnd(-6,6);const cs=[q[0],q[1]-a*q[0],q[2]-a*q[1],r-a*q[2]];const ask=pick([1,2,'r']);
+     return{q:`用綜合除法求 ${M(`(${polyStr(cs)}) ÷ (${poly([[1,X],[-a,'']])})`)}，商式寫成 ${M(`${X2} + <i>b</i><i>x</i> + <i>c</i>`)}，${ask==='r'?'餘式':ask===1?'<i>b</i>':'<i>c</i>'} 是多少？`,ans:[ask==='r'?r:q[ask],1],steps:[`係數 ${cs.map(num).join('、')}，用 ${num(a)} 做綜合除法：下拉、乘 ${num(a)}、相加`,`得到 ${q.map(num).join('、')} | 餘 ${num(r)}，商式 ${M(polyStr(q))}`,`答案是 <b>${num(ask==='r'?r:q[ask])}</b>`]}}],
+  2:[()=>{const a=nz(-3,3),c=[nz(-2,2),rnd(-4,4),null,rnd(-6,6)];const known=c[0]*a**3+c[1]*a*a+c[3];if(known%a!==0)LEVELS_RETRY();const k=-known/a;
+     return{q:`${M(`<i>f</i>(<i>x</i>) = ${poly([[c[0],X3],[c[1],X2]])} + <i>k</i><i>x</i>${c[3]?(c[3]>0?' + '+c[3]:' − '+(-c[3])):''}`)} 有因式 ${M(poly([[1,X],[-a,'']]))}，求 <i>k</i>。`,ans:[k,1],steps:[`因式定理：<i>f</i>(${num(a)}) ＝ 0`,`${num(c[0]*a**3)} ＋ ${par(c[1]*a*a)} ＋ ${par(a)}<i>k</i> ＋ ${par(c[3])} ＝ 0 ⇒ ${num(a)}<i>k</i> ＝ ${num(-known)}`,`<i>k</i> ＝ <b>${num(k)}</b>`]}},
+   ()=>{const b=pick([2,3]),a=pick([1,-1,3,-3,5]);if(gcd(a,b)!==1)LEVELS_RETRY();const cs=[rnd(1,3)*b,rnd(-4,4),rnd(-4,4)];const v=R(cs[0]*a*a+cs[1]*a*b+cs[2]*b*b,b*b);
+     return{q:`${M(`<i>f</i>(<i>x</i>) = ${polyStr(cs)}`)} 除以 ${M(poly([[b,X],[-a,'']]))} 的餘式是多少？`,ans:v,steps:[`除以 ${b}<i>x</i> − ${par(a)}，餘式 ＝ ${M(`<i>f</i>(${rFmt(R(a,b))})`)}`,`代入計算，答案是 <b>${M(rFmt(v))}</b>`]}}],
+  3:[()=>{let a,b;do{a=rnd(-3,3);b=rnd(-3,3)}while(a===b);const p=rnd(-5,5),q=rnd(-6,6);const fa=p*a+q,fb=p*b+q;const ask=Math.random()<.5;
+     return{q:`<i>f</i>(<i>x</i>) 除以 ${M(poly([[1,X],[-a,'']]))} 餘 ${num(fa)}，除以 ${M(poly([[1,X],[-b,'']]))} 餘 ${num(fb)}。<i>f</i>(<i>x</i>) 除以 ${M(`(${poly([[1,X],[-a,'']])})(${poly([[1,X],[-b,'']])})`)} 的餘式為 ${M('<i>p</i><i>x</i> + <i>q</i>')}，求 ${ask?'<i>p</i>':'<i>q</i>'}。`,ans:[ask?p:q,1],steps:[`設 <i>f</i>(<i>x</i>) ＝ (<i>x</i> − ${par(a)})(<i>x</i> − ${par(b)})<i>Q</i>(<i>x</i>) ＋ <i>px</i> ＋ <i>q</i>`,`代 ${num(a)}：${num(a)}<i>p</i> ＋ <i>q</i> ＝ ${num(fa)}；代 ${num(b)}：${num(b)}<i>p</i> ＋ <i>q</i> ＝ ${num(fb)}`,`相減得 <i>p</i> ＝ ${num(p)}，<i>q</i> ＝ ${num(q)}，答案是 <b>${num(ask?p:q)}</b>`]}}],
+  4:[()=>{let a,b;do{a=rnd(-3,3);b=rnd(-3,3)}while(a===b||a===0||b===0);const c3=nz(-2,2),A=rnd(-3,3),B=rnd(-3,3);
+     /* f = c3 x^3 + A x^2 + m x + n, divisible by (x-a)(x-b) → find m,n */
+     const r=(x)=>c3*x**3+A*x*x;const m=R(-(r(a)-r(b)),a-b);if(m[1]!==1)LEVELS_RETRY();const n=-(r(a)+m[0]*a);const ask=Math.random()<.5;
+     return{q:`${M(`<i>f</i>(<i>x</i>) = ${poly([[c3,X3],[A,X2]])} + <i>m</i><i>x</i> + <i>n</i>`)} 能被 ${M(`(${poly([[1,X],[-a,'']])})(${poly([[1,X],[-b,'']])})`)} 整除，求 ${ask?'<i>m</i>':'<i>n</i>'}。`,ans:[ask?m[0]:n,1],steps:[`整除 ⇒ <i>f</i>(${num(a)}) ＝ 0 且 <i>f</i>(${num(b)}) ＝ 0`,`${num(r(a))} ＋ ${par(a)}<i>m</i> ＋ <i>n</i> ＝ 0；${num(r(b))} ＋ ${par(b)}<i>m</i> ＋ <i>n</i> ＝ 0`,`相減解得 <i>m</i> ＝ ${num(m[0])}，<i>n</i> ＝ ${num(n)}，答案是 <b>${num(ask?m[0]:n)}</b>`]}}]}});
+
+const M32=mkLesson({id:'m32',sec:'3-2',secName:'多項式函數及其圖形',title:'一次、二次與三次函數的圖形',
+ goal:'會用配方法找二次函數的頂點與最值，判斷與 x 軸交點，處理區間最值，並認識三次函數的對稱中心。',
+ concept:`<div class="prose"><p><b>二次函數</b> ${M('<i>y</i> = <i>a</i><i>x</i><sup>2</sup> + <i>b</i><i>x</i> + <i>c</i>')}（<i>a</i> ≠ 0）的圖形是拋物線。配方成 ${M('<i>y</i> = <i>a</i>(<i>x</i> − <i>h</i>)<sup>2</sup> + <i>k</i>')}：</p>
+  <ul><li>頂點 (<i>h</i>, <i>k</i>)，對稱軸 <i>x</i> ＝ <i>h</i> ＝ −<i>b</i>/(2<i>a</i>)。</li><li><i>a</i> ＞ 0 開口向上，有最小值 <i>k</i>；<i>a</i> ＜ 0 開口向下，有最大值 <i>k</i>。</li>
+  <li>與 <i>x</i> 軸交點個數看判別式 <i>D</i> ＝ <i>b</i>² − 4<i>ac</i>：<i>D</i> ＞ 0 兩點、＝ 0 一點（相切）、＜ 0 沒有交點。</li></ul>
+  <p><b>三次函數</b> ${M('<i>y</i> = <i>a</i>(<i>x</i> − <i>h</i>)<sup>3</sup> + <i>p</i>(<i>x</i> − <i>h</i>) + <i>k</i>')} 的圖形對稱於點 (<i>h</i>, <i>k</i>)，叫做<b>對稱中心</b>，<i>h</i> ＝ −<i>b</i>/(3<i>a</i>)。</p></div>
+`,
+ deep:`<div class="prose"><p><b>區間最值</b>：在 [<i>m</i>, <i>n</i>] 上求二次函數的最值，先看頂點在不在區間內。開口向上時，頂點在區間內 → 最小值是頂點；最大值在離對稱軸較遠的端點。頂點不在區間內 → 最大、最小都在端點。</p>
+  <p><b>判別式的意義</b>：令 <i>y</i> ＝ 0 解方程式，配方後 (<i>x</i> − <i>h</i>)² ＝ <i>D</i>/(4<i>a</i>²)，<i>D</i> 的正負決定右邊能不能開根號，也就是有沒有實數解。</p>
+  <p><b>三次函數的對稱中心</b>：<i>y</i> ＝ <i>x</i>³ − 3<i>x</i> 是奇函數（<i>f</i>(−<i>x</i>) ＝ −<i>f</i>(<i>x</i>)），對稱於原點。把它平移就得到一般的三次函數，對稱中心跟著平移到 (<i>h</i>, <i>k</i>)。</p></div>`,
+ ex:{q:`求 ${M(`<i>y</i> = 2${X2} − 8<i>x</i> + 3`)} 的最小值。`,steps:[`配方：${M(`<i>y</i> = 2(${X2} − 4<i>x</i>) + 3 = 2(<i>x</i> − 2)<sup>2</sup> − 8 + 3`)}`,`${M('<i>y</i> = 2(<i>x</i> − 2)<sup>2</sup> − 5')}，開口向上`,'<i>x</i> ＝ 2 時有最小值 <b>−5</b>。']},
+ notes:{2:'由一般式配方，判斷頂點、對稱軸與 x 軸交點。',3:'區間最值：先看頂點是否在區間內。',4:'三次函數的對稱中心。'},
+ gens:{
+  1:[()=>{const a=pick([1,2,-1,-2,3]),h=rnd(-4,4),k=rnd(-9,9),ask=pick(['h','k']);const lead=a===1?'':a===-1?'−':num(a);return{q:`拋物線 ${M(`<i>y</i> = ${lead}${sq(X,h)}${k?(k<0?' − '+(-k):' + '+k):''}`)} 的頂點為 (<i>h</i>, <i>k</i>)，求 ${ask==='h'?'<i>h</i>':'<i>k</i>'}。`,ans:[ask==='h'?h:k,1],steps:[`頂點式 <i>y</i> ＝ <i>a</i>(<i>x</i> − <i>h</i>)² ＋ <i>k</i>，括號裡是「減 <i>h</i>」`,`頂點 (${num(h)}, ${num(k)})，答案是 <b>${num(ask==='h'?h:k)}</b>`]}},
+   ()=>{const m=nz(-4,4),b=rnd(-6,6),x0=rnd(-4,4);return{q:`一次函數 ${M(`<i>f</i>(<i>x</i>) = ${poly([[m,X],[b,'']])}`)}，求 <i>f</i>(${num(x0)})。`,ans:[m*x0+b,1],steps:[`代入：${num(m)} × ${par(x0)} ＋ ${par(b)}`,`答案是 <b>${num(m*x0+b)}</b>`]}}],
+  2:[()=>{const a=pick([1,2,-1,-2,3,-3]),h=rnd(-4,4),k=rnd(-9,9),b=-2*a*h,c=a*h*h+k,ask=pick(['ax','ext']);return{q:`${M(`<i>y</i> = ${poly([[a,X2],[b,X],[c,'']])}`)} 的${ask==='ax'?'對稱軸為 <i>x</i> ＝ ?':(a>0?'最小值':'最大值')+'是多少？'}`,ans:[ask==='ax'?h:k,1],steps:[`對稱軸 <i>x</i> ＝ −<i>b</i>/(2<i>a</i>) ＝ ${M(fr(num(-b),2*a))} ＝ ${num(h)}`,ask==='ax'?`答案是 <b>${num(h)}</b>`:`代入 <i>x</i> ＝ ${num(h)} 得 ${num(k)}，開口${a>0?'向上，為最小值':'向下，為最大值'} <b>${num(k)}</b>`]}},
+   ()=>{const b=rnd(-8,8),c=rnd(-9,9),D=b*b-4*c,n=D>0?2:D===0?1:0;return{q:`拋物線 ${M(`<i>y</i> = ${poly([[1,X2],[b,X],[c,'']])}`)} 與 <i>x</i> 軸有幾個交點？`,ans:[n,1],steps:[`判別式 <i>D</i> ＝ <i>b</i>² − 4<i>ac</i> ＝ ${b*b} − ${par(4*c)} ＝ ${num(D)}`,`<i>D</i> ${D>0?'＞':D===0?'＝':'＜'} 0，答案是 <b>${n}</b>`]}}],
+  3:[()=>{const a=pick([1,-1,2]),h=rnd(-3,3),k=rnd(-6,6);let m,n;do{m=rnd(-5,4);n=rnd(m+1,6)}while(false);const f=x=>a*(x-h)**2+k;const vals=[f(m),f(n)];if(h>=m&&h<=n)vals.push(k);const mx=Math.max(...vals),mn=Math.min(...vals),askMax=Math.random()<.5;
+     return{q:`${M(`<i>f</i>(<i>x</i>) = ${a===1?'':a===-1?'−':a}${sq(X,h)}${k?(k<0?' − '+(-k):' + '+k):''}`)}，在 ${M(`${num(m)} ≤ <i>x</i> ≤ ${num(n)}`)} 的${askMax?'最大值':'最小值'}是多少？`,ans:[askMax?mx:mn,1],steps:[`頂點 <i>x</i> ＝ ${num(h)} ${h>=m&&h<=n?'在':'不在'}區間內；端點 <i>f</i>(${num(m)}) ＝ ${num(f(m))}、<i>f</i>(${num(n)}) ＝ ${num(f(n))}${h>=m&&h<=n?`，頂點值 ${num(k)}`:''}`,`比較這些值，${askMax?'最大':'最小'}值是 <b>${num(askMax?mx:mn)}</b>`]}}],
+  4:[()=>{const a=pick([1,2,-1]),h=rnd(-3,3),p=rnd(-4,4),k=rnd(-6,6);const b=-3*a*h,c=3*a*h*h+p,d=-a*h**3-p*h+k;const ask=pick(['h','k','sum']);
+     return{q:`三次函數 ${M(`<i>y</i> = ${poly([[a,X3],[b,X2],[c,X],[d,'']])}`)} 的圖形對稱中心為 (<i>h</i>, <i>k</i>)，求 ${ask==='h'?'<i>h</i>':ask==='k'?'<i>k</i>':'<i>h</i> + <i>k</i>'}。`,ans:[ask==='h'?h:ask==='k'?k:h+k,1],steps:[`對稱中心的 <i>x</i> 坐標 <i>h</i> ＝ −<i>b</i>/(3<i>a</i>) ＝ ${M(fr(num(-b),3*a))} ＝ ${num(h)}`,`<i>k</i> ＝ <i>f</i>(${num(h)}) ＝ ${num(k)}`,`答案是 <b>${num(ask==='h'?h:ask==='k'?k:h+k)}</b>`]}}]}});
+
+const M33=mkLesson({id:'m33',sec:'3-3',secName:'多項式不等式',title:'一次、二次與高次不等式',
+ goal:'會解一次、二次與高次多項式不等式，熟練數線上的正負號判斷，並處理「恆成立」的條件。',
+ concept:`<div class="prose"><p><b>二次不等式</b>（<i>a</i> ＞ 0）：先求 <i>ax</i>² ＋ <i>bx</i> ＋ <i>c</i> ＝ 0 的兩根 α ＜ β。</p>
+  <ul><li>${M('&lt; 0')}（或 ≤ 0）：解在兩根<b>之間</b>，α ＜ <i>x</i> ＜ β。</li><li>${M('&gt; 0')}（或 ≥ 0）：解在兩根<b>外側</b>，<i>x</i> ＜ α 或 <i>x</i> ＞ β。</li>
+  <li>若 <i>a</i> ＜ 0，先兩邊乘 −1（不等號反向）。</li></ul>
+  <p><b>高次不等式</b>：因式分解後，把根標在數線上，<b>從最右邊開始是正，每經過一個根就變號</b>（重根偶數次不變號）。</p></div>
+  <div class="tip"><b>常見錯誤：</b>乘或除以負數時，不等號要反向；重根 (<i>x</i> − 2)² 經過時不變號，而且 (<i>x</i> − 2)² ≥ 0 恆成立。</div>`,
+ deep:`<div class="prose"><p><b>為什麼從右邊開始是正的？</b>當 <i>x</i> 比所有根都大，每個因式 (<i>x</i> − <i>r</i>) 都是正的，乘起來是正的（首項係數為正時）。往左每跨過一個根，就有一個因式變負，整體變號一次。</p>
+  <p><b>恆成立條件</b>：<i>ax</i>² ＋ <i>bx</i> ＋ <i>c</i> ＞ 0 對所有實數 <i>x</i> 都成立 ⇔ <i>a</i> ＞ 0 且 <i>D</i> ＜ 0（拋物線整個在 <i>x</i> 軸上方）。若是 ≥ 0，則 <i>D</i> ≤ 0。</p>
+  <p><b>由解反推係數</b>：若 <i>x</i>² ＋ <i>bx</i> ＋ <i>c</i> ＜ 0 的解是 2 ＜ <i>x</i> ＜ 5，代表 2、5 是方程式的兩根，所以 <i>b</i> ＝ −(2 ＋ 5) ＝ −7，<i>c</i> ＝ 2 × 5 ＝ 10（根與係數關係）。</p></div>`,
+ ex:{q:`解 ${M(`${X2} − <i>x</i> − 6 ≥ 0`)}。`,steps:[`因式分解：(<i>x</i> − 3)(<i>x</i> ＋ 2) ≥ 0，兩根 −2、3。`,'開口向上，「≥ 0」取兩根外側。','解為 <b><i>x</i> ≤ −2 或 <i>x</i> ≥ 3</b>。']},
+ notes:{2:'二次不等式：先因式分解找兩根，再判斷取中間或外側。',3:'高次不等式：數線上由右而左正負交替。',4:'恆成立與由解反推係數。'},
+ gens:{
+  1:[()=>{const a=nz(-4,4),b=rnd(-9,9),c=rnd(-9,9);const bound=R(c-b,a),gt=Math.random()<.5;const dir=(a>0)===gt;const askMin=dir;
+     /* a x + b > c  → x > (c-b)/a if a>0 */
+     const lo=Math.floor(bound[0]/bound[1]);const ans=dir?(bound[1]===1?bound[0]+1:Math.floor(bound[0]/bound[1])+1):(bound[1]===1?bound[0]-1:Math.ceil(bound[0]/bound[1])-1);
+     return{q:`滿足 ${M(`${poly([[a,X],[b,'']])} ${gt?'&gt;':'&lt;'} ${num(c)}`)} 的${dir?'最小整數':'最大整數'}是多少？`,ans:[ans,1],steps:[`移項：${M(`${a===1?'':a===-1?'−':num(a)}<i>x</i> ${gt?'&gt;':'&lt;'} ${num(c-b)}`)}`,`${a<0?'除以負數，不等號反向：':'兩邊除以 '+a+'：'}${M(`<i>x</i> ${dir?'&gt;':'&lt;'} ${rFmt(bound)}`)}`,`答案是 <b>${num(ans)}</b>`]}}],
+  2:[()=>{const r1=rnd(-6,4),r2=r1+rnd(1,7),strict=Math.random()<.5,inside=Math.random()<.6;const f=poly([[1,X2],[-(r1+r2),X],[r1*r2,'']]);
+     if(inside){const cnt=strict?r2-r1-1:r2-r1+1;if(cnt<=0)LEVELS_RETRY();return{q:`滿足 ${M(`${f} ${strict?'&lt;':'≤'} 0`)} 的整數 <i>x</i> 有幾個？`,ans:[cnt,1],steps:[`(<i>x</i> − ${par(r1)})(<i>x</i> − ${par(r2)}) ${strict?'&lt;':'≤'} 0，兩根 ${num(r1)}、${num(r2)}`,`開口向上、小於 0 取兩根之間：${M(`${num(r1)} ${strict?'&lt;':'≤'} <i>x</i> ${strict?'&lt;':'≤'} ${num(r2)}`)}`,`整數共 <b>${cnt}</b> 個`]}}
+     const ans=strict?r2+1:r2;if(ans<=0)LEVELS_RETRY();return{q:`滿足 ${M(`${f} ${strict?'&gt;':'≥'} 0`)} 的最小<b>正</b>整數是多少？`,ans:[r2>=1?ans:1,1],steps:[`兩根 ${num(r1)}、${num(r2)}，大於 0 取外側：<i>x</i> ${strict?'&lt;':'≤'} ${num(r1)} 或 <i>x</i> ${strict?'&gt;':'≥'} ${num(r2)}`,`最小正整數是 <b>${r2>=1?ans:1}</b>`]}}],
+  3:[()=>{const s=[...new Set([rnd(-6,6),rnd(-6,6),rnd(-6,6)])];if(s.length<3)LEVELS_RETRY();s.sort((a,b)=>a-b);const [a,b,c]=s,strict=Math.random()<.5,lt=Math.random()<.5;let cnt=0;
+     for(let x=-10;x<=10;x++){const v=(x-a)*(x-b)*(x-c);if(lt?(strict?v<0:v<=0):(strict?v>0:v>=0))cnt++}
+     const sol=lt?`<i>x</i> ${strict?'&lt;':'≤'} ${num(a)} 或 ${num(b)} ${strict?'&lt;':'≤'} <i>x</i> ${strict?'&lt;':'≤'} ${num(c)}`:`${num(a)} ${strict?'&lt;':'≤'} <i>x</i> ${strict?'&lt;':'≤'} ${num(b)} 或 <i>x</i> ${strict?'&gt;':'≥'} ${num(c)}`;
+     return{q:`在 −10 ≤ <i>x</i> ≤ 10 的範圍內，滿足 ${M(`(${poly([[1,X],[-a,'']])})(${poly([[1,X],[-b,'']])})(${poly([[1,X],[-c,'']])}) ${lt?(strict?'&lt;':'≤'):(strict?'&gt;':'≥')} 0`)} 的整數有幾個？`,ans:[cnt,1],steps:[`根 ${num(a)}、${num(b)}、${num(c)}，由右而左：正、負、正、負`,`解：${M(sol)}`,`在 −10～10 中數一數，共 <b>${cnt}</b> 個`]}}],
+  4:[()=>{const m=pick([2,3,4,5,6]),c=m*m,strict=Math.random()<.5;const cnt=strict?2*(2*m)-1:2*(2*m)+1;
+     return{q:`若 ${M(`${X2} + <i>k</i><i>x</i> + ${c} ${strict?'&gt;':'≥'} 0`)} 對所有實數 <i>x</i> 都成立，整數 <i>k</i> 有幾個？`,ans:[cnt,1],steps:[`開口向上，${strict?'恆正':'恆非負'}的條件是判別式 ${strict?'&lt;':'≤'} 0：${M(`<i>k</i><sup>2</sup> − ${4*c} ${strict?'&lt;':'≤'} 0`)}`,`${M(`−${2*m} ${strict?'&lt;':'≤'} <i>k</i> ${strict?'&lt;':'≤'} ${2*m}`)}`,`整數 <i>k</i> 共 <b>${cnt}</b> 個`]}},
+   ()=>{const p=rnd(-5,3),q=p+rnd(1,6),ask=Math.random()<.5;return{q:`已知 ${M(`${X2} + <i>b</i><i>x</i> + <i>c</i> &lt; 0`)} 的解為 ${M(`${num(p)} &lt; <i>x</i> &lt; ${num(q)}`)}，求 ${ask?'<i>b</i>':'<i>c</i>'}。`,ans:[ask?-(p+q):p*q,1],steps:[`解在兩根之間，所以 ${num(p)}、${num(q)} 是 ${M(`${X2} + <i>b</i><i>x</i> + <i>c</i> = 0`)} 的兩根`,`${M(`${X2} + <i>b</i><i>x</i> + <i>c</i> = (<i>x</i> − ${par(p)})(<i>x</i> − ${par(q)})`)}：<i>b</i> ＝ −(${num(p)} ＋ ${par(q)}) ＝ ${num(-(p+q))}，<i>c</i> ＝ ${num(p*q)}`,`答案是 <b>${num(ask?-(p+q):p*q)}</b>`]}},
+   ()=>{const a=rnd(-4,4),b=rnd(-4,4);if(a===b)LEVELS_RETRY();let cnt=0;for(let x=-10;x<=10;x++){if((x-a)**2*(x-b)<0)cnt++}
+     return{q:`在 −10 ≤ <i>x</i> ≤ 10 的範圍內，滿足 ${M(`(${poly([[1,X],[-a,'']])})<sup>2</sup>(${poly([[1,X],[-b,'']])}) &lt; 0`)} 的整數有幾個？`,ans:[cnt,1],steps:[`(<i>x</i> − ${par(a)})² ≥ 0，等於 0 時整個式子是 0（不符合 ＜ 0），所以 <i>x</i> ≠ ${num(a)}`,`其餘只要 <i>x</i> − ${par(b)} ＜ 0，即 <i>x</i> ＜ ${num(b)}，並排除 <i>x</i> ＝ ${num(a)}`,`在 −10～10 中共 <b>${cnt}</b> 個`]}}]}});
+
+/* old single-type practice topics are now covered by full sections */
+for(const k of ['abs','root','mult','rem','quad'])delete MATH_TOPICS[k];
+/* insert in textbook order */
+{const ord=['neg','m11','m12','m13','m14','coord','dist','mid','slope','line','perp','pdist','circle','cline','m31','m32','m33'];const all=[...MATH_LESSONS,M11,M12,M13,M14,M31,M32,M33];MATH_LESSONS.length=0;for(const id of ord)MATH_LESSONS.push(all.find(l=>l.id===id))}
+Object.assign(MATH_TOPICS,{m11:{ch:0,name:'1-1 實數與根式',fromLesson:'m11'},m12:{ch:0,name:'1-2 絕對值',fromLesson:'m12'},m13:{ch:0,name:'1-3 指數',fromLesson:'m13'},m14:{ch:0,name:'1-4 常用對數',fromLesson:'m14'},m31:{ch:2,name:'3-1 餘式與因式定理',fromLesson:'m31'},m32:{ch:2,name:'3-2 多項式函數圖形',fromLesson:'m32'},m33:{ch:2,name:'3-3 多項式不等式',fromLesson:'m33'}});
 /* ================= 南一版 section labels (math) ================= */
 const NANI_SEC={coord:['2-1','直線方程式及其圖形'],dist:['2-1','直線方程式及其圖形'],mid:['2-1','直線方程式及其圖形'],slope:['2-1','直線方程式及其圖形'],line:['2-1','直線方程式及其圖形'],
  perp:['2-2','直線方程式的應用'],pdist:['2-2','直線方程式的應用'],circle:['2-3','圓方程式'],cline:['2-4','圓與直線的關係']};
@@ -2441,9 +2666,9 @@ const unitsOf=ls=>[...new Set(ls.map(l=>l.unit))];
 const mkTopics=ls=>{const u=unitsOf(ls),o={};ls.forEach(l=>{o[l.id]={ch:u.indexOf(l.unit),name:l.title,fromLesson:l.id}});return o};
 const CEEC_LIST='https://www.ceec.edu.tw/xmfile?xsmsid=0J052424829869345634';
 const SUBJ={
- math:{name:'數學',lessons:MATH_LESSONS,topics:MATH_TOPICS,chapters:MATH_CHAPTERS,tabs:['從頭學・第二章','隨機練習','考古題・模擬考','題庫'],
-  sub:{learn:'從頭學第二章「直線與圓」：每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
-  mockFrom:2,mockMin:50,mockDesc:'範圍是第二章第 3～10 課'},
+ math:{name:'數學',lessons:MATH_LESSONS,topics:MATH_TOPICS,chapters:MATH_CHAPTERS,tabs:['從頭學・數學1','隨機練習','考古題・模擬考','題庫'],
+  sub:{learn:'數學 1 全冊（南一版 1-1～3-3）：每一課先看懂，再深入理解，跟著做，最後自己練。',prac:'高一上三章隨機出題。出題會自動偏向你比較不熟的單元。',past:'大考歷屆題改寫（附官方來源）、各校段考原卷連結，以及限時 50 分鐘的模擬段考。',bank:'每個單元固定 50 題，八成是中等以上難度。題號固定，可以分次做完。'},
+  mockFrom:1,mockMin:50,mockDesc:'範圍是數學 1 全冊（1-1～3-3）'},
  chem:{name:'化學',lessons:CHEM_LESSONS,topics:mkTopics(CHEM_LESSONS),chapters:unitsOf(CHEM_LESSONS),tabs:['從頭學・化學','隨機練習','模擬考','題庫'],
   sub:{learn:'高一上基礎化學全冊 12 課：觀念、深入理解、例題，再用四級難度自己練。',prac:'化學 12 課隨機出題，難度可以自動調整。',past:'限時 50 分鐘的化學模擬段考，以及官方歷屆試題連結。',bank:'每個單元固定 100 題，八成是中等以上難度。題號固定，可以分次做完。'},
   mockFrom:0,mockMin:50,mockDesc:'範圍是化學全部 12 課',
