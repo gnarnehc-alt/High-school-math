@@ -422,7 +422,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v26・2026/11/14 15:45</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v27・2026/11/14 15:51</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -4967,9 +4967,13 @@ const SUBJ={
   mockFrom:0,mockMin:40,mockDesc:'範圍是生物全部 12 課',
   links:[{name:'大考中心・學測歷屆試題與答案',url:CEEC_LIST,note:'學測「自然考科」包含高一生物的範圍，細胞、遺傳的題目最常出現。'}]}
 };
-/* math: group by topic instead of textbook sections */
-{const G={neg:'數與式',m11:'數與式',m12:'數與式',m13:'數與式',m14:'數與式',coord:'坐標平面與直線',dist:'坐標平面與直線',mid:'坐標平面與直線',slope:'坐標平面與直線',line:'坐標平面與直線',perp:'坐標平面與直線',pdist:'坐標平面與直線',circle:'圓',cline:'圓',m31:'多項式',m32:'多項式',m33:'多項式'};
- for(const l of MATH_LESSONS){l.unit=G[l.id]||l.unit;delete l.sec;delete l.secName;delete l.pre}
+/* math: 南一版章節順序 */
+{const C1='第一章　實數與指對數',C2='第二章　直線與圓',C3='第三章　多項式函數';
+ const G={neg:[C1,'暖身','正負數'],m11:[C1,'1-1','實數'],m12:[C1,'1-2','絕對值'],m13:[C1,'1-3','指數'],m14:[C1,'1-4','常用對數'],
+  coord:[C2,'2-1','直線方程式及其圖形'],dist:[C2,'2-1','直線方程式及其圖形'],mid:[C2,'2-1','直線方程式及其圖形'],slope:[C2,'2-1','直線方程式及其圖形'],line:[C2,'2-1','直線方程式及其圖形'],
+  perp:[C2,'2-2','直線方程式的應用'],pdist:[C2,'2-2','直線方程式的應用'],circle:[C2,'2-3','圓方程式'],cline:[C2,'2-4','圓與直線的關係'],
+  m31:[C3,'3-1','多項式的運算與應用'],m32:[C3,'3-2','多項式函數及其圖形'],m33:[C3,'3-3','多項式不等式']};
+ for(const l of MATH_LESSONS){const g=G[l.id];delete l.pre;if(g){l.unit=g[0];l.sec=g[1];l.secName=g[2]}else{delete l.sec;delete l.secName}}
  SUBJ.math.topics=mkTopics(MATH_LESSONS);SUBJ.math.chapters=unitsOf(MATH_LESSONS);}
 ALL_LESSONS.push(...PHYS_LESSONS);
 SUBJ.phys={name:'物理',lessons:PHYS_LESSONS,topics:mkTopics(PHYS_LESSONS),chapters:unitsOf(PHYS_LESSONS),tabs:['從頭學・物理','隨機練習','模擬考','題庫'],
@@ -6382,7 +6386,7 @@ function renderPath(){
   $('path-list').innerHTML=LESSONS.map((l,i)=>{const o=lvOf(l.id),st=stars(o),done=st>0;
     const cnt=st===MAXLV?'精通':'★'.repeat(st)+'☆'.repeat(MAXLV-st);
     const head=(l.unit||'').replace('　',' ');let h='';if(head&&head!==lastHead){h=`<li class="sec-head">${head}</li>`;lastHead=head}
-    return `${h}<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.title}</span><span class="cnt">${cnt}</span></button></li>`}).join('');
+    return `${h}<li><button type="button" class="lesson-link${done?' done':''}" data-id="${l.id}" aria-current="${l.id===S.cur}"><span class="no">${done?'✓':i+1}</span><span>${l.sec?`<span class="sec">${l.sec}</span>`:''}${l.title}</span><span class="cnt">${cnt}</span></button></li>`}).join('');
   const s=LESSONS.reduce((a,l)=>a+stars(lvOf(l.id)),0),T=LESSONS.length*MAXLV;
   $('overall').innerHTML=`星星 ${s} / ${T}（每級答對 3 題得一顆）<div class="bar"><i style="width:${s/T*100}%"></i></div>`;
 }
