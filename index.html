@@ -422,7 +422,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v25・2026/11/14 15:22</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v26・2026/11/14 15:45</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -2434,7 +2434,7 @@ function bankKey(p){const st=p.q.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<[^
 const BANK_CACHE={};
 function subjectOf(l){return l.subj||(l.id.startsWith('c_')?'chem':l.id.startsWith('b_')?'bio':'math')}
 function buildBank(l){if(BANK_CACHE[l.id])return BANK_CACHE[l.id];
- const plan=BANK_PLAN[subjectOf(l)],orig=Math.random;Math.random=seedRand((subjectOf(l).startsWith('math')?'bank-v4:':'bank-v1:')+l.id);const seen=new Set(),out=[];
+ const plan=BANK_PLAN[subjectOf(l)],orig=Math.random;Math.random=seedRand((subjectOf(l).startsWith('math')?'bank-v5:':'bank-v1:')+l.id);const seen=new Set(),out=[];
  const draw=(lv,want,maxTries)=>{let got=0,tries=0;while(got<want&&tries<maxTries){tries++;let p;try{p=genLv(l,lv)}catch(e){continue}const k=bankKey(p);if(seen.has(k))continue;seen.add(k);p.lv=lv;out.push(p);got++}return got};
  try{let carry=0;for(let lv=1;lv<=4;lv++){const want=plan[lv-1]+carry;carry=want-draw(lv,want,want*80)}
   for(const lv of [4,3,2]){if(carry<=0)break;carry-=draw(lv,carry,carry*400)}}
@@ -6215,6 +6215,100 @@ DX.perp[4][2]=RX.perpBis;DX.dist[2][2]=RX.triType;DX.dist[4][1]=RX.minSq;
 DX.pdist[1][2]=RX.pdistX;DX.pdist[2][2]=RX.parK;
 DX.circle[2][2]=RX.centerDist;DX.circle[3][1]=RX.inOut;DX.circle[3][2]=RX.areaPi;DX.circle[4][1]=RX.tanAxes;DX.cline[2][1]=RX.tanPoint;
 
+/* ================= 「平行與垂直」：逐步拆細的解答（不跳步） ================= */
+const SB=(title,...lines)=>`<b>${title}</b><br>${lines.join('<br>')}`;
+const FR=r=>M(rFmt(r));
+const FX=r=>r[1]===1&&r[0]===1?'':r[1]===1&&r[0]===-1?'−':FR(r);
+const CX=c=>c===1?'':c===-1?'−':num(c);
+const PS=r=>{const t=M(rFmt(r));return r[0]<0?'('+t+')':t};
+const subX=(A,B,C,pm,k)=>{/* 把 y=pm x + k 代入 Ax+By+C=0 的完整展開 */const Bp=Fm([B,1],pm),Bk=Fm([B,1],k);const co=Fa([A,1],Bp),cs=Fa(Bk,[C,1]);const x=Fd(Fm([-1,1],cs),co);return{x,L:[`・代入：${CX(A)}x ＋ ${par(B)} × (${FX(pm)}x ${k[0]>=0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))}) ${fx(C,'')} ＝ 0`,`・把括號乘開：${CX(A)}x ＋ ${PS(Bp)}x ＋ ${PS(Bk)} ${fx(C,'')} ＝ 0`,`・x 的項合併：(${num(A)} ＋ ${PS(Bp)})x ＝ ${FR(co)}x；常數合併：${PS(Bk)} ${fx(C,'')} ＝ ${FR(cs)}`,`・${FR(co)}x ＋ ${PS(cs)} ＝ 0，移項：${FR(co)}x ＝ ${FR(Fm([-1,1],cs))}`,`・兩邊除以 ${PS(co)}：x ＝ ${FR(x)}`]}};
+const ySlope=(a,b,c,name)=>{/* ax+by+c=0 → y=…，回傳說明行 */const m=R(-a,b),k=R(-c,b);const L=[];
+ L.push(`把 ${name||'方程式'} ${gL(a,b,c)} 改寫成「y ＝ …」的樣子：`);
+ const rhs=`${CX(-a)}x${c?` ${fx(-c,'')}`:''}`;
+ L.push(`・把含 x 的項${c?'和常數':''}移到等號右邊（移過去要變號）：${b===1?'y':b===-1?'−y':num(b)+'y'} ＝ ${rhs}`);
+ if(b!==1)L.push(`・兩邊都除以 ${par(b)}：y ＝ ${FX(m)}x${k[0]?` ${k[0]>0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))}`:''}`);
+ L.push(`・x 前面的數就是斜率，所以斜率是 <b>${FR(m)}</b>`);return{m,k,L}};
+const negRec=(m,who)=>{/* 垂直斜率說明 */const p=Fd([-1,1],m);return{p,L:[`兩條線垂直時，斜率相乘 ＝ −1：`,`・${FR(m)} × （${who||'所求直線'}的斜率）＝ −1`,`・${who||'所求直線'}的斜率 ＝ −1 ÷ ${PS(m)} ＝ −1 × ${PS(Fd([1,1],m))} ＝ <b>${FR(p)}</b>`,`（小技巧：把原斜率「上下顛倒、再變號」就是垂直的斜率）`]}};
+const PP={};
+PP[1]=[
+ ()=>{const m=R(nz(-5,5),pick([1,2,3]));const pp=Math.random()<.5;const k0=rnd(-5,5);const nr=negRec(m,'所求直線');const v=pp?m:nr.p;return{q:`和直線 y ＝ ${FX(m)}x ${fx(k0,'')} ${pp?'平行':'<b>垂直</b>'}的直線，斜率是多少？`,ans:v,steps:[
+  SB('【這題在問什麼】',`找一條和 y ＝ ${FX(m)}x ${fx(k0,'')} ${pp?'平行':'垂直'}的直線，它的斜率是多少。`),
+  SB('第 1 步：讀出原本直線的斜率',`y ＝ ${FX(m)}x ${fx(k0,'')} 已經是「y ＝ mx ＋ b」的樣子，`,`x 前面的數 ${FR(m)} 就是斜率。`),
+  pp?SB('第 2 步：平行的規則','兩條線平行 ⇔ 斜率一樣（方向相同，只是位置不同）。',`所以所求直線的斜率也是 ${FR(m)}。`):SB('第 2 步：垂直的規則',...nr.L),
+  pp?SB('第 3 步：檢查',`斜率一樣、但 y 截距不同，兩條線就不會重疊，確實是平行。`):SB('第 3 步：檢查',`${FR(m)} × ${PS(v)} ＝ ${FR(Fm(m,v))}，等於 −1 ✔`),
+  `答案是 <b>${FR(v)}</b>`]}},
+ ()=>{const a=nz(-6,6),b=nz(-5,5),c=rnd(-9,9);const ys=ySlope(a,b,c,'直線');const nr=negRec(ys.m);return{q:`和直線 ${gL(a,b,c)} <b>垂直</b>的直線，斜率是多少？`,ans:nr.p,steps:[
+  SB('【這題在問什麼】','先找出這條直線的斜率，再找和它垂直的斜率。'),SB('第 1 步：求原本直線的斜率',...ys.L),SB('第 2 步：求垂直的斜率',...nr.L),
+  SB('第 3 步：檢查',`${FR(ys.m)} × ${PS(nr.p)} ＝ ${FR(Fm(ys.m,nr.p))} ✔`),`答案是 <b>${FR(nr.p)}</b>`]}},
+ ()=>{const S=[[R(2,3),R(-3,2),'垂直'],[R(1,2),R(1,2),'平行'],[R(3,1),R(1,3),'都不是'],[R(-4,1),R(1,4),'垂直'],[R(5,2),R(-5,2),'都不是'],[R(-1,3),R(3,1),'垂直'],[R(-2,1),R(-2,1),'平行']];const[a,b,ans]=pick(S);const pr=Fm(a,b);return mc(`斜率分別為 ${rFmt(a)} 與 ${rFmt(b)} 的兩條直線（y 截距不同），關係是？`,ans,['平行','垂直','都不是'].filter(x=>x!==ans),[
+  SB('【判斷規則】','・斜率一樣 → 平行','・斜率相乘 ＝ −1 → 垂直','・兩個都不是 → 都不是（斜斜地相交）'),
+  SB('第 1 步：比較兩個斜率是否一樣',`${rFmt(a)} 和 ${rFmt(b)} ${a[0]===b[0]&&a[1]===b[1]?'一樣':'不一樣'}。`),
+  SB('第 2 步：算兩個斜率相乘',`${rFmt(a)} × ${b[0]<0?'('+rFmt(b)+')':rFmt(b)} ＝ ${rFmt(pr)}${pr[0]===-1&&pr[1]===1?'，等於 −1':'，不等於 −1'}。`),
+  SB('第 3 步：下結論',ans==='平行'?'斜率一樣 → 平行。':ans==='垂直'?'相乘是 −1 → 垂直。':'不一樣、相乘也不是 −1 → 都不是。')])}];
+PP[2]=[
+ ()=>{const m=R(nz(-4,4),pick([1,2]));const k0=rnd(-5,5);const x0=rnd(-5,5),y0=rnd(-5,5);const nr=negRec(m,'L');const pm=nr.p;const b=Fs([y0,1],Fm(pm,[x0,1]));return{q:`直線 L 和 y ＝ ${FX(m)}x ${fx(k0,'')} <b>垂直</b>，而且通過點 ${P(x0,y0)}。把 L 寫成 y ＝ mx ＋ b，b 是多少？`,ans:b,steps:[
+  SB('【這題在問什麼】','要寫出 L 的方程式 y ＝ mx ＋ b。只要知道「斜率 m」和「b」就完成了。'),
+  SB('第 1 步：讀出原本直線的斜率',`y ＝ ${FX(m)}x ${fx(k0,'')}，斜率是 ${FR(m)}。`),SB('第 2 步：求 L 的斜率',...nr.L),
+  SB('第 3 步：把點代進去求 b',`現在 L：y ＝ ${FX(pm)}x ＋ b，又知道 L 通過 ${P(x0,y0)}，`,`把 x ＝ ${num(x0)}、y ＝ ${num(y0)} 代進去：`,`・${num(y0)} ＝ ${FR(pm)} × ${par(x0)} ＋ b`,`・${num(y0)} ＝ ${FR(Fm(pm,[x0,1]))} ＋ b`,`・b ＝ ${num(y0)} − ${PS(Fm(pm,[x0,1]))} ＝ ${FR(b)}`),
+  SB('第 4 步：檢查',`L：y ＝ ${FX(pm)}x ${b[0]>=0?'＋':'−'} ${FR(R(Math.abs(b[0]),b[1]))}，把 x ＝ ${num(x0)} 代回：${FR(Fa(Fm(pm,[x0,1]),b))}，等於 ${num(y0)} ✔`),`答案是 <b>${FR(b)}</b>`]}},
+ ()=>{const m=R(nz(-4,4),pick([1,2]));const k0=rnd(-5,5);const x0=rnd(-5,5),y0=rnd(-5,5);const b=Fs([y0,1],Fm(m,[x0,1]));return{q:`直線 L 和 y ＝ ${FX(m)}x ${fx(k0,'')} 平行，而且通過點 ${P(x0,y0)}。把 L 寫成 y ＝ mx ＋ b，b 是多少？`,ans:b,steps:[
+  SB('【這題在問什麼】','寫出 L 的方程式 y ＝ mx ＋ b，要找斜率和 b。'),SB('第 1 步：L 的斜率',`平行 ⇔ 斜率一樣，所以 L 的斜率 ＝ ${FR(m)}。`),
+  SB('第 2 步：把點代進去求 b',`L：y ＝ ${FX(m)}x ＋ b，代入 ${P(x0,y0)}：`,`・${num(y0)} ＝ ${FR(m)} × ${par(x0)} ＋ b`,`・${num(y0)} ＝ ${FR(Fm(m,[x0,1]))} ＋ b`,`・b ＝ ${num(y0)} − ${PS(Fm(m,[x0,1]))} ＝ ${FR(b)}`),
+  SB('第 3 步：檢查',`代回：${FR(m)} × ${par(x0)} ＋ ${PS(b)} ＝ ${num(y0)} ✔`),`答案是 <b>${FR(b)}</b>`]}},
+ ()=>{const a=nz(-5,5),b=nz(-5,5),c=nz(-5,5),d=nz(-5,5);const c1=rnd(-5,5),c2=rnd(-5,5);const s1=ySlope(a,b,c1,'第一條'),s2=ySlope(c,d,c2,'第二條');const same=s1.m[0]===s2.m[0]&&s1.m[1]===s2.m[1];const pr=Fm(s1.m,s2.m);const ans=same?'平行（或重合）':pr[0]===-1&&pr[1]===1?'垂直':'都不是';return mc(`直線 ${gL(a,b,c1)} 與 ${gL(c,d,c2)} 的關係是？`,ans,['平行（或重合）','垂直','都不是'].filter(x=>x!==ans),[
+  SB('【這題在問什麼】','比較兩條線的斜率：一樣 → 平行；相乘 ＝ −1 → 垂直。'),SB('第 1 步：第一條的斜率',...s1.L),SB('第 2 步：第二條的斜率',...s2.L),
+  SB('第 3 步：比較',`兩個斜率 ${FR(s1.m)} 和 ${FR(s2.m)} ${same?'一樣':'不一樣'}；`,`相乘：${FR(s1.m)} × ${PS(s2.m)} ＝ ${FR(pr)}。`,`所以是「${ans}」。`)])}];
+PP[3]=[
+ ()=>{const a1=nz(-5,5),b1=nz(-4,4),b2=nz(-3,3);const per=Math.random()<.5;const c1=rnd(-6,6),c2=rnd(-6,6);/* line2: kx + b2 y + c2 = 0 */const s1=R(-a1,b1);const k=per?R(-b1*b2,a1):R(a1*b2,b1);const s2=Fd(Fm([-1,1],k),[b2,1]);
+  return{q:`直線 ${gL(a1,b1,c1)} 和 kx ${fx(b2,'y')} ${fx(c2,'')} ＝ 0 ${per?'<b>垂直</b>':'平行'}，求 k。`,ans:k,steps:[
+  SB('【這題在問什麼】',`兩條線${per?'垂直':'平行'}，第二條有未知數 k。把兩條線的斜率都寫出來，再用${per?'「相乘 ＝ −1」':'「斜率一樣」'}列方程式。`),
+  SB('第 1 步：第一條的斜率',...ySlope(a1,b1,c1,'第一條').L),
+  SB('第 2 步：第二條的斜率（含 k）',`kx ${fx(b2,'y')} ${fx(c2,'')} ＝ 0`,`・把 kx 和常數移到右邊：${b2===1?'y':b2===-1?'−y':num(b2)+'y'} ＝ −kx ${fx(-c2,'')}`,b2!==1?`・兩邊除以 ${par(b2)}：x 前面的數變成 −k ÷ ${par(b2)}`:'・x 前面的數是 −k',`・所以第二條的斜率是 ${b2===1?'−k':b2===-1?'k':`−k／${par(b2)}`}`),
+  SB(`第 3 步：用${per?'垂直':'平行'}的規則列方程式`,per?`${FR(s1)} × （${b2===1?'−k':b2===-1?'k':`−k／${par(b2)}`}）＝ −1`:`${FR(s1)} ＝ ${b2===1?'−k':b2===-1?'k':`−k／${par(b2)}`}`,...(per?[`・左邊乘開：${FR(Fm([-1,1],s1))} × k ÷ ${par(b2)} ＝ −1`,`・兩邊同乘 ${par(b2)}：${FR(Fm([-1,1],s1))} × k ＝ ${num(-b2)}`,`・兩邊除以 ${PS(Fm([-1,1],s1))}：k ＝ ${FR(k)}`]:[`・兩邊同乘 ${par(-b2)}：k ＝ ${FR(s1)} × ${par(-b2)}`,`・k ＝ ${FR(k)}`])),
+  SB('第 4 步：檢查',`k ＝ ${FR(k)} 時第二條的斜率是 ${FR(s2)}，${per?`${FR(s1)} × ${PS(s2)} ＝ ${FR(Fm(s1,s2))}`:`和 ${FR(s1)} 一樣`} ✔`),`答案是 <b>${FR(k)}</b>`]}},
+ ()=>{let A,B,C;do{A=[rnd(-5,5),rnd(-5,5)];B=[rnd(-5,5),rnd(-5,5)];C=[rnd(-5,5),rnd(-5,5)]}while(A[0]===B[0]||A[1]===B[1]);const mAB=R(B[1]-A[1],B[0]-A[0]);const nr=negRec(mAB,'高');return{q:`△ABC 中 A${P(...A)}、B${P(...B)}、C${P(...C)}，從 C 到 AB 的高所在直線，斜率是多少？`,ans:nr.p,fig2:plane({R:RR(...A,...B,...C),pts:[PT(...A,'A'),PT(...B,'B'),PT(...C,'C','pen')],segs:[{p:A,q:B,c:'blue'},{p:B,q:C,c:'blue'},{p:C,q:A,c:'blue'}]}),steps:[
+  SB('【這題在問什麼】','「從 C 到 AB 的高」是從 C 往 AB 畫的垂直線。它和 AB 垂直，所以只要先求 AB 的斜率。'),
+  SB('第 1 步：求 AB 的斜率','斜率 ＝ （y 的變化）÷（x 的變化）',`・y 的變化：${num(B[1])} − ${par(A[1])} ＝ ${num(B[1]-A[1])}`,`・x 的變化：${num(B[0])} − ${par(A[0])} ＝ ${num(B[0]-A[0])}`,`・AB 的斜率 ＝ ${num(B[1]-A[1])} ÷ ${par(B[0]-A[0])} ＝ ${FR(mAB)}`),
+  SB('第 2 步：求高的斜率',...nr.L),SB('第 3 步：C 有什麼用？','C 只決定這條高「畫在哪裡」，不影響它的斜率，所以這題用不到 C 的坐標。'),`答案是 <b>${FR(nr.p)}</b>`]}},
+ ()=>{const H=[rnd(-4,4),rnd(-4,4)];const d=pick([[1,2],[2,1],[1,3],[3,1],[2,3],[1,-2],[2,-1],[1,1]]);const s=rnd(1,2),t=rnd(1,2);const right=Math.random()<.6;const A=H.slice();const B=[H[0]+s*d[0],H[1]+s*d[1]];const C=right?[H[0]-t*d[1],H[1]+t*d[0]]:[H[0]-t*d[1]+1,H[1]+t*d[0]];
+  const sl=(P1,P2)=>P1[0]===P2[0]?null:R(P2[1]-P1[1],P2[0]-P1[0]);const mAB=sl(A,B),mAC=sl(A,C),mBC=sl(B,C);if(!mAB||!mAC||!mBC)LEVELS_RETRY();const pr=(x,y)=>Fm(x,y);const isM1=r=>r[0]===-1&&r[1]===1;const ok=isM1(pr(mAB,mAC))||isM1(pr(mAB,mBC))||isM1(pr(mAC,mBC));const ans=ok?'是直角三角形':'不是直角三角形';
+  return mc(`A${P(...A)}、B${P(...B)}、C${P(...C)} 三點圍成的三角形，是不是直角三角形？`,ans,[ok?'不是直角三角形':'是直角三角形'],[
+  SB('【怎麼判斷】','直角 ＝ 兩邊垂直 ＝ 兩邊的斜率相乘 ＝ −1。把三條邊的斜率都算出來，兩兩相乘看看。'),
+  SB('第 1 步：三條邊的斜率',`・AB：(${num(B[1])} − ${par(A[1])}) ÷ (${num(B[0])} − ${par(A[0])}) ＝ ${FR(mAB)}`,`・AC：(${num(C[1])} − ${par(A[1])}) ÷ (${num(C[0])} − ${par(A[0])}) ＝ ${FR(mAC)}`,`・BC：(${num(C[1])} − ${par(B[1])}) ÷ (${num(C[0])} − ${par(B[0])}) ＝ ${FR(mBC)}`),
+  SB('第 2 步：兩兩相乘',`・AB × AC ＝ ${FR(pr(mAB,mAC))}`,`・AB × BC ＝ ${FR(pr(mAB,mBC))}`,`・AC × BC ＝ ${FR(pr(mAC,mBC))}`),
+  SB('第 3 步：下結論',ok?'有一組相乘等於 −1，那兩邊垂直，所以是直角三角形。':'沒有任何一組等於 −1，所以不是直角三角形。')])}];
+PP[4]=[
+ /* 對稱點（和使用者指定的題目同一型，逐步寫法） */
+ ()=>{const H=[rnd(-4,4),rnd(-4,4)];const b=pick([-3,-2,2,3,-1]);const a=1;const sgn=pick([1,-1]);const c=-(a*H[0]+b*H[1]);const s=pick([1,-1,2]);const Pp=[H[0]-s*a,H[1]-s*b],Q=[H[0]+s*a,H[1]+s*b];const ask=Math.random()<.5;
+  const A=a*sgn,B=b*sgn,C=c*sgn;const ys=ySlope(A,B,C,'L');const nr=negRec(ys.m,'PP′');const pm=nr.p;const k=Fs([Pp[1],1],Fm(pm,[Pp[0],1]));
+  const dx=H[0]-Pp[0],dy=H[1]-Pp[1];const mv=(v,h,v2)=>v>0?`往${h} ${v} 格`:v<0?`往${v2} ${-v} 格`:'不動';
+  return{q:`點 P${P(...Pp)} 關於直線 L：${gL(A,B,C)} 的對稱點是 P′，P′ 的 ${ask?'x':'y'} 坐標是多少？`,ans:[Q[ask?0:1],1],fig2:plane({R:RR(...Pp,...Q,...H),lines:[{a:A,b:B,c:C}],pts:[PT(...Pp,'P'),PT(...H,'H','amber'),PT(...Q,"P′",'pen')],segs:[{p:Pp,q:Q,c:'pen',dash:true}]}),steps:[
+  SB('【這題在問什麼】','把 P 點對直線 L 照鏡子，鏡子裡的點叫 P′。'),
+  SB('【先記住對稱點的兩個條件】','・條件一：P 和 P′ 的連線，和 L <b>垂直</b>。','・條件二：P 和 P′ 的正中間（中點）H，剛好在 L 上。','做法：先從 P 畫一條垂直 L 的線，找出它和 L 的交點 H，再從 H 往前走同樣的距離到 P′。'),
+  SB('第 1 步：求 L 的斜率',...ys.L),SB('第 2 步：求 PP′ 這條線的斜率',...nr.L),
+  SB('第 3 步：寫出 PP′ 這條線',`這條線斜率是 ${FR(pm)}、通過 P${P(...Pp)}。設 y ＝ ${FX(pm)}x ＋ b，把 P 代進去：`,`・${num(Pp[1])} ＝ ${FR(pm)} × ${par(Pp[0])} ＋ b`,`・${num(Pp[1])} ＝ ${FR(Fm(pm,[Pp[0],1]))} ＋ b`,`・b ＝ ${FR(k)}`,`所以這條線是 y ＝ ${FX(pm)}x${k[0]?` ${k[0]>0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))}`:''}`),
+  SB('第 4 步：找交點 H（也就是中點）',`把 y ＝ ${FX(pm)}x${k[0]?` ${k[0]>0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))}`:''} 代進 L：${gL(A,B,C)}`,...subX(A,B,C,pm,k).L,`・再代回 y ＝ ${FR(pm)} × ${par(H[0])}${k[0]?` ${k[0]>0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))}`:''} ＝ ${num(H[1])}`,`所以 H${P(...H)}。`,`檢查 H 在 L 上：${num(A)}×${par(H[0])} ＋ ${par(B)}×${par(H[1])} ${fx(C,'')} ＝ 0 ✔`),
+  SB('第 5 步：從 H 再走一樣遠，就到 P′',`先看 P 走到 H 怎麼移動：`,`・x：從 ${num(Pp[0])} 變成 ${num(H[0])}，${mv(dx,'右','左')}`,`・y：從 ${num(Pp[1])} 變成 ${num(H[1])}，${mv(dy,'上','下')}`,`從 H 再照同樣的方式移動一次：`,`・x：${num(H[0])} → ${num(Q[0])}`,`・y：${num(H[1])} → ${num(Q[1])}`,`所以 P′${P(...Q)}。`),
+  SB('第 6 步：檢查',`・P 和 P′ 的中點：(${num(Pp[0])} ＋ ${par(Q[0])}) ÷ 2 ＝ ${num(H[0])}，(${num(Pp[1])} ＋ ${par(Q[1])}) ÷ 2 ＝ ${num(H[1])}，正好是 H ✔`),
+  `答案是 <b>${num(Q[ask?0:1])}</b>`]}},
+ /* 垂足 */
+ ()=>{const H=[rnd(-4,4),rnd(-4,4)];const b=pick([-3,-2,2,3,-1,1]);const sgn=pick([1,-1]);const c=-(H[0]+b*H[1]);const s=pick([1,-1,2]);const Pp=[H[0]-s,H[1]-s*b];const ask=Math.random()<.5;const A=sgn,B=b*sgn,C=c*sgn;const ys=ySlope(A,B,C,'L');const nr=negRec(ys.m,'PH');const pm=nr.p;const k=Fs([Pp[1],1],Fm(pm,[Pp[0],1]));
+  return{q:`點 P${P(...Pp)} 到直線 L：${gL(A,B,C)} 的垂足為 H，H 的 ${ask?'x':'y'} 坐標是多少？`,ans:[H[ask?0:1],1],fig2:plane({R:RR(...Pp,...H),lines:[{a:A,b:B,c:C}],pts:[PT(...Pp,'P'),PT(...H,'H','pen')],segs:[{p:Pp,q:H,c:'pen',dash:true}]}),steps:[
+  SB('【這題在問什麼】','垂足 H：從 P 往 L 畫一條垂直線，碰到 L 的那一點。'),SB('第 1 步：求 L 的斜率',...ys.L),SB('第 2 步：求垂直線 PH 的斜率',...nr.L),
+  SB('第 3 步：寫出 PH 這條線',`斜率 ${FR(pm)}、通過 P${P(...Pp)}。設 y ＝ ${FX(pm)}x ＋ b，代入 P：`,`・${num(Pp[1])} ＝ ${FR(Fm(pm,[Pp[0],1]))} ＋ b，b ＝ ${FR(k)}`),
+  SB('第 4 步：和 L 聯立求交點',`把 PH 的式子 y ＝ ${FX(pm)}x ${k[0]>=0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))} 代進 L：`,...subX(A,B,C,pm,k).L,`・再代回 y ＝ ${FR(pm)} × ${par(H[0])} ${k[0]>=0?'＋':'−'} ${FR(R(Math.abs(k[0]),k[1]))} ＝ ${num(H[1])}`,`檢查：${num(A)}×${par(H[0])} ＋ ${par(B)}×${par(H[1])} ${fx(C,'')} ＝ 0 ✔ H 在 L 上`),`答案是 <b>${num(H[ask?0:1])}</b>`]}},
+ /* 垂直平分線 */
+ ()=>{const Mm=[rnd(-4,4),rnd(-4,4)];const d=pick([[1,2],[2,1],[1,3],[3,1],[2,-1],[1,-2],[3,-1],[2,3]]).map(x=>x*pick([1,1,-1]));const A=[Mm[0]-d[0],Mm[1]-d[1]],B=[Mm[0]+d[0],Mm[1]+d[1]];const mAB=R(B[1]-A[1],B[0]-A[0]);const nr=negRec(mAB,'垂直平分線');const pm=nr.p;
+  const g=gcd(d[0],d[1])||1;let aa=d[0]/g,bb=d[1]/g;if(aa<0||(aa===0&&bb<0)){aa=-aa;bb=-bb}const cc=aa*Mm[0]+bb*Mm[1];
+  return{q:`A${P(...A)}、B${P(...B)}，線段 AB 的垂直平分線寫成 ${lin2(aa,bb,0)} ＝ c，求 c。`,ans:[cc,1],fig2:plane({R:RR(...A,...B),pts:[PT(...A,'A'),PT(...B,'B'),PT(...Mm,'M','pen')],segs:[{p:A,q:B,c:'blue'}],lines:[{a:aa,b:bb,c:-cc,col:'pen'}]}),steps:[
+  SB('【這題在問什麼】','垂直平分線 ＝ 通過 AB 的中點、而且和 AB 垂直的那條線。所以要找「中點」和「斜率」。'),
+  SB('第 1 步：求 AB 的中點 M','中點 ＝ 兩點坐標各自平均',`・x：(${num(A[0])} ＋ ${par(B[0])}) ÷ 2 ＝ ${num(Mm[0])}`,`・y：(${num(A[1])} ＋ ${par(B[1])}) ÷ 2 ＝ ${num(Mm[1])}`,`M${P(...Mm)}`),
+  SB('第 2 步：求 AB 的斜率',`(${num(B[1])} − ${par(A[1])}) ÷ (${num(B[0])} − ${par(A[0])}) ＝ ${num(B[1]-A[1])} ÷ ${par(B[0]-A[0])} ＝ ${FR(mAB)}`),
+  SB('第 3 步：求垂直平分線的斜率',...nr.L),
+  SB('第 4 步：寫出這條線並整理成題目的樣子',`斜率 ${FR(pm)}、通過 M${P(...Mm)}：y − ${par(Mm[1])} ＝ ${FR(pm)}(x − ${par(Mm[0])})`,...(pm[1]===1?[`・右邊乘開：y ${fx(-Mm[1],'')} ＝ ${CX(pm[0])}x ${fx(-pm[0]*Mm[0],'')}`,`・x、y 移到左邊，常數移到右邊：${lin2(pm[0],-1,0)} ＝ ${num(pm[0]*Mm[0]-Mm[1])}`,...(pm[0]===aa?[]:[`・兩邊同乘 ${par(aa/pm[0])}，寫成題目的樣子：${lin2(aa,bb,0)} ＝ ${num(cc)}`])]:[`・兩邊同乘 ${par(d[1])}，把分母去掉：${CX(d[1])}(y − ${par(Mm[1])}) ＝ ${CX(-d[0])}(x − ${par(Mm[0])})`,`・乘開：${CX(d[1])}y ${fx(-d[1]*Mm[1],'')} ＝ ${CX(-d[0])}x ${fx(d[0]*Mm[0],'')}`,`・把 x 項移到左邊、常數移到右邊：${lin2(d[0],d[1],0)} ＝ ${num(d[0]*Mm[0]+d[1]*Mm[1])}`,...(d[0]===aa&&d[1]===bb?[]:[`・兩邊同除以 ${par(d[0]/aa)}，寫成題目的樣子：${lin2(aa,bb,0)} ＝ ${num(cc)}`])])),
+  SB('第 5 步：檢查',`M 代進去：${num(aa)}×${par(Mm[0])} ＋ ${par(bb)}×${par(Mm[1])} ＝ ${num(cc)} ✔`),`答案是 <b>${num(cc)}</b>`]}}];
+DX.perp={1:PP[1],2:PP[2],3:PP[3],4:PP[4]};
+
 /* ---- 套用：第二單元與圓的四個難度全部改用詳解版 ---- */
 for(const id in DX){const l=ALL_LESSONS.find(x=>x.id===id);if(!l)continue;l.levels=[1,2,3,4].map(lv=>{const gs=DX[id][lv].filter(Boolean);return retryWrap(mixW(...gs.map(g=>[g,1])))})}
 
@@ -6246,7 +6340,7 @@ const KEY='hs-math-dojo-v1';
 const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},lv:{},tlv:{},diff:'auto',cur:'neg',tab:'learn',subject:'math',curBy:{},enabledBy:{},mockBy:{}});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
-try{if(!S.bankV4){const ids=new Set(ALL_LESSONS.filter(l=>subjectOf(l).startsWith('math')).map(l=>l.id));for(const k in (S.bankRes||{}))if(ids.has(k))delete S.bankRes[k];S.bankV4=1}}catch(e){}
+try{if(!S.bankV5){const ids=new Set(ALL_LESSONS.filter(l=>subjectOf(l).startsWith('math')).map(l=>l.id));for(const k in (S.bankRes||{}))if(ids.has(k))delete S.bankRes[k];S.bankV5=1}}catch(e){}
 S.curBy=S.curBy||{};S.enabledBy=S.enabledBy||{};S.mockBy=S.mockBy||{};
 if(S.mockBest!=null&&!S.mockBy.math)S.mockBy.math={best:S.mockBest,n:S.mockN||0};
 if(!S.enabledBy.math)S.enabledBy.math=S.enabled||[];if(!S.curBy.math)S.curBy.math=S.cur;
