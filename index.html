@@ -422,7 +422,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v24・2026/11/14 15:02</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v25・2026/11/14 15:22</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -2410,7 +2410,7 @@ EXTRA.b_div2={
   ['種子庫屬於移地保育',1,''],['外來種一定會成為入侵種',0,''],['分類階層越低，生物的共同特徵越多',1,''],['古菌常生活在極端環境',1,''],
   ['生物多樣性只包含物種多樣性',0,''],['真菌屬於植物界',0,'']]};
 /* ================= extra generators wired into lessons ================= */
-function mixW(...gs){const tot=gs.reduce((a,g)=>a+g[1],0);return()=>{let x=Math.random()*tot;for(const [g,w] of gs){x-=w;if(x<=0)return g()}return gs[gs.length-1][0]()}}
+function mixW(...gs){const tot=gs.reduce((a,g)=>a+g[1],0);const run=g=>{const r=g();if(r&&typeof r==='object'&&!r._gen)r._gen=g;return r};return()=>{let x=Math.random()*tot;for(const [g,w] of gs){x-=w;if(x<=0)return run(g)}return run(gs[gs.length-1][0])}}
 function pairsGen(groups){return()=>{const g=pick(groups),it=pick(g),others=g.filter(x=>x!==it);
   if(Math.random()<.5)return mc(`「${it[1]}」，這是指？`,it[0],others.map(x=>x[0]),[`${it[0]}：${it[1]}。`]);
   return mc(`關於「${it[0]}」，下列敘述何者正確？`,it[1],others.map(x=>x[1]),[`${it[0]}：${it[1]}。`])}}
@@ -2434,7 +2434,7 @@ function bankKey(p){const st=p.q.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<[^
 const BANK_CACHE={};
 function subjectOf(l){return l.subj||(l.id.startsWith('c_')?'chem':l.id.startsWith('b_')?'bio':'math')}
 function buildBank(l){if(BANK_CACHE[l.id])return BANK_CACHE[l.id];
- const plan=BANK_PLAN[subjectOf(l)],orig=Math.random;Math.random=seedRand((subjectOf(l).startsWith('math')?'bank-v3:':'bank-v1:')+l.id);const seen=new Set(),out=[];
+ const plan=BANK_PLAN[subjectOf(l)],orig=Math.random;Math.random=seedRand((subjectOf(l).startsWith('math')?'bank-v4:':'bank-v1:')+l.id);const seen=new Set(),out=[];
  const draw=(lv,want,maxTries)=>{let got=0,tries=0;while(got<want&&tries<maxTries){tries++;let p;try{p=genLv(l,lv)}catch(e){continue}const k=bankKey(p);if(seen.has(k))continue;seen.add(k);p.lv=lv;out.push(p);got++}return got};
  try{let carry=0;for(let lv=1;lv<=4;lv++){const want=plan[lv-1]+carry;carry=want-draw(lv,want,want*80)}
   for(const lv of [4,3,2]){if(carry<=0)break;carry-=draw(lv,carry,carry*400)}}
@@ -5851,7 +5851,8 @@ function findConcept(k,l){const subj=subjectOf(l);
 function ctagOf(L){const s=SUBJ[subjectOf(L)];const u=(L.unit||'').replace(/^[^　\s]*[　\s]/,'');return `<span class="ctag">${s?s.name:''}${u?'・'+u:''}／${L.title}</span>`}
 const TIP_CACHE={};
 function tipOf(l){if(l.id in TIP_CACHE)return TIP_CACHE[l.id];let t='';try{const h=l.concept();const m=h.match(/<div class="tip">([\s\S]*?)<\/div>/);if(m)t=m[1].replace(/^\s*<b>[^<]*<\/b>\s*/,'').replace(/^[：:]\s*/,'').trim()}catch(e){}return TIP_CACHE[l.id]=t}
-function enrichSol(l,p,lv){if(p._en||!p.steps||!p.steps.length)return p;const used=[l],tagged=new Set();const last=p.steps.length-1;
+const fixNeg=s=>String(s).replace(/(>|^)([^<]*)/g,(m,a,t)=>a+t.replace(/(^|[\s(（,，=＝×÷＋+\-−、；;：])-(\d)/g,'$1−$2'));
+function enrichSol(l,p,lv){if(p._en||!p.steps||!p.steps.length)return p;if(subjectOf(l).startsWith('math')){p.q=fixNeg(p.q);p.steps=p.steps.map(fixNeg);if(p.choices)p.choices=p.choices.map(fixNeg)}const used=[l],tagged=new Set();const last=p.steps.length-1;
  const steps=p.steps.map((s,i)=>i===last?s:String(s).replace(/<b>([^<>]{2,18})<\/b>/g,(m0,k)=>{const L=findConcept(k,l);if(!L)return m0;if(!used.includes(L))used.push(L);if(tagged.has(k))return m0;tagged.add(k);return `<b>${k}</b>${ctagOf(L)}`}));
  if(p.multi){for(let i=0;i<last;i++)steps[i]=steps[i]+ctagOf(l)}
  let out;if(lv===4){out=[`<div class="sol-head">📌 <b>本題觀念</b>：${used.map(L=>`${L.title}${ctagOf(L)}`).join('；')}</div>`,...steps];const tip=tipOf(l);if(tip)out.splice(out.length-1,0,`<div class="sol-tip">⚠ <b>易錯提醒</b>：${tip}</div>`)}
@@ -5859,6 +5860,366 @@ function enrichSol(l,p,lv){if(p._en||!p.steps||!p.steps.length)return p;const us
  p.steps=out;p._en=1;return p}
 
 /* ==F4 END== */
+/* ==D2 START== */
+{
+/* ================= 第二單元（坐標平面與直線）＋ 圓：詳解版題型 ================= */
+const DX={};
+const plus=(f,pre,post)=>()=>{const p=f();p.steps=[...[].concat(pre||[]),...p.steps.slice(0,-1),...[].concat(post||[]),p.steps[p.steps.length-1]];return p};
+
+const RR=(...ns)=>Math.min(14,Math.max(7,...ns.map(v=>Math.ceil(Math.abs(v))))+1);
+const PT=(x,y,label,c)=>({x,y,label,c});
+const QN=(x,y)=>x>0&&y>0?1:x<0&&y>0?2:x<0&&y<0?3:x>0&&y<0?4:0;
+const LQ=['','第一象限（x ＞ 0、y ＞ 0）','第二象限（x ＜ 0、y ＞ 0）','第三象限（x ＜ 0、y ＜ 0）','第四象限（x ＞ 0、y ＜ 0）'];
+const eqL=(a,b,c)=>`${lin2(a,b,0)} ${c>=0?'＝':'＝'} ${num(c)}`;/* ax+by = c */
+const gL=(a,b,c)=>`${lin2(a,b,c)} ＝ 0`;/* ax+by+c = 0 */
+
+/* ---------------- 坐標與象限 ---------------- */
+DX.coord={
+1:[()=>{const x=nz(-7,7),y=nz(-7,7),q=QN(x,y);return{q:`點 P${P(x,y)} 在第幾象限？（填 1、2、3 或 4）`,ans:[q,1],fig2:plane({quads:true,pts:[PT(x,y,'P','pen')]}),steps:[
+   `思路：象限只看 x、y 的正負號，不看大小。`,
+   `四個象限的規則：第一象限 (＋, ＋)、第二象限 (−, ＋)、第三象限 (−, −)、第四象限 (＋, −)。`,
+   `P 的 x 坐標 ${num(x)} ${x>0?'＞':'＜'} 0，y 坐標 ${num(y)} ${y>0?'＞':'＜'} 0，符號是 (${x>0?'＋':'−'}, ${y>0?'＋':'−'})。`,
+   `對照規則：${LQ[q]}。`,`答案是 <b>${q}</b>`]}},
+ ()=>{const x=rnd(-6,6),y=rnd(-6,6),dx=nz(-4,4),dy=nz(-4,4);const i=rnd(0,1);const B=[x+dx,y+dy];return{q:`點 A${P(x,y)} 先向${dx>0?'右':'左'} ${Math.abs(dx)} 格、再向${dy>0?'上':'下'} ${Math.abs(dy)} 格，到達點 B。B 的 ${i?'y':'x'} 坐標是多少？`,ans:[B[i],1],fig2:plane({R:RR(...B,x,y),pts:[PT(x,y,'A'),PT(...B,'B','pen')],segs:[{p:[x,y],q:[x+dx,y],c:'blue',dash:true},{p:[x+dx,y],q:B,c:'pen',dash:true}]}),steps:[
+   `思路：左右移動只改 x，上下移動只改 y。`,
+   `向${dx>0?'右':'左'} ${Math.abs(dx)} 格：x ${dx>0?'加':'減'} ${Math.abs(dx)}，${num(x)} ${dx>0?'＋':'−'} ${Math.abs(dx)} ＝ ${num(x+dx)}。`,
+   `向${dy>0?'上':'下'} ${Math.abs(dy)} 格：y ${dy>0?'加':'減'} ${Math.abs(dy)}，${num(y)} ${dy>0?'＋':'−'} ${Math.abs(dy)} ＝ ${num(y+dy)}。`,
+   `所以 B${P(...B)}，${i?'y':'x'} 坐標是 ${num(B[i])}。`,`答案是 <b>${num(B[i])}</b>`]}},
+ ()=>{const x=nz(-9,9),y=nz(-9,9);const ax=Math.random()<.5;const v=Math.abs(ax?y:x);return{q:`點 P${P(x,y)} 到 ${ax?'x':'y'} 軸的距離是多少？`,ans:[v,1],fig2:plane({R:RR(x,y),pts:[PT(x,y,'P','pen')],segs:[{p:[x,y],q:ax?[x,0]:[0,y],c:'pen',dash:true,label:''+v}]}),steps:[
+   `思路：從 P 往 ${ax?'x':'y'} 軸作垂線，垂線長就是距離。`,
+   `${ax?'x 軸是水平線 y ＝ 0，P 到它的垂線是鉛直的，長度就是 |y 坐標|':'y 軸是鉛直線 x ＝ 0，P 到它的垂線是水平的，長度就是 |x 坐標|'}。`,
+   `距離是長度，一定是正的，所以要取絕對值：|${num(ax?y:x)}| ＝ ${v}。`,
+   `常見錯誤：「到 x 軸的距離」看的是 y 坐標，不是 x 坐標。`,`答案是 <b>${v}</b>`]}}],
+2:[()=>{const sa=pick([1,-1]),sb=pick([1,-1]);const T=pick([['a','−b'],['−a','b'],['ab','a'],['−a','ab'],['a − b','b'],['b','a ＋ b']]);const val=t=>{const A=sa*3,B=sb*2;return {a:A,'−a':-A,b:B,'−b':-B,ab:A*B,'a − b':sa>0&&sb<0?1:sa<0&&sb>0?-1:null,'a ＋ b':sa>0&&sb>0?1:sa<0&&sb<0?-1:null}[t]};const vx=val(T[0]),vy=val(T[1]);if(vx===null||vy===null)LEVELS_RETRY();const q=QN(vx,vy);
+   const why=t=>t==='a'?`a ${sa>0?'＞':'＜'} 0`:t==='−a'?`a ${sa>0?'＞ 0，加負號變負':'＜ 0，加負號變正'}`:t==='b'?`b ${sb>0?'＞':'＜'} 0`:t==='−b'?`b ${sb>0?'＞ 0，加負號變負':'＜ 0，加負號變正'}`:t==='ab'?`兩數相乘：${sa===sb?'同號得正':'異號得負'}`:t==='a − b'?`${sa>0?'正數減負數一定是正的':'負數減正數一定是負的'}`:`${sa>0?'兩個正數相加是正的':'兩個負數相加是負的'}`;
+   return{q:`已知 a ${sa>0?'＞':'＜'} 0、b ${sb>0?'＞':'＜'} 0，點 P(${T[0]}, ${T[1]}) 在第幾象限？（填 1～4）`,ans:[q,1],steps:[
+   `思路：不用知道 a、b 是多少，只要判斷 x、y 坐標的正負號。`,
+   `x 坐標 ${T[0]}：${why(T[0])}，所以 x ${vx>0?'＞':'＜'} 0。`,`y 坐標 ${T[1]}：${why(T[1])}，所以 y ${vy>0?'＞':'＜'} 0。`,
+   `符號 (${vx>0?'＋':'−'}, ${vy>0?'＋':'−'}) 是${LQ[q]}。`,`答案是 <b>${q}</b>`]}},
+ ()=>{const x=nz(-8,8),y=nz(-8,8);const T=pick([['x 軸',[x,-y],'x 不變、y 變號'],['y 軸',[-x,y],'y 不變、x 變號'],['原點',[-x,-y],'x、y 都變號']]);const i=rnd(0,1);return{q:`點 P${P(x,y)} 對${T[0]}的對稱點為 Q，Q 的 ${i?'y':'x'} 坐標是多少？`,ans:[T[1][i],1],fig2:plane({R:RR(x,y),pts:[PT(x,y,'P'),PT(...T[1],'Q','pen')],segs:[{p:[x,y],q:T[1],c:'amber',dash:true}]}),steps:[
+   `思路：對稱點和 P 到對稱軸（或對稱中心）的距離相同、方向相反。`,
+   `對${T[0]}對稱的規則：${T[2]}。${T[0]==='x 軸'?'（像照水面上的倒影，上下翻過來）':T[0]==='y 軸'?'（像照鏡子，左右翻過來）':'（等於先對 x 軸、再對 y 軸對稱）'}`,
+   `Q ＝ ${P(...T[1])}。`,`檢查：P 和 Q 的中點是 ${P((x+T[1][0])/2,(y+T[1][1])/2)}，${T[0]==='原點'?'正好是原點':'正好落在'+T[0]+'上'}。`,`答案是 <b>${num(T[1][i])}</b>`]}},
+ ()=>{const A=[rnd(-7,7),rnd(-7,7)],B=[rnd(-7,7),rnd(-7,7)];const h=Math.random()<.5;const v=Math.abs(h?A[0]-B[0]:A[1]-B[1]);if(!v)LEVELS_RETRY();return{q:`A${P(...A)}、B${P(...B)}，從 A 走到 B，${h?'水平方向（左右）':'鉛直方向（上下）'}要走幾格？`,ans:[v,1],steps:[
+   `思路：${h?'左右的移動量看 x 坐標的差':'上下的移動量看 y 坐標的差'}。`,
+   `${h?'x':'y'} 坐標：A 是 ${num(h?A[0]:A[1])}，B 是 ${num(h?B[0]:B[1])}。`,
+   `差 ＝ ${num(h?B[0]:B[1])} − ${par(h?A[0]:A[1])} ＝ ${num(h?B[0]-A[0]:B[1]-A[1])}，${(h?B[0]-A[0]:B[1]-A[1])>0?(h?'往右':'往上'):(h?'往左':'往下')}走。`,
+   `格數是距離，取絕對值：${v}。`,`答案是 <b>${v}</b>`]}}],
+3:[()=>{const p=nz(-3,3),q=rnd(-5,5),r=nz(-3,3),s=rnd(-5,5);const onY=Math.random()<.5;/* P(pa+q, ra+s) */const a=R(-(onY?q:s),onY?p:r);const other=Fa(Fm([onY?r:p,1],a),[onY?s:q,1]);const t=(c,k)=>`${c===1?'':c===-1?'−':num(c)}a${k?` ${k>0?'＋':'−'} ${Math.abs(k)}`:''}`;
+   return{q:`點 P(${t(p,q)}, ${t(r,s)}) 在 ${onY?'y':'x'} 軸上，P 的 ${onY?'y':'x'} 坐標是多少？`,ans:other,steps:[
+   `思路：在 ${onY?'y':'x'} 軸上的點，${onY?'x':'y'} 坐標一定是 0。`,
+   `所以 ${onY?t(p,q):t(r,s)} ＝ 0。`,
+   `解方程式：${onY?p:r}a ＝ ${num(-(onY?q:s))}，a ＝ ${rFmt(a)}。`,
+   `代回另一個坐標：${onY?t(r,s):t(p,q)} ＝ ${num(onY?r:p)} × ${rFmt(a)} ${(onY?s:q)>=0?'＋':'−'} ${Math.abs(onY?s:q)} ＝ ${rFmt(other)}。`,`答案是 <b>${M(rFmt(other))}</b>`]}},
+ ()=>{const x=nz(-8,8),y=nz(-8,8);if(x===y)LEVELS_RETRY();const i=rnd(0,1);const Q=[y,x];return{q:`點 P${P(x,y)} 對直線 y ＝ x 的對稱點 Q，Q 的 ${i?'y':'x'} 坐標是多少？`,ans:[Q[i],1],fig2:plane({R:RR(x,y),lines:[{a:1,b:-1,c:0,col:'amber'}],pts:[PT(x,y,'P'),PT(...Q,'Q','pen')],segs:[{p:[x,y],q:Q,c:'pen',dash:true}]}),steps:[
+   `思路：直線 y ＝ x 把 x 坐標和 y 坐標的角色對調。`,
+   `規則：(x, y) 對 y ＝ x 的對稱點是 (y, x)，兩個坐標交換。`,
+   `所以 Q ＝ ${P(...Q)}。`,`檢查：PQ 的中點 ${P((x+y)/2,(x+y)/2)} 的 x、y 相等，確實在 y ＝ x 上；PQ 斜率 −1，和 y ＝ x 垂直。`,`答案是 <b>${num(Q[i])}</b>`]}},
+ ()=>{const k=nz(-6,6);const a=pick([1,2,3]),b=rnd(-6,6);/* P(a t + b, k) equidistant to both axes, t>0 ... simpler: P(m, 2m−c) in quadrant with |x|=|y| */const c=nz(-9,9);const m=c;/* x=m, y=2m−c → |m|=|m| when y=m */return{q:`點 P(t, 2t ${c>=0?'−':'＋'} ${Math.abs(c)}) 在直線 y ＝ x 上，求 t。`,ans:[c,1],steps:[
+   `思路：在直線 y ＝ x 上 ⇔ y 坐標等於 x 坐標。`,`列式：2t ${c>=0?'−':'＋'} ${Math.abs(c)} ＝ t。`,`移項：2t − t ＝ ${num(c)}，t ＝ ${num(c)}。`,`檢查：P${P(c,c)}，x、y 相等。`,`答案是 <b>${num(c)}</b>`]}}],
+4:[()=>{const A=[rnd(-5,5),rnd(-5,5)],B=[rnd(-5,5),rnd(-5,5)],C=[rnd(-5,5),rnd(-5,5)];const u=[B[0]-A[0],B[1]-A[1]],w=[C[0]-A[0],C[1]-A[1]];const cr=u[0]*w[1]-u[1]*w[0];if(!cr)LEVELS_RETRY();const ar=R(Math.abs(cr),2);return{q:`求以 A${P(...A)}、B${P(...B)}、C${P(...C)} 為頂點的三角形面積。`,ans:ar,fig2:plane({R:RR(...A,...B,...C),pts:[PT(...A,'A'),PT(...B,'B'),PT(...C,'C')],segs:[{p:A,q:B,c:'blue'},{p:B,q:C,c:'blue'},{p:C,q:A,c:'blue'}]}),steps:[
+   `思路：把 A 平移到原點，三角形形狀不變，再用公式 面積 ＝ ½|x₁y₂ − x₂y₁|。`,
+   `平移（每個點都減掉 A${P(...A)}）：B → ${P(...u)}，C → ${P(...w)}。`,
+   `<b>坐標平面上的三角形面積</b>：½|x₁y₂ − x₂y₁|，x₁ ＝ ${num(u[0])}、y₁ ＝ ${num(u[1])}、x₂ ＝ ${num(w[0])}、y₂ ＝ ${num(w[1])}。`,
+   `x₁y₂ ＝ ${num(u[0])} × ${par(w[1])} ＝ ${num(u[0]*w[1])}；x₂y₁ ＝ ${num(w[0])} × ${par(u[1])} ＝ ${num(w[0]*u[1])}。`,
+   `相減 ${num(u[0]*w[1])} − ${par(w[0]*u[1])} ＝ ${num(cr)}，取絕對值再除以 2：${Math.abs(cr)} ÷ 2 ＝ ${rFmt(ar)}。`,`答案是 <b>${M(rFmt(ar))}</b>`]}},
+ ...F4.coord.map(f=>()=>{const p=f();p.steps=[`思路：四邊形不能直接套三角形公式，沿對角線切成兩個三角形，各自算再相加。`,...p.steps];return p}),
+ ()=>{const b=rnd(2,8),S=rnd(3,20),xc=rnd(-4,4);const k=R(2*S,b);return{q:`A(0, 0)、B(${b}, 0)、C(${num(xc)}, k)，k ＞ 0，△ABC 面積為 ${S}，求 k。`,ans:k,steps:[
+   `思路：AB 在 x 軸上，拿 AB 當底，高就是 C 到 x 軸的距離。`,`底 AB ＝ ${b} − 0 ＝ ${b}。`,
+   `高 ＝ C 到 x 軸的距離 ＝ |k| ＝ k（k ＞ 0）。注意 C 的 x 坐標 ${num(xc)} 不影響高。`,
+   `面積 ＝ ½ × 底 × 高：½ × ${b} × k ＝ ${S}，所以 k ＝ ${2*S} ÷ ${b} ＝ ${rFmt(k)}。`,`答案是 <b>${M(rFmt(k))}</b>`]}}]};
+
+/* ---------------- 兩點距離 ---------------- */
+const TR=()=>pick([[3,4,5],[6,8,10],[5,12,13],[8,15,17]]);
+DX.dist={
+1:[()=>{let[dx,dy,d]=TR();if(Math.random()<.5)[dx,dy]=[dy,dx];dx*=pick([1,-1]);dy*=pick([1,-1]);const x1=rnd(-5,5),y1=rnd(-5,5),x2=x1+dx,y2=y1+dy;return{q:`求 A${P(x1,y1)} 和 B${P(x2,y2)} 兩點的距離。`,ans:[d,1],fig2:plane({R:RR(x1,y1,x2,y2),pts:[PT(x1,y1,'A'),PT(x2,y2,'B','pen')],segs:[{p:[x1,y1],q:[x2,y1],c:'blue',dash:true,label:''+Math.abs(dx)},{p:[x2,y1],q:[x2,y2],c:'pen',dash:true,label:''+Math.abs(dy)},{p:[x1,y1],q:[x2,y2],c:'ink'}]}),steps:[
+   `思路：從 A 先橫著走到 (${num(x2)}, ${num(y1)})、再直著走到 B，圍出直角三角形，AB 是斜邊。`,
+   `<b>兩點距離公式</b>：AB ＝ √((x₂ − x₁)² ＋ (y₂ − y₁)²)。`,
+   `橫差：${num(x2)} − ${par(x1)} ＝ ${num(dx)}；直差：${num(y2)} − ${par(y1)} ＝ ${num(dy)}。`,
+   `平方：${par(dx)}² ＝ ${dx*dx}，${par(dy)}² ＝ ${dy*dy}（負數平方會變正，所以誰減誰都可以）。`,
+   `AB ＝ √(${dx*dx} ＋ ${dy*dy}) ＝ √${d*d} ＝ ${d}。`,`答案是 <b>${d}</b>`]}},
+ ()=>{const[a,b,c]=TR();const x=a*pick([1,-1]),y=b*pick([1,-1]);const s=Math.random()<.5;const P_=s?[x,y]:[y,x];return{q:`點 P${P(...P_)} 到原點 O 的距離是多少？`,ans:[c,1],steps:[
+   `思路：原點 O(0, 0)，套兩點距離公式，差就是 P 的坐標本身。`,`OP ＝ √(${par(P_[0])}² ＋ ${par(P_[1])}²)。`,`＝ √(${P_[0]**2} ＋ ${P_[1]**2}) ＝ √${c*c}。`,`${c*c} ＝ ${c}²，所以 OP ＝ ${c}。`,`答案是 <b>${c}</b>`]}},
+ ()=>{const y=rnd(-6,6),x1=rnd(-8,0),x2=rnd(1,8);const h=Math.random()<.5;const A=h?[x1,y]:[y,x1],B=h?[x2,y]:[y,x2];return{q:`求 A${P(...A)} 和 B${P(...B)} 的距離。`,ans:[x2-x1,1],steps:[
+   `思路：先看哪個坐標一樣。兩點的 ${h?'y':'x'} 坐標都是 ${num(y)}，在同一條${h?'水平':'鉛直'}線上。`,
+   `同一條${h?'水平':'鉛直'}線上，距離就是另一個坐標的差：|${num(x2)} − ${par(x1)}|。`,`＝ |${x2-x1}| ＝ ${x2-x1}。`,`檢查：用距離公式 √(${h?`${(x2-x1)**2} ＋ 0`:`0 ＋ ${(x2-x1)**2}`}) 也一樣。`,`答案是 <b>${x2-x1}</b>`]}}],
+2:[()=>{const x1=rnd(-6,6),y1=rnd(-6,6),dx=nz(-6,6),dy=nz(-6,6);const n=dx*dx+dy*dy;if(isSq(n))LEVELS_RETRY();return{q:`A${P(x1,y1)}、B${P(x1+dx,y1+dy)}，AB ＝ √n，求 n。`,ans:[n,1],steps:[
+   `思路：距離不是整數時，答案留根號；題目要的是根號裡面的數。`,`<b>兩點距離公式</b>：AB² ＝ (Δx)² ＋ (Δy)²。`,
+   `Δx ＝ ${num(x1+dx)} − ${par(x1)} ＝ ${num(dx)}，Δy ＝ ${num(y1+dy)} − ${par(y1)} ＝ ${num(dy)}。`,`AB² ＝ ${dx*dx} ＋ ${dy*dy} ＝ ${n}，所以 AB ＝ √${n}。`,`答案是 <b>${n}</b>`]}},
+ ()=>{const[a,b,c]=TR();const x1=rnd(-5,5),y1=rnd(-5,5);const dx=a*pick([1,-1]);const k1=y1+b,k2=y1-b;return{q:`A${P(x1,y1)}、B(${num(x1+dx)}, k)，AB ＝ ${c}，k 有兩個可能值，較大的是多少？`,ans:[k1,1],steps:[
+   `思路：用距離公式列方程式，平方後解出 k。`,`<b>兩點距離公式</b>：(${num(x1+dx)} − ${par(x1)})² ＋ (k − ${par(y1)})² ＝ ${c}²。`,
+   `${dx*dx} ＋ (k − ${par(y1)})² ＝ ${c*c}，所以 (k − ${par(y1)})² ＝ ${c*c-dx*dx}。`,
+   `開平方要記得正負：k − ${par(y1)} ＝ ±${b}，k ＝ ${num(k1)} 或 ${num(k2)}。`,`較大的是 ${num(k1)}。`,`答案是 <b>${num(k1)}</b>`]}},
+ ...XG.dist[2].slice(1).map(f=>()=>{const p=f();p.steps=[`思路：先算三邊長的平方（不用開根號），再比較：有兩邊相等 → 等腰；兩短邊平方和 ＝ 最長邊平方 → 直角（<b>畢氏定理</b>的逆定理）。`,...p.steps];return p})],
+3:[()=>{const A=[rnd(-5,5),rnd(-5,5)],B=[rnd(-5,5),rnd(-5,5)];if(A[0]===B[0])LEVELS_RETRY();const num_=B[0]**2+B[1]**2-A[0]**2-A[1]**2,den=2*(B[0]-A[0]);const t=R(num_,den);const onX=Math.random()<.5;
+   if(onX)return{q:`x 軸上有一點 P 到 A${P(...A)} 和 B${P(...B)} 的距離相等，P 的 x 坐標是多少？`,ans:t,fig2:plane({R:RR(...A,...B,t[0]/t[1]),pts:[PT(...A,'A'),PT(...B,'B'),PT(t[0]/t[1],0,'P','pen')],segs:[{p:A,q:[t[0]/t[1],0],c:'pen',dash:true},{p:B,q:[t[0]/t[1],0],c:'pen',dash:true}]}),steps:[
+   `思路：P 在 x 軸上 → 設 P(t, 0)；距離相等 → 列 PA² ＝ PB²（平方後不用開根號）。`,
+   `PA² ＝ (t − ${par(A[0])})² ＋ (0 − ${par(A[1])})² ＝ t² ${fx(-2*A[0],'t')} ＋ ${A[0]**2+A[1]**2}`,
+   `PB² ＝ (t − ${par(B[0])})² ＋ (0 − ${par(B[1])})² ＝ t² ${fx(-2*B[0],'t')} ＋ ${B[0]**2+B[1]**2}`,
+   `兩式相等，t² 消掉：${num(-2*A[0])}t ＋ ${A[0]**2+A[1]**2} ＝ ${num(-2*B[0])}t ＋ ${B[0]**2+B[1]**2}`,
+   `移項：${num(den)}t ＝ ${num(num_)}，t ＝ ${rFmt(t)}。`,`答案是 <b>${M(rFmt(t))}</b>`]};
+   if(A[1]===B[1])LEVELS_RETRY();const t2=R(num_,2*(B[1]-A[1]));return{q:`y 軸上有一點 P 到 A${P(...A)} 和 B${P(...B)} 的距離相等，P 的 y 坐標是多少？`,ans:t2,steps:[
+   `思路：P 在 y 軸上 → 設 P(0, t)；距離相等 → PA² ＝ PB²。`,`PA² ＝ ${A[0]**2} ＋ (t − ${par(A[1])})² ＝ t² ${fx(-2*A[1],'t')} ＋ ${A[0]**2+A[1]**2}`,
+   `PB² ＝ ${B[0]**2} ＋ (t − ${par(B[1])})² ＝ t² ${fx(-2*B[1],'t')} ＋ ${B[0]**2+B[1]**2}`,`t² 消掉後移項：${num(2*(B[1]-A[1]))}t ＝ ${num(num_)}`,`t ＝ ${rFmt(t2)}。`,`答案是 <b>${M(rFmt(t2))}</b>`]}},
+ ()=>{const[a,b,c]=TR();const k=1;const x=rnd(-4,4),y=rnd(-4,4);const per=a+b+c;return{q:`A${P(x,y)}、B${P(x+a,y)}、C${P(x,y+b)}，求 △ABC 的周長。`,ans:[per,1],fig2:plane({R:RR(x+a,y+b,x,y),pts:[PT(x,y,'A'),PT(x+a,y,'B'),PT(x,y+b,'C')],segs:[{p:[x,y],q:[x+a,y],c:'blue'},{p:[x+a,y],q:[x,y+b],c:'pen'},{p:[x,y+b],q:[x,y],c:'blue'}]}),steps:[
+   `思路：周長 ＝ 三邊長相加，三邊各用一次距離公式。`,`AB：y 坐標相同，AB ＝ |${num(x+a)} − ${par(x)}| ＝ ${a}。`,`AC：x 坐標相同，AC ＝ |${num(y+b)} − ${par(y)}| ＝ ${b}。`,
+   `BC：<b>兩點距離公式</b> √(${a}² ＋ ${b}²) ＝ √${c*c} ＝ ${c}（也可以看出 △ABC 是直角三角形，∠A ＝ 90°）。`,`周長 ＝ ${a} ＋ ${b} ＋ ${c} ＝ ${per}。`,`答案是 <b>${per}</b>`]}},
+ ()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],C=[rnd(-6,6),rnd(-6,6)];const ab=(A[0]-B[0])**2+(A[1]-B[1])**2,ac=(A[0]-C[0])**2+(A[1]-C[1])**2;if(ab===ac||!ab||!ac)LEVELS_RETRY();const near=ab<ac?'B':'C';return mc(`A${P(...A)}、B${P(...B)}、C${P(...C)}，B 和 C 哪一點離 A 比較近？`,near,[near==='B'?'C':'B','一樣近','無法判斷'],[`思路：比較距離時，比較「距離的平方」就好，不用開根號。`,`AB² ＝ (${num(B[0])} − ${par(A[0])})² ＋ (${num(B[1])} − ${par(A[1])})² ＝ ${ab}`,`AC² ＝ (${num(C[0])} − ${par(A[0])})² ＋ (${num(C[1])} − ${par(A[1])})² ＝ ${ac}`,`${ab} ${ab<ac?'＜':'＞'} ${ac}，所以 ${near} 比較近。`])}],
+4:[...F4.dist,...XG.dist[4].slice(1).map(f=>()=>{const p=f();p.steps=[`思路：設 P(t, 0)，把 PA² ＋ PB² 展開成 t 的二次函數，再配方求最小值。`,`PA² ＋ PB² ＝ 2t² − 2(a₁ ＋ b₁)t ＋ (常數)，開口向上，頂點 t ＝ (A、B 的 x 坐標平均) 時最小。`,...p.steps];return p}),plus(()=>LV.dist.g4(),['思路：在 x 軸上找一點 P 讓 PA ＋ PB 最小，用「對稱點」把折線拉成直線（兩點之間直線最短）。','關鍵：P 在 x 軸上，所以 PB ＝ PB′（B′ 是 B 對 x 軸的對稱點）。'])]};
+
+/* ---- 把原本的題型加上「思路」與「公式」兩步 ---- */
+
+/* ---------------- 中點與分點 ---------------- */
+DX.mid={
+1:[plus(()=>MATH_LESSONS.find(l=>l.id==='mid').gen(),['思路：中點在兩點的正中間，x、y 各自取平均。','<b>中點公式</b>：M ＝ ((x₁ ＋ x₂)／2, (y₁ ＋ y₂)／2)。'],'檢查：中點的坐標一定介於兩個端點的坐標之間。'),
+ ()=>{const x=nz(-9,9),y=nz(-9,9);const i=rnd(0,1);return{q:`A${P(x,y)} 和 B 的中點是原點，B 的 ${i?'y':'x'} 坐標是多少？`,ans:[-(i?y:x),1],steps:[
+   `思路：用中點公式反推 B。`,`<b>中點公式</b>：(${num(x)} ＋ b₁)／2 ＝ 0、(${num(y)} ＋ b₂)／2 ＝ 0。`,`解得 b₁ ＝ ${num(-x)}、b₂ ＝ ${num(-y)}，B${P(-x,-y)}。`,`觀察：中點是原點時，B 就是 A 對原點的對稱點（兩坐標都變號）。`,`答案是 <b>${num(-(i?y:x))}</b>`]}},
+ ()=>{const a=rnd(-12,12),b=rnd(-12,12);if(a===b)LEVELS_RETRY();const v=R(a+b,2);return{q:`數線上 A(${num(a)})、B(${num(b)})，AB 中點的坐標是多少？`,ans:v,steps:[
+   `思路：數線上的中點就是兩數的平均。`,`(${num(a)} ＋ ${par(b)})／2 ＝ ${num(a+b)}／2。`,`＝ ${rFmt(v)}。`,`檢查：中點到 A、B 的距離都是 |${num(a)} − ${par(b)}|／2 ＝ ${rFmt(R(Math.abs(a-b),2))}。`,`答案是 <b>${M(rFmt(v))}</b>`]}}],
+2:[()=>{const A=[rnd(-6,6),rnd(-6,6)],Mm=[rnd(-5,5),rnd(-5,5)];const B=[2*Mm[0]-A[0],2*Mm[1]-A[1]];const i=rnd(0,1);return{q:`線段 AB 的中點是 M${P(...Mm)}，A${P(...A)}，B 的 ${i?'y':'x'} 坐標是多少？`,ans:[B[i],1],fig2:plane({R:RR(...A,...B),pts:[PT(...A,'A'),PT(...Mm,'M','amber'),PT(...B,'B','pen')],segs:[{p:A,q:B,c:'blue'}]}),steps:[
+   `思路：M 是中點 → A 到 M 走多少，M 到 B 就再走一樣多。`,
+   `<b>中點公式</b>只看 ${i?'y':'x'}：(${num(A[i])} ＋ b)／2 ＝ ${num(Mm[i])}。`,`兩邊乘 2：${num(A[i])} ＋ b ＝ ${2*Mm[i]}，b ＝ ${2*Mm[i]} − ${par(A[i])} ＝ ${num(B[i])}。`,
+   `另一種想法：A → M 的 ${i?'y':'x'} 變化是 ${num(Mm[i]-A[i])}，M → B 再變化 ${num(Mm[i]-A[i])}：${num(Mm[i])} ＋ ${par(Mm[i]-A[i])} ＝ ${num(B[i])}。`,`答案是 <b>${num(B[i])}</b>`]}},
+ ()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],m=rnd(1,4),n=rnd(1,4);const i=rnd(0,1);const v=R(n*A[i]+m*B[i],m+n);return{q:`A${P(...A)}、B${P(...B)}，P 在線段 AB 上且 AP : PB ＝ ${m} : ${n}，P 的 ${i?'y':'x'} 坐標是多少？`,ans:v,steps:[
+   `思路：從 A 出發，往 B 走全程的 ${m}／${m+n}。`,`<b>分點公式</b>：P ＝ A ＋ ${m}／${m+n} × (B − A)，或寫成 (${n}A ＋ ${m}B)／${m+n}（係數交叉）。`,
+   `只看 ${i?'y':'x'}：${num(A[i])} ＋ ${m}／${m+n} × (${num(B[i])} − ${par(A[i])}) ＝ ${num(A[i])} ＋ ${rFmt(R(m*(B[i]-A[i]),m+n))}。`,`＝ ${rFmt(v)}。`,`檢查：用 (${n} × ${par(A[i])} ＋ ${m} × ${par(B[i])})／${m+n} ＝ ${rFmt(v)}，一致。`,`答案是 <b>${M(rFmt(v))}</b>`]}},
+ plus(XG.mid[2][1],['思路：中線是頂點連到對邊中點的線段，先求中點，再算距離。','用到 <b>中點公式</b> 與 <b>兩點距離公式</b>。'])],
+3:[()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],C=[rnd(-6,6),rnd(-6,6)];const i=rnd(0,1);const v=R(A[i]+B[i]+C[i],3);return{q:`△ABC 中 A${P(...A)}、B${P(...B)}、C${P(...C)}，重心 G 的 ${i?'y':'x'} 坐標是多少？`,ans:v,steps:[
+   `思路：重心是三條中線的交點，坐標是三個頂點的平均。`,`<b>重心坐標</b>：G ＝ ((x₁ ＋ x₂ ＋ x₃)／3, (y₁ ＋ y₂ ＋ y₃)／3)。`,
+   `只看 ${i?'y':'x'}：(${num(A[i])} ＋ ${par(B[i])} ＋ ${par(C[i])})／3 ＝ ${num(A[i]+B[i]+C[i])}／3。`,`＝ ${rFmt(v)}。`,`答案是 <b>${M(rFmt(v))}</b>`]}},
+ ()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],C=[rnd(-6,6),rnd(-6,6)];if((B[0]-A[0])*(C[1]-A[1])===(C[0]-A[0])*(B[1]-A[1]))LEVELS_RETRY();const D=[A[0]+C[0]-B[0],A[1]+C[1]-B[1]];const i=rnd(0,1);return{q:`ABCD 是平行四邊形（頂點依序排列），A${P(...A)}、B${P(...B)}、C${P(...C)}，D 的 ${i?'y':'x'} 坐標是多少？`,ans:[D[i],1],fig2:plane({R:RR(...A,...B,...C,...D),pts:[PT(...A,'A'),PT(...B,'B'),PT(...C,'C'),PT(...D,'D','pen')],segs:[{p:A,q:B,c:'blue'},{p:B,q:C,c:'blue'},{p:C,q:D,c:'pen',dash:true},{p:D,q:A,c:'pen',dash:true},{p:A,q:C,c:'amber',dash:true},{p:B,q:D,c:'amber',dash:true}]}),steps:[
+   `思路：平行四邊形的兩條對角線互相平分 → AC 的中點 ＝ BD 的中點。`,`<b>中點公式</b>：(A ＋ C)／2 ＝ (B ＋ D)／2，所以 A ＋ C ＝ B ＋ D，D ＝ A ＋ C − B。`,
+   `只看 ${i?'y':'x'}：${num(A[i])} ＋ ${par(C[i])} − ${par(B[i])} ＝ ${num(D[i])}。`,`注意頂點要「依序」：D 和 B 是對角，所以用 A ＋ C − B，而不是 A ＋ B − C。`,`答案是 <b>${num(D[i])}</b>`]}},
+ plus(XG.mid[3][0],['思路：平行四邊形的對角線互相平分，交點就是對角線的中點。','<b>中點公式</b>：交點 ＝ (A ＋ C)／2。'])],
+4:[plus(()=>LV.mid.g4(),['思路：已知三邊的中點，用<b>中點公式</b>寫成三個式子，相加減消去 B、C。']),...F4.mid,plus(XG.mid[4][1],['思路：三等分點把 AB 分成三段，靠近 B 的那一點離 A 是全長的 ⅔。','<b>分點公式</b>：AP : PB ＝ 2 : 1，P ＝ (1·A ＋ 2·B)／3。'])]};
+
+/* ---------------- 斜率 ---------------- */
+DX.slope={
+1:[()=>{let A,B;do{A=[rnd(-6,6),rnd(-6,6)];B=[rnd(-6,6),rnd(-6,6)]}while(A[0]===B[0]);const m=R(B[1]-A[1],B[0]-A[0]);return{q:`求通過 A${P(...A)}、B${P(...B)} 的直線斜率。（分數請寫成 a/b）`,ans:m,fig2:plane({R:RR(...A,...B),pts:[PT(...A,'A'),PT(...B,'B','pen')],segs:[{p:A,q:[B[0],A[1]],c:'blue',dash:true,label:''+(B[0]-A[0])},{p:[B[0],A[1]],q:B,c:'pen',dash:true,label:''+(B[1]-A[1])},{p:A,q:B,c:'ink'}]}),steps:[
+   `思路：斜率 ＝ 往右走 1 格時，上升多少。`,`<b>斜率</b>公式：m ＝ (y₂ − y₁)／(x₂ − x₁)，上下兩個差的順序要一致。`,
+   `分子：${num(B[1])} − ${par(A[1])} ＝ ${num(B[1]-A[1])}；分母：${num(B[0])} − ${par(A[0])} ＝ ${num(B[0]-A[0])}。`,`m ＝ ${num(B[1]-A[1])}／${num(B[0]-A[0])} ＝ ${rFmt(m)}（約分）。`,
+   `檢查：m ${m[0]>0?'＞ 0，直線往右上升':m[0]<0?'＜ 0，直線往右下降':'＝ 0，水平線'}，和兩點的位置相符。`,`答案是 <b>${M(rFmt(m))}</b>`]}},
+ ()=>{const a=nz(-6,6),b=nz(-6,6),c=rnd(-9,9);const v=R(-a,b);return{q:`直線 ${gL(a,b,c)} 的斜率是多少？`,ans:v,steps:[
+   `思路：把方程式化成 y ＝ mx ＋ k 的形式，x 前面的數就是斜率。`,`移項：${lin2(0,b,0)} ＝ ${num(-a)}x ${fx(-c,'')}。`,`兩邊除以 ${num(b)}：y ＝ ${rFmt(R(-a,b))}x ${c?(R(-c,b)[0]>=0?'＋ ':'− ')+rFmt(R(Math.abs(c),Math.abs(b))):''}。`,
+   `所以斜率 ＝ ${rFmt(v)}。速算：ax ＋ by ＋ c ＝ 0 的<b>斜率</b> ＝ −a／b。`,`答案是 <b>${M(rFmt(v))}</b>`]}},
+ plus(XG.slope[1][1],['思路：傾斜角是直線和 x 軸正向的夾角，斜率 ＝ tan(傾斜角)。','記住三個特例：0° → 0、45° → 1、135° → −1；90° 是鉛直線，斜率不存在。'])],
+2:[()=>{const A=[rnd(-5,5),rnd(-5,5)],d=[nz(-3,3),nz(-3,3)],t=nz(-2,3);const B=[A[0]+d[0],A[1]+d[1]],xc=A[0]+t*d[0],k=A[1]+t*d[1];return{q:`A${P(...A)}、B${P(...B)}、C(${num(xc)}, k) 三點在同一條直線上，求 k。`,ans:[k,1],steps:[
+   `思路：三點共線 ⇔ AB 的斜率 ＝ AC 的斜率。`,`<b>斜率</b>：m<sub>AB</sub> ＝ (${num(B[1])} − ${par(A[1])})／(${num(B[0])} − ${par(A[0])}) ＝ ${rFmt(R(d[1],d[0]))}。`,
+   `m<sub>AC</sub> ＝ (k − ${par(A[1])})／(${num(xc)} − ${par(A[0])}) ＝ (k − ${par(A[1])})／${num(t*d[0])}。`,`令兩者相等：k − ${par(A[1])} ＝ ${rFmt(R(d[1],d[0]))} × ${num(t*d[0])} ＝ ${num(t*d[1])}，k ＝ ${num(k)}。`,`答案是 <b>${num(k)}</b>`]}},
+ plus(XG.slope[2][0],['思路：已知斜率和一點，另一點的 y 坐標可以用「斜率 ＝ 上升／前進」反推。','<b>斜率</b>公式：m ＝ (y₂ − y₁)／(x₂ − x₁)。']),
+ plus(XG.slope[2][1],['思路：斜率是 m、y 截距是 b 的直線就是 y ＝ mx ＋ b（斜截式），代入 x 即可。'])],
+3:[()=>{const m=nz(-4,4),t=rnd(-5,5);const A=[2,t],B=[t,t+m*(t-2)];if(t===2||m===-1)LEVELS_RETRY();const yB=B[1];return{q:`A(2, t)、B(t, ${num(yB)}) 兩點連線的斜率是 ${m}，且 t ≠ 2，求 t。`,ans:[t,1],steps:[
+   `思路：用斜率公式列方程式，未知數同時出現在分子和分母。`,`<b>斜率</b>：(${num(yB)} − t)／(t − 2) ＝ ${m}。`,`交叉相乘：${num(yB)} − t ＝ ${m}(t − 2) ＝ ${m}t ${fx(-2*m,'')}。`,
+   `移項：${num(yB+2*m)} ＝ ${m+1===0?'0':num(m+1)+'t'}${m+1===0?'（無解）':''}，t ＝ ${num(t)}。`,`檢查 t ≠ 2，分母不為 0。`,`答案是 <b>${num(t)}</b>`]}},
+ plus(XG.slope[3][0],['思路：先用中點公式求 AB 中點，再算它和 C 連線的斜率。','用到 <b>中點公式</b> 與 <b>斜率</b>公式。']),
+ ()=>{const m=R(nz(-4,4),pick([1,2,3])),P0=[rnd(-5,5),rnd(-5,5)];if(m[0]===0)LEVELS_RETRY();const xi=Fs([P0[0],1],Fd([P0[1],1],m));return{q:`斜率為 ${M(rFmt(m))} 的直線通過 P${P(...P0)}，它和 x 軸交點的 x 坐標是多少？`,ans:xi,steps:[
+   `思路：和 x 軸的交點 y ＝ 0；從 P 走到 y ＝ 0 要下降（或上升）${Math.abs(P0[1])}。`,`<b>斜率</b>：(0 − ${par(P0[1])})／(x − ${par(P0[0])}) ＝ ${rFmt(m)}。`,
+   `x − ${par(P0[0])} ＝ ${num(-P0[1])} ÷ ${rFmt(m)} ＝ ${rFmt(Fd([-P0[1],1],m))}。`,`x ＝ ${rFmt(xi)}。`,`答案是 <b>${M(rFmt(xi))}</b>`]}}],
+4:[plus(()=>LV.slope.g4(),['思路：直線繞著 P 轉動掃過線段 AB，斜率的範圍就在 PA、PB 兩個<b>斜率</b>之間。']),...F4.slope,()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],m=rnd(1,4),n=rnd(1,4);const C=[R(n*A[0]+m*B[0],m+n),R(n*A[1]+m*B[1],m+n)];if(C[0][0]===0)LEVELS_RETRY();const s=Fd(C[1],C[0]);return{q:`A${P(...A)}、B${P(...B)}，C 在線段 AB 上且 AC : CB ＝ ${m} : ${n}，求直線 OC 的斜率（O 為原點）。`,ans:s,steps:[
+   `思路：先用分點公式求 C，再算原點到 C 的斜率。`,`<b>分點公式</b>：C ＝ (${n}A ＋ ${m}B)／${m+n} ＝ (${rFmt(C[0])}, ${rFmt(C[1])})。`,
+   `<b>斜率</b>：OC 的斜率 ＝ (y − 0)／(x − 0) ＝ ${rFmt(C[1])} ÷ ${rFmt(C[0])}。`,`＝ ${rFmt(s)}。`,`答案是 <b>${M(rFmt(s))}</b>`]}}]};
+
+/* ---------------- 直線方程式 ---------------- */
+DX.line={
+1:[()=>{const m=nz(-4,4),b=rnd(-6,6),x=rnd(-5,5);return{q:`直線 y ＝ ${m===1?'':m===-1?'−':m}x ${fx(b,'')} 上，x ＝ ${num(x)} 的那個點，y 坐標是多少？`,ans:[m*x+b,1],steps:[
+   `思路：點在直線上 ⇔ 坐標代入方程式會成立。`,`把 x ＝ ${num(x)} 代入：y ＝ ${m} × ${par(x)} ${fx(b,'')}。`,`${m} × ${par(x)} ＝ ${num(m*x)}，再 ${b>=0?'加':'減'} ${Math.abs(b)}：${num(m*x+b)}。`,`所以這個點是 ${P(x,m*x+b)}。`,`答案是 <b>${num(m*x+b)}</b>`]}},
+ ()=>{const m=nz(-4,4),x0=rnd(-5,5),y0=rnd(-5,5);const b=y0-m*x0;return{q:`一條直線斜率是 ${m}，通過點 ${P(x0,y0)}。把它寫成 y ＝ mx ＋ b，b 是多少？`,ans:[b,1],steps:[
+   `思路：斜截式 y ＝ mx ＋ b 中 m 已知，只差 b；用通過的點代入求 b。`,`y ＝ ${m}x ＋ b，代入 ${P(x0,y0)}：${num(y0)} ＝ ${m} × ${par(x0)} ＋ b。`,`${num(y0)} ＝ ${num(m*x0)} ＋ b，b ＝ ${num(y0)} − ${par(m*x0)} ＝ ${num(b)}。`,`直線：y ＝ ${m}x ${fx(b,'')}。`,`答案是 <b>${num(b)}</b>`]}},
+ ()=>{const a=nz(-6,6),b=nz(-6,6);const c=a*b*nz(-3,3);const v=R(c,b);return{q:`直線 ${eqL(a,b,c)} 的 y 截距是多少？`,ans:v,steps:[
+   `思路：y 截距是直線和 y 軸交點的 y 坐標，y 軸上 x ＝ 0。`,`令 x ＝ 0：${num(b)}y ＝ ${num(c)}。`,`y ＝ ${num(c)} ÷ ${par(b)} ＝ ${rFmt(v)}。`,`所以直線和 y 軸交於 (0, ${rFmt(v)})。`,`答案是 <b>${M(rFmt(v))}</b>`]}}],
+2:[()=>{let A,B;do{A=[rnd(-5,5),rnd(-5,5)];B=[rnd(-5,5),rnd(-5,5)]}while(A[0]===B[0]);const m=R(B[1]-A[1],B[0]-A[0]);const b=Fs([A[1],1],Fm(m,[A[0],1]));return{q:`通過 A${P(...A)}、B${P(...B)} 的直線寫成 y ＝ mx ＋ b，b 是多少？`,ans:b,steps:[
+   `思路：先求斜率 m，再代一點求 b。`,`<b>斜率</b>：m ＝ (${num(B[1])} − ${par(A[1])})／(${num(B[0])} − ${par(A[0])}) ＝ ${rFmt(m)}。`,
+   `代入 A：${num(A[1])} ＝ ${rFmt(m)} × ${par(A[0])} ＋ b，b ＝ ${num(A[1])} − ${rFmt(Fm(m,[A[0],1]))} ＝ ${rFmt(b)}。`,`檢查：代入 B，${rFmt(m)} × ${par(B[0])} ＋ ${rFmt(b)} ＝ ${rFmt(Fa(Fm(m,[B[0],1]),b))} ＝ ${num(B[1])}，正確。`,`答案是 <b>${M(rFmt(b))}</b>`]}},
+ plus(XG.line[2][0],['思路：x／a ＋ y／b ＝ 1 是<b>截距式</b>，直線過 (a, 0) 與 (0, b) 兩點。','用兩個截距點算斜率：(b − 0)／(0 − a) ＝ −b／a。']),
+ plus(XG.line[2][1],['思路：交點同時在兩條直線上 → 解聯立方程式。','用加減消去法：讓某個變數的係數相同（或相反）再相減（或相加）。'],'檢查：把交點代回兩條直線都要成立。')],
+3:[()=>{const a=nz(-6,6),b=nz(-6,6);const c=a*b*nz(-3,3);const xi=R(c,a),yi=R(c,b);const S=Fm([1,2],R(Math.abs(xi[0]*yi[0]),xi[1]*yi[1]));const ask=Math.random()<.5;return{q:`直線 ${eqL(a,b,c)} ${ask?'的 x 截距是多少':'和兩坐標軸圍成的三角形面積是多少'}？`,ans:ask?xi:S,steps:[
+   `思路：x 截距：令 y ＝ 0；y 截距：令 x ＝ 0。`,`令 y ＝ 0：${num(a)}x ＝ ${num(c)}，x 截距 ＝ ${rFmt(xi)}。`,`令 x ＝ 0：${num(b)}y ＝ ${num(c)}，y 截距 ＝ ${rFmt(yi)}。`,
+   ask?`所以 x 截距 ${rFmt(xi)}（y 截距 ${rFmt(yi)} 用不到）。`:`直線和兩軸圍出直角三角形，兩股長是 |${rFmt(xi)}| 和 |${rFmt(yi)}|，面積 ＝ ½ × |${rFmt(xi)}| × |${rFmt(yi)}| ＝ ${rFmt(S)}。`,ask?`答案是 <b>${M(rFmt(xi))}</b>`:`答案是 <b>${M(rFmt(S))}</b>`]}},
+ ()=>{const m=R(nz(-4,4),pick([1,2])),P0=[rnd(-5,5),rnd(-5,5)];const b=Fs([P0[1],1],Fm(m,[P0[0],1]));const k=rnd(-6,6);return{q:`直線 L 和 y ＝ ${rFmt(m)}x ${fx(k,'')} 平行，且通過 ${P(...P0)}。把 L 寫成 y ＝ mx ＋ b，b 是多少？`,ans:b,steps:[
+   `思路：平行線斜率相同，所以 L 的斜率也是 ${rFmt(m)}，只要再求 b。`,`L：y ＝ ${rFmt(m)}x ＋ b，代入 ${P(...P0)}：${num(P0[1])} ＝ ${rFmt(m)} × ${par(P0[0])} ＋ b。`,
+   `b ＝ ${num(P0[1])} − ${rFmt(Fm(m,[P0[0],1]))} ＝ ${rFmt(b)}。`,`檢查：b ≠ ${k} 時兩線平行不重合${Fs(b,[k,1])[0]===0?'（這題剛好重合）':''}。`,`答案是 <b>${M(rFmt(b))}</b>`]}},
+ plus(()=>LV.line.g3(),['思路：截距就是直線和坐標軸的交點：x 截距令 y ＝ 0，y 截距令 x ＝ 0。','和兩軸圍成的三角形是直角三角形，兩股長就是兩個截距的絕對值。'])],
+4:[plus(()=>LV.line.g4(),['思路：用截距式設直線，再用<b>算幾不等式</b>求面積的最小值。','面積 ＝ ½ab，只要求 ab 的最小值；「和固定、求積」反過來就是「積的範圍」。']),...F4.line,plus(XG.line[4][1],['思路：三條直線兩兩求交點得到三個頂點，再用三角形面積公式。','<b>坐標平面上的三角形面積</b>：½|x₁y₂ − x₂y₁|（先把一個頂點平移到原點）。'])]};
+
+/* ---------------- 平行與垂直 ---------------- */
+DX.perp={
+1:[()=>{const m=R(nz(-5,5),pick([1,2,3]));const pp=Math.random()<.5;const v=pp?m:Fd([-1,1],m);return{q:`和直線 y ＝ ${rFmt(m)}x ${fx(rnd(-5,5),'')} ${pp?'平行':'<b>垂直</b>'}的直線，斜率是多少？`,ans:v,steps:[
+   `思路：${pp?'平行線的斜率相等':'垂直的兩條直線（都不是鉛直線）斜率相乘 ＝ −1'}。`,`已知直線的斜率是 ${rFmt(m)}。`,
+   pp?`平行線的斜率也是 ${rFmt(m)}。`:`<b>垂直</b>：斜率取「負倒數」，−1 ÷ ${rFmt(m)} ＝ ${rFmt(v)}。`,pp?'（截距不同才是平行；截距相同就是同一條線）':`檢查：${rFmt(m)} × ${rFmt(v)} ＝ −1。`,`答案是 <b>${M(rFmt(v))}</b>`]}},
+ ()=>{const S=[[R(2,3),R(-3,2),'垂直'],[R(1,2),R(1,2),'平行'],[R(3,1),R(1,3),'都不是'],[R(-4,1),R(1,4),'垂直'],[R(5,2),R(-5,2),'都不是'],[R(-1,3),R(3,1),'垂直']];const[a,b,ans]=pick(S);return mc(`斜率分別為 ${rFmt(a)} 與 ${rFmt(b)} 的兩條直線（截距不同），關係是？`,ans,['平行','垂直','都不是'].filter(x=>x!==ans),[`思路：斜率相等 → 平行；相乘 ＝ −1 → 垂直。`,`${rFmt(a)} × ${rFmt(b)} ＝ ${rFmt(Fm(a,b))}${ans==='垂直'?'，等於 −1':''}；兩斜率${a[0]===b[0]&&a[1]===b[1]?'相等':'不相等'}。`])}],
+2:[()=>{const m=R(nz(-4,4),pick([1,2]));const pm=Fd([-1,1],m);const P0=[rnd(-5,5),rnd(-5,5)];const b=Fs([P0[1],1],Fm(pm,[P0[0],1]));return{q:`直線 L 和 y ＝ ${rFmt(m)}x ${fx(rnd(-5,5),'')} <b>垂直</b>，而且通過 ${P(...P0)}。把 L 寫成 y ＝ mx ＋ b，b 是多少？`,ans:b,steps:[
+   `思路：先用「垂直 → 斜率相乘 ＝ −1」求 L 的斜率，再代點求 b。`,`L 的斜率 ＝ −1 ÷ ${rFmt(m)} ＝ ${rFmt(pm)}。`,`L：y ＝ ${rFmt(pm)}x ＋ b，代入 ${P(...P0)}：${num(P0[1])} ＝ ${rFmt(pm)} × ${par(P0[0])} ＋ b。`,
+   `b ＝ ${num(P0[1])} − ${rFmt(Fm(pm,[P0[0],1]))} ＝ ${rFmt(b)}。`,`答案是 <b>${M(rFmt(b))}</b>`]}},
+ ()=>{const a=nz(-5,5),b=nz(-5,5),c=nz(-5,5),d=nz(-5,5);const dot=a*c+b*d;const par_=a*d-b*c===0;const ans=par_?'平行（或重合）':dot===0?'垂直':'都不是';return mc(`直線 ${gL(a,b,rnd(-5,5))} 與 ${gL(c,d,rnd(-5,5))} 的關係是？`,ans,['平行（或重合）','垂直','都不是'].filter(x=>x!==ans),[`思路：一般式 ax ＋ by ＋ c ＝ 0 的斜率 −a／b；也可以直接用係數判斷。`,`斜率：${rFmt(R(-a,b))} 與 ${rFmt(R(-c,d))}。`,`<b>垂直</b> ⇔ a₁a₂ ＋ b₁b₂ ＝ 0：${a}×${par(c)} ＋ ${par(b)}×${par(d)} ＝ ${dot}；平行 ⇔ a₁b₂ − a₂b₁ ＝ 0：${a*d-b*c}。`])},
+ plus(()=>LV.perp.g2(),['思路：<b>垂直</b>的兩直線斜率相乘 ＝ −1，先求 L 的斜率，再代入通過的點求 b。'])],
+3:[plus(()=>LV.perp.g3(),['思路：一般式 ax ＋ by ＋ c ＝ 0 的斜率是 −a／b；<b>垂直</b>時斜率相乘 ＝ −1，平行時斜率相等。','也可以直接用係數：垂直 ⇔ a₁a₂ ＋ b₁b₂ ＝ 0；平行 ⇔ a₁b₂ ＝ a₂b₁。']),()=>{const A=[rnd(-5,5),rnd(-5,5)],B=[rnd(-5,5),rnd(-5,5)],C=[rnd(-5,5),rnd(-5,5)];if(B[1]===A[1])LEVELS_RETRY();const mAB=R(B[1]-A[1],B[0]-A[0]);if(A[0]===B[0])LEVELS_RETRY();const h=Fd([-1,1],mAB);return{q:`△ABC 中 A${P(...A)}、B${P(...B)}、C${P(...C)}，從 C 到 AB 的高所在直線，斜率是多少？`,ans:h,steps:[
+   `思路：高和底邊 AB <b>垂直</b>，所以先求 AB 斜率，再取負倒數。`,`<b>斜率</b>：m<sub>AB</sub> ＝ (${num(B[1])} − ${par(A[1])})／(${num(B[0])} − ${par(A[0])}) ＝ ${rFmt(mAB)}。`,`高的斜率 ＝ −1 ÷ ${rFmt(mAB)} ＝ ${rFmt(h)}。`,`C 的坐標只決定高的位置，不影響斜率。`,`答案是 <b>${M(rFmt(h))}</b>`]}}],
+4:[plus(()=>LV.perp.g4(),['思路：P 和對稱點 P′ 的連線和 L <b>垂直</b>，而且中點在 L 上。','做法：從 P 沿 L 的法向量方向走到 L 上（垂足 H），再走同樣距離到 P′。']),...F4.perp,plus(XG.perp[4][0],['思路：垂直平分線上的點到 A、B 等距 → 列 PA² ＝ PB² 化簡。','也可以想成：通過 AB 中點、和 AB <b>垂直</b>的直線。'])]};
+
+/* ---------------- 點到直線距離 ---------------- */
+const NT=()=>pick([[3,4,5],[4,3,5],[5,12,13],[12,5,13],[6,8,10],[8,15,17]]);
+DX.pdist={
+1:[()=>{const x=nz(-9,9),y=nz(-9,9),c=rnd(-9,9);const h=Math.random()<.5;if(h&&c===y||!h&&c===x)LEVELS_RETRY();const v=Math.abs(h?y-c:x-c);return{q:`求點 P${P(x,y)} 到直線 ${h?'y':'x'} ＝ ${num(c)} 的距離。`,ans:[v,1],fig2:plane({R:RR(x,y,c),pts:[PT(x,y,'P','pen')],lines:[h?{a:0,b:1,c:-c}:{a:1,b:0,c:-c}],segs:[{p:[x,y],q:h?[x,c]:[c,y],c:'pen',dash:true,label:''+v}]}),steps:[
+   `思路：${h?'y ＝ '+num(c)+' 是水平線，P 到它的垂線是鉛直的':'x ＝ '+num(c)+' 是鉛直線，P 到它的垂線是水平的'}，不用套公式。`,
+   `垂足是 ${h?P(x,c):P(c,y)}，距離就是 ${h?'y':'x'} 坐標的差。`,`|${num(h?y:x)} − ${par(c)}| ＝ ${v}。`,`檢查：用公式 |${h?'0·x ＋ 1·y':'1·x ＋ 0·y'} − ${par(c)}|／1 也一樣。`,`答案是 <b>${v}</b>`]}},
+ ()=>{const[a,b,c]=NT();const k=c*nz(-4,4);return{q:`原點到直線 ${a}x ＋ ${b}y ＝ ${num(k)} 的距離是多少？`,ans:[Math.abs(k)/c,1],steps:[
+   `思路：先把直線寫成 ax ＋ by ＋ c ＝ 0，再套公式。`,`${a}x ＋ ${b}y ${fx(-k,'')} ＝ 0。`,`<b>點到直線距離</b>：|a·x₀ ＋ b·y₀ ＋ c|／√(a² ＋ b²)，原點 x₀ ＝ y₀ ＝ 0。`,
+   `分子 |${num(-k)}| ＝ ${Math.abs(k)}，分母 √(${a*a} ＋ ${b*b}) ＝ √${c*c} ＝ ${c}。`,`${Math.abs(k)} ÷ ${c} ＝ ${Math.abs(k)/c}。`,`答案是 <b>${Math.abs(k)/c}</b>`]}},
+ plus(XG.pdist[1][0],['思路：x ＝ c 是鉛直線，距離就是 x 坐標相減的絕對值。'])],
+2:[()=>{const[a,b,c]=NT();const P0=[rnd(-6,6),rnd(-6,6)];const d=rnd(0,5);const s=pick([1,-1]);const C=s*c*d-a*P0[0]-b*P0[1];return{q:`求點 P${P(...P0)} 到直線 ${a}x ＋ ${b}y ${fx(C,'')} ＝ 0 的距離。`,ans:[d,1],steps:[
+   `思路：直線已經是 ax ＋ by ＋ c ＝ 0 的形式，直接套公式。`,`<b>點到直線距離</b>：d ＝ |a·x₀ ＋ b·y₀ ＋ c|／√(a² ＋ b²)。`,
+   `分子：|${a} × ${par(P0[0])} ＋ ${b} × ${par(P0[1])} ${fx(C,'')}| ＝ |${num(a*P0[0])} ${fx(b*P0[1],'')} ${fx(C,'')}| ＝ |${num(s*c*d)}| ＝ ${c*d}。`,
+   `分母：√(${a}² ＋ ${b}²) ＝ √${c*c} ＝ ${c}。`,`d ＝ ${c*d} ÷ ${c} ＝ ${d}${d===0?'（距離 0 表示 P 在直線上）':''}。`,`答案是 <b>${d}</b>`]}},
+ ()=>{const[a,b,c]=NT();const c1=rnd(-20,20),dd=rnd(1,4);const c2=c1+pick([1,-1])*dd*c;return{q:`求兩平行線 ${a}x ＋ ${b}y ${fx(c1,'')} ＝ 0 和 ${a}x ＋ ${b}y ${fx(c2,'')} ＝ 0 的距離。`,ans:[dd,1],steps:[
+   `思路：兩線 x、y 的係數完全相同，所以平行；可以用公式 |c₁ − c₂|／√(a² ＋ b²)。`,`為什麼？在第一條線上任取一點，算它到第二條線的距離，代入後 ax₀ ＋ by₀ 會變成 −c₁。`,
+   `|${num(c1)} − ${par(c2)}| ＝ ${Math.abs(c1-c2)}，√(${a*a} ＋ ${b*b}) ＝ ${c}。`,`距離 ＝ ${Math.abs(c1-c2)} ÷ ${c} ＝ ${dd}。`,`答案是 <b>${dd}</b>`]}},
+ plus(XG.pdist[2][0],['思路：平行線寫成同樣的 ax ＋ by，只差常數 k；用兩平行線距離公式 |k − c₁|／√(a² ＋ b²) ＝ d 解 k。'],'注意：距離為 d 的平行線有兩條（在兩側），所以 k 有兩個值。')],
+3:[()=>{const[a,b,c]=NT();const k0=rnd(1,8),d=rnd(1,4);const C=-a*k0+d*c;/* |a k + C|/c = d → a k + C = ±d c → k = (±dc − C)/a; with C = d c − a k0 → k = k0 or k = (−2dc + a k0)/a */const k2=R(-2*d*c+a*k0,a);const ks=[[k0,1],k2].filter(x=>x[0]/x[1]>0);if(ks.length!==1)LEVELS_RETRY();return{q:`點 P(k, 0) 到直線 ${a}x ${fx(-b,'y')} ${fx(C,'')} ＝ 0 的距離是 ${d}，且 k ＞ 0，求 k。`,ans:ks[0],steps:[
+   `思路：用點到直線距離列出含絕對值的方程式，拆成正負兩種情況。`,`<b>點到直線距離</b>：|${a}k ${fx(C,'')}|／√(${a*a} ＋ ${b*b}) ＝ ${d}，分母 ＝ ${c}。`,
+   `|${a}k ${fx(C,'')}| ＝ ${d*c} ⇒ ${a}k ${fx(C,'')} ＝ ${d*c} 或 ${a}k ${fx(C,'')} ＝ ${-d*c}。`,`解得 k ＝ ${k0} 或 k ＝ ${rFmt(k2)}。`,`題目要求 k ＞ 0，所以 k ＝ ${rFmt(ks[0])}。`,`答案是 <b>${M(rFmt(ks[0]))}</b>`]}},
+ ()=>{const[a,b,c]=NT();const m=pick([2,3]),c1=rnd(-12,12),dd=rnd(1,3);const c2=m*c1+pick([1,-1])*m*dd*c;return{q:`求兩平行線 ${a}x ＋ ${b}y ${fx(c1,'')} ＝ 0 和 ${m*a}x ＋ ${m*b}y ${fx(c2,'')} ＝ 0 的距離。`,ans:[dd,1],steps:[
+   `思路：兩平行線距離公式要求 x、y 係數完全相同，第二式是第一式的 ${m} 倍，先調整。`,`把第一式乘 ${m}：${m*a}x ＋ ${m*b}y ${fx(m*c1,'')} ＝ 0。`,
+   `兩平行線距離 ＝ |${num(m*c1)} − ${par(c2)}|／√(${(m*a)**2} ＋ ${(m*b)**2}) ＝ ${Math.abs(m*c1-c2)}／${m*c}。`,`＝ ${dd}。常見錯誤：沒調係數就直接用 |c₁ − c₂|。`,`答案是 <b>${dd}</b>`]}},
+ plus(()=>LV.pdist.g3(),['思路：用<b>點到直線距離</b>公式列方程式；兩平行線則先把係數調成一樣。'])],
+4:[plus(()=>LV.pdist.g4(),['思路：到兩直線等距的點在角平分線上：|式子₁|／√(…) ＝ |式子₂|／√(…)，拆成兩種情況。']),...F4.pdist,()=>{const[a,b,c]=NT();const c1=rnd(-15,15),dd=rnd(2,5);const c2=c1-dd*c;const t=rnd(1,dd-1);return{q:`P 在兩平行線 L₁：${a}x ＋ ${b}y ${fx(c1,'')} ＝ 0 與 L₂：${a}x ＋ ${b}y ${fx(c2,'')} ＝ 0 之間，P 到 L₁ 的距離是 ${t}，P 到 L₂ 的距離是多少？`,ans:[dd-t,1],steps:[
+   `思路：P 夾在兩條平行線中間時，到兩線的距離和 ＝ 兩線的距離。`,`兩平行線距離 ＝ |${num(c1)} − ${par(c2)}|／√(${a*a} ＋ ${b*b}) ＝ ${dd*c}／${c} ＝ ${dd}。`,
+   `P 到 L₂ ＝ ${dd} − ${t} ＝ ${dd-t}。`,`注意：如果 P 在兩線外側，就要用相減而不是相加。`,`答案是 <b>${dd-t}</b>`]}}]};
+
+/* ---------------- 圓 ---------------- */
+const circStd=(h,k,r2)=>`${sq(X,h)} ＋ ${sq(Y,k)} ＝ ${r2}`;
+DX.circle={
+1:[()=>{const h=rnd(-6,6),k=rnd(-6,6),r=rnd(1,9);const ask=rnd(0,2);const v=[r,h,k][ask];return{q:`圓 ${M(circStd(h,k,r*r))} 的${['半徑','圓心 x 坐標','圓心 y 坐標'][ask]}是多少？`,ans:[v,1],steps:[
+   `思路：和標準式 (x − h)² ＋ (y − k)² ＝ r² 對照，圓心 (h, k)、半徑 r。`,`注意符號：(x ${fx(-h,'')})² 表示 h ＝ ${num(h)}（括號裡是「減 h」，看到加號 h 是負的）。`,
+   `圓心 ${P(h,k)}；r² ＝ ${r*r}，r ＝ ${r}（半徑取正）。`,`常見錯誤：半徑是 ${r}，不是 ${r*r}。`,`答案是 <b>${num(v)}</b>`]}},
+ ()=>{const h=nz(-5,5),k=nz(-5,5),r=rnd(1,6);const F=h*h+k*k-r*r;return{q:`圓 ${M(`x<sup>2</sup> ＋ y<sup>2</sup> ${fx(-2*h,'x')} ${fx(-2*k,'y')} ${fx(F,'')} = 0`)} 的半徑是多少？`,ans:[r,1],steps:[
+   `思路：一般式要<b>配方</b>成標準式，才看得出圓心和半徑。`,`x² ${fx(-2*h,'x')}：加上 (${num(-2*h)}／2)² ＝ ${h*h} 配成 (x ${fx(-h,'')})²；y² ${fx(-2*k,'y')}：加上 ${k*k} 配成 (y ${fx(-k,'')})²。`,
+   `兩邊同加 ${h*h} ＋ ${k*k}，常數移到右邊：(x ${fx(-h,'')})² ＋ (y ${fx(-k,'')})² ＝ ${h*h} ＋ ${k*k} − ${par(F)} ＝ ${r*r}。`,`r² ＝ ${r*r}，r ＝ ${r}。速算：r² ＝ (D² ＋ E²)／4 − F。`,`答案是 <b>${r}</b>`]}},
+ ()=>{const h=rnd(-5,5),k=rnd(-5,5),r=rnd(1,7);return{q:`以 ${P(h,k)} 為圓心、半徑 ${r} 的圓，方程式寫成 x² ＋ y² ＋ Dx ＋ Ey ＋ F ＝ 0，F 是多少？`,ans:[h*h+k*k-r*r,1],steps:[
+   `思路：先寫標準式，再展開。`,`標準式：${circStd(h,k,r*r)}。`,`展開：x² ${fx(-2*h,'x')} ＋ ${h*h} ＋ y² ${fx(-2*k,'y')} ＋ ${k*k} ＝ ${r*r}。`,
+   `常數移到左邊：F ＝ ${h*h} ＋ ${k*k} − ${r*r} ＝ ${num(h*h+k*k-r*r)}。`,`答案是 <b>${num(h*h+k*k-r*r)}</b>`]}}],
+2:[()=>{const A=[rnd(-5,5),rnd(-5,5)];const u=rnd(-3,3),v=rnd(-3,3);if(!u&&!v)LEVELS_RETRY();const B=[A[0]+2*u,A[1]+2*v];const C=[A[0]+u,A[1]+v];const r2=u*u+v*v;const ask=Math.random()<.5;return{q:`以 A${P(...A)}、B${P(...B)} 為直徑兩端的圓，${ask?'半徑的平方 r² 是多少':'圓心的 x 坐標是多少'}？`,ans:[ask?r2:C[0],1],fig2:plane({R:RR(...A,...B)+1,circles:[{x:C[0],y:C[1],r:Math.sqrt(r2)}],pts:[PT(...A,'A'),PT(...B,'B'),PT(...C,'圓心','pen')],segs:[{p:A,q:B,c:'blue'}]}),steps:[
+   `思路：直徑的中點是圓心，直徑的一半是半徑。`,`<b>中點公式</b>：圓心 ＝ ((${num(A[0])} ＋ ${par(B[0])})／2, (${num(A[1])} ＋ ${par(B[1])})／2) ＝ ${P(...C)}。`,
+   `半徑 ＝ 圓心到 A 的距離：r² ＝ (${num(A[0])} − ${par(C[0])})² ＋ (${num(A[1])} − ${par(C[1])})² ＝ ${u*u} ＋ ${v*v} ＝ ${r2}。`,`方程式：${circStd(...C,r2)}。`,`答案是 <b>${num(ask?r2:C[0])}</b>`]}},
+ ()=>{const h=rnd(-4,4),k=rnd(-4,4);const[a,b,c]=pick([[3,4,5],[1,2,0],[2,3,0],[5,12,13],[1,1,0]]);const p=[h+a*pick([1,-1]),k+b*pick([1,-1])];const r2=a*a+b*b;return{q:`以 ${P(h,k)} 為圓心、通過點 ${P(...p)} 的圓，方程式寫成 (x − h)² ＋ (y − k)² ＝ r²，r² 是多少？`,ans:[r2,1],steps:[
+   `思路：圓心到圓上任一點的距離都是半徑。`,`<b>兩點距離公式</b>：r² ＝ (${num(p[0])} − ${par(h)})² ＋ (${num(p[1])} − ${par(k)})²。`,`＝ ${a*a} ＋ ${b*b} ＝ ${r2}。`,`方程式：${circStd(h,k,r2)}。`,`答案是 <b>${r2}</b>`]}},
+ plus(XG.circle[2][1],['思路：先從兩個標準式讀出圓心，再用兩點距離公式。'])],
+3:[()=>{const h=nz(-5,5),k=nz(-5,5);const lim=h*h+k*k;return{q:`方程式 ${M(`x<sup>2</sup> ＋ y<sup>2</sup> ${fx(2*h,'x')} ${fx(2*k,'y')} ＋ m = 0`)} 的圖形是一個圓，m 最大可以是哪個整數？`,ans:[lim-1,1],steps:[
+   `思路：<b>配方</b>後右邊是 r²，要是一個圓，r² 必須大於 0。`,`(x ${fx(h,'')})² ＋ (y ${fx(k,'')})² ＝ ${h*h} ＋ ${k*k} − m ＝ ${lim} − m。`,
+   `${lim} − m ＞ 0 ⇒ m ＜ ${lim}。`,`（m ＝ ${lim} 時圖形只剩一個點，m ＞ ${lim} 時沒有圖形）`,`m 最大的整數是 ${lim-1}。`,`答案是 <b>${lim-1}</b>`]}},
+ plus(XG.circle[3][0],['思路：比較「點到圓心的距離」和「半徑」：小於 → 圓內；等於 → 圓上；大於 → 圓外。','比較平方就好，不用開根號。']),
+ plus(XG.circle[3][1],['思路：圓面積 ＝ πr²，所以 k 就是 r²；一般式先<b>配方</b>求 r²。'])],
+4:[plus(()=>LV.circle.g4(),['思路：設一般式 x² ＋ y² ＋ Dx ＋ Ey ＋ F ＝ 0，三點代入得三條方程式，兩兩相減消去 F。']),plus(XG.circle[4][0],['思路：和兩軸都相切、圓心在第一象限 → 圓心 (r, r)、半徑 r。','把點代入 (x − r)² ＋ (y − r)² ＝ r²，得到 r 的一元二次方程式，可能有兩個解。']),...F4.circle]};
+
+/* ---------------- 圓與直線 ---------------- */
+DX.cline={
+1:[()=>{const h=rnd(-3,3),k=rnd(-3,3),r=rnd(2,6);const[a,b,c]=pick([[3,4,5],[4,3,5]]).map((x,i)=>i<2?x*pick([1,-1]):x);const d=rnd(0,9);const s=pick([1,-1]);const C=s*5*d-a*h-b*k;const n=d<r?2:d===r?1:0;return{q:`圓 ${M(circStd(h,k,r*r))} 和直線 ${a}x ${fx(b,'y')} ${fx(C,'')} ＝ 0 有幾個交點？`,ans:[n,1],steps:[
+   `思路：比較「圓心到直線的距離 d」和「半徑 r」。d ＜ r 交兩點、d ＝ r 相切一點、d ＞ r 不相交。`,`圓心 ${P(h,k)}，半徑 ${r}。`,
+   `<b>點到直線距離</b>：d ＝ |${a}×${par(h)} ＋ ${par(b)}×${par(k)} ${fx(C,'')}|／√(${a*a} ＋ ${b*b}) ＝ ${5*d}／5 ＝ ${d}。`,`d ＝ ${d} ${d<r?'＜':d===r?'＝':'＞'} r ＝ ${r}，${n===2?'相交於兩點':n===1?'相切':'沒有交點'}。`,`答案是 <b>${n}</b>`]}},
+ ()=>{const h=rnd(-4,4),k=rnd(-4,4),r=rnd(2,6);const hv=Math.random()<.5;const c=(hv?k:h)+rnd(-r-2,r+2);const d=Math.abs(c-(hv?k:h));const n=d<r?2:d===r?1:0;return{q:`圓 ${M(circStd(h,k,r*r))} 和直線 ${hv?'y':'x'} ＝ ${num(c)} 有幾個交點？`,ans:[n,1],steps:[
+   `思路：${hv?'水平':'鉛直'}線到圓心的距離直接看坐標差。`,`圓心 ${P(h,k)}，半徑 ${r}。`,`距離 d ＝ |${num(c)} − ${par(hv?k:h)}| ＝ ${d}。`,`d ${d<r?'＜':d===r?'＝':'＞'} r，${n===2?'交兩點':n===1?'相切，交一點':'不相交'}。`,`答案是 <b>${n}</b>`]}},
+ plus(()=>MATH_LESSONS.find(l=>l.id==='cline').gen(),['思路：比較圓心到直線的距離 d 與半徑 r：d ＜ r 交兩點、d ＝ r 相切、d ＞ r 不相交。'])],
+2:[plus(()=>LV.cline.g2(),['思路：相切 ⇔ 圓心到直線的距離 ＝ 半徑，用<b>點到直線距離</b>列含絕對值的方程式。','絕對值方程式要拆成正、負兩種情況，所以 c 有兩個值（直線的兩側各一條切線）。']),plus(XG.cline[2][0],['思路：圓上一點的切線和「圓心到該點的半徑」<b>垂直</b>，所以半徑方向就是切線的法向量。','切線：(P − 圓心) · (X − P) ＝ 0。']),
+ ()=>{const[a,b,c]=pick([[3,4,5],[4,3,5],[5,12,13],[12,5,13]]);const h=rnd(-4,4),k=rnd(-4,4);const r=rnd(1,6);const C=pick([1,-1])*c*r-a*h-b*k;return{q:`以 ${P(h,k)} 為圓心的圓和直線 ${a}x ＋ ${b}y ${fx(C,'')} ＝ 0 相切，求半徑。`,ans:[r,1],steps:[
+   `思路：相切 ⇔ 圓心到直線的距離 ＝ 半徑。`,`<b>點到直線距離</b>：|${a}×${par(h)} ＋ ${b}×${par(k)} ${fx(C,'')}|／√(${a*a} ＋ ${b*b})。`,`＝ ${c*r}／${c} ＝ ${r}。`,`所以半徑 r ＝ ${r}。`,`答案是 <b>${r}</b>`]}}],
+3:[plus(()=>LV.cline.g3(),['思路：圓心到弦作垂線會平分弦，半徑、弦心距、半弦構成直角三角形（<b>畢氏定理</b>）。','弦心距用<b>點到直線距離</b>求。']),()=>{const h=rnd(-4,4),k=rnd(-4,4);const[hl,d]=pick([[3,4],[4,3],[5,12],[12,5],[6,8],[8,6]]);const r=Math.round(Math.sqrt(hl*hl+d*d));const hv=Math.random()<.5;const c=(hv?k:h)+pick([1,-1])*d;return{q:`直線 ${hv?'y':'x'} ＝ ${num(c)} 被圓 ${M(circStd(h,k,r*r))} 截出的弦，長度是多少？`,ans:[2*hl,1],steps:[
+   `思路：圓心到弦的垂線會平分弦，形成直角三角形：半徑是斜邊、弦心距是一股、半弦是另一股。`,`圓心 ${P(h,k)}、半徑 ${r}，弦心距 d ＝ |${num(c)} − ${par(hv?k:h)}| ＝ ${d}。`,
+   `<b>畢氏定理</b>：半弦 ＝ √(r² − d²) ＝ √(${r*r} − ${d*d}) ＝ √${hl*hl} ＝ ${hl}。`,`弦長 ＝ 2 × ${hl} ＝ ${2*hl}。`,`答案是 <b>${2*hl}</b>`]}},
+ ()=>{const[hl,d]=pick([[3,4],[4,3],[5,12],[12,5],[6,8],[8,6]]);const r=Math.round(Math.sqrt(hl*hl+d*d));return{q:`半徑 ${r} 的圓中，一條弦長 ${2*hl}，圓心到這條弦的距離是多少？`,ans:[d,1],steps:[
+   `思路：圓心到弦的垂線平分弦，半徑、半弦、弦心距構成直角三角形。`,`半弦 ＝ ${2*hl} ÷ 2 ＝ ${hl}。`,`<b>畢氏定理</b>：弦心距 ＝ √(r² − 半弦²) ＝ √(${r*r} − ${hl*hl}) ＝ √${d*d}。`,`＝ ${d}。`,`答案是 <b>${d}</b>`]}}],
+4:[plus(()=>LV.cline.g4(),['思路：圓上的點到直線的距離，最大 ＝ d ＋ r，最小 ＝ d − r（d 是圓心到直線的距離，直線在圓外時）；切線長則用 √(OP² − r²)。']),()=>{const h=rnd(-3,3),k=rnd(-3,3);const[t,r,dd]=pick([[3,4,5],[4,3,5],[5,12,13],[12,5,13],[6,8,10],[8,6,10]]);const[u,v]=pick([[dd,0],[0,dd],[-dd,0],[0,-dd]]);const p=[h+u,k+v];return{q:`從點 P${P(...p)} 對圓 ${M(circStd(h,k,r*r))} 作切線，切線長（P 到切點的距離）是多少？`,ans:[t,1],steps:[
+   `思路：切點、圓心、P 構成直角三角形（半徑 ⊥ 切線），直角在切點。`,`圓心 O${P(h,k)}、半徑 ${r}；<b>兩點距離公式</b>：OP ＝ √(${u*u} ＋ ${v*v}) ＝ ${dd}。`,
+   `<b>畢氏定理</b>：切線長 ＝ √(OP² − r²) ＝ √(${dd*dd} − ${r*r}) ＝ √${t*t}。`,`＝ ${t}。`,`答案是 <b>${t}</b>`]}},
+ ()=>{const h=rnd(-3,3),k=rnd(-3,3);const[hl,d]=pick([[3,4],[4,3],[5,12],[12,5]]);const r=Math.round(Math.sqrt(hl*hl+d*d));const[u,v]=pick([[d,0],[0,d],[-d,0],[0,-d]]);const p=[h+u,k+v];return{q:`圓 ${M(circStd(h,k,r*r))} 內一點 P${P(...p)}，通過 P 的弦中，最短的弦長是多少？`,ans:[2*hl,1],steps:[
+   `思路：弦心距越大，弦越短。通過 P 的弦，弦心距最大就是 OP（此時弦和 OP <b>垂直</b>）。`,`<b>兩點距離公式</b>：OP ＝ ${d}，半徑 ${r}。`,
+   `<b>畢氏定理</b>：半弦 ＝ √(r² − OP²) ＝ √(${r*r} − ${d*d}) ＝ ${hl}。`,`最短弦長 ＝ 2 × ${hl} ＝ ${2*hl}（最長的弦是通過 P 的直徑 ${2*r}）。`,`答案是 <b>${2*hl}</b>`]}}]};
+
+
+/* ---- 改寫成完整步驟的題型（取代原本較簡略的版本） ---- */
+const RX={};
+RX.median=()=>{const B=[rnd(-6,6),rnd(-6,6)],C=[rnd(-6,6),rnd(-6,6)];if((B[0]+C[0])%2||(B[1]+C[1])%2||(B[0]===C[0]&&B[1]===C[1]))LEVELS_RETRY();const Mm=[(B[0]+C[0])/2,(B[1]+C[1])/2];const[a,b,c]=pick([[3,4,5],[4,3,5],[6,8,10],[8,6,10],[5,12,13]]);const A=[Mm[0]+a*pick([1,-1]),Mm[1]+b*pick([1,-1])];
+ return{q:`△ABC 中 A${P(...A)}、B${P(...B)}、C${P(...C)}，求 BC 邊上的中線 AM 長。`,ans:[c,1],fig2:plane({R:RR(...A,...B,...C),pts:[PT(...A,'A'),PT(...B,'B'),PT(...C,'C'),PT(...Mm,'M','pen')],segs:[{p:A,q:B,c:'blue'},{p:B,q:C,c:'blue'},{p:C,q:A,c:'blue'},{p:A,q:Mm,c:'pen'}]}),steps:[
+ `思路：中線是頂點 A 連到對邊 BC 中點 M 的線段，所以先求 M，再算 AM。`,
+ `<b>中點公式</b>：M ＝ ((${num(B[0])} ＋ ${par(C[0])})／2, (${num(B[1])} ＋ ${par(C[1])})／2) ＝ ${P(...Mm)}。`,
+ `<b>兩點距離公式</b>：AM ＝ √((${num(A[0])} − ${par(Mm[0])})² ＋ (${num(A[1])} − ${par(Mm[1])})²)。`,
+ `＝ √(${(A[0]-Mm[0])**2} ＋ ${(A[1]-Mm[1])**2}) ＝ √${c*c} ＝ ${c}。`,`答案是 <b>${c}</b>`]}};
+RX.diag=()=>{const A=[rnd(-6,6),rnd(-6,6)],C=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)];const D=[A[0]+C[0]-B[0],A[1]+C[1]-B[1]];const i=rnd(0,1);const v=R(A[i]+C[i],2);return{q:`平行四邊形 ABCD 中 A${P(...A)}、B${P(...B)}、C${P(...C)}，兩條對角線的交點 O 的 ${i?'y':'x'} 坐標是多少？`,ans:v,steps:[
+ `思路：平行四邊形的兩條對角線互相平分，所以交點 O 同時是 AC 的中點、也是 BD 的中點。B 在這題用不到。`,
+ `<b>中點公式</b>：O ＝ AC 的中點，只看 ${i?'y':'x'}：(${num(A[i])} ＋ ${par(C[i])})／2 ＝ ${num(A[i]+C[i])}／2。`,`＝ ${rFmt(v)}。`,
+ `檢查：D ＝ A ＋ C − B ＝ ${P(...D)}，BD 的中點 ${i?'y':'x'} 坐標 (${num(B[i])} ＋ ${par(D[i])})／2 也是 ${rFmt(v)}。`,`答案是 <b>${M(rFmt(v))}</b>`]}};
+RX.trisect=()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)];const i=rnd(0,1);const nearB=Math.random()<.5;const v=nearB?R(A[i]+2*B[i],3):R(2*A[i]+B[i],3);return{q:`A${P(...A)}、B${P(...B)}，線段 AB 的兩個三等分點中，靠近 ${nearB?'B':'A'} 的那一點的 ${i?'y':'x'} 坐標是多少？`,ans:v,steps:[
+ `思路：三等分點把 AB 切成三等份。靠近 ${nearB?'B':'A'} 的點，從 A 出發要走全程的 ${nearB?'⅔':'⅓'}。`,
+ `<b>分點公式</b>：P ＝ A ＋ ${nearB?'⅔':'⅓'}(B − A)，也就是 AP : PB ＝ ${nearB?'2 : 1':'1 : 2'}，P ＝ (${nearB?'1':'2'}·A ＋ ${nearB?'2':'1'}·B)／3。`,
+ `只看 ${i?'y':'x'}：A 是 ${num(A[i])}，B 是 ${num(B[i])}，差 ${num(B[i]-A[i])}。`,
+ `${num(A[i])} ＋ ${nearB?'⅔':'⅓'} × ${par(B[i]-A[i])} ＝ ${num(A[i])} ＋ ${rFmt(R((nearB?2:1)*(B[i]-A[i]),3))} ＝ ${rFmt(v)}。`,`答案是 <b>${M(rFmt(v))}</b>`]}};
+RX.incl=()=>{const T=pick([[45,1,'往右走 1 格、往上走 1 格'],[135,-1,'往右走 1 格、往下走 1 格'],[0,0,'水平線，往右走不會上升']]);return{q:`直線和 x 軸正向的夾角（傾斜角）為 ${T[0]}°，斜率是多少？`,ans:[T[1],1],steps:[
+ `思路：<b>斜率</b>就是「往右走 1 格，往上升多少」，可以從傾斜角畫出來。`,`傾斜角 ${T[0]}°：${T[2]}。`,
+ T[0]===0?'上升 0，斜率 ＝ 0 ÷ 1 ＝ 0。':`${T[0]===45?'45° 的直角三角形兩股相等，上升 1':'135° 的直線往右下降，等腰直角三角形，上升 −1'}，斜率 ＝ ${T[1]} ÷ 1 ＝ ${T[1]}。`,
+ `補充：傾斜角 90° 是鉛直線，斜率不存在；傾斜角在 0°～90° 斜率為正，90°～180° 斜率為負。`,`答案是 <b>${num(T[1])}</b>`]}};
+RX.slopeK=()=>{const m=R(nz(-4,4),pick([1,1,2,3])),x1=rnd(-5,5),y1=rnd(-5,5),dx=m[1]*nz(-3,3);const y2=Fa([y1,1],Fm(m,[dx,1]));return{q:`A${P(x1,y1)}、B(${num(x1+dx)}, k)，直線 AB 的斜率為 ${M(rFmt(m))}，求 k。`,ans:y2,steps:[
+ `思路：已知斜率和一點，另一點的 y 坐標用「上升 ＝ 斜率 × 前進」反推。`,`<b>斜率</b>公式：(k − ${par(y1)})／(${num(x1+dx)} − ${par(x1)}) ＝ ${rFmt(m)}。`,
+ `前進（x 的差）＝ ${num(dx)}，所以 k − ${par(y1)} ＝ ${rFmt(m)} × ${par(dx)} ＝ ${rFmt(Fm(m,[dx,1]))}。`,`k ＝ ${num(y1)} ＋ ${rFmt(Fm(m,[dx,1]))} ＝ ${rFmt(y2)}。`,`答案是 <b>${M(rFmt(y2))}</b>`]}};
+RX.slopeInt=()=>{const m=nz(-4,4),b=rnd(-6,6),x=rnd(-5,5);return{q:`斜率為 ${num(m)}、y 截距為 ${num(b)} 的直線上，x ＝ ${num(x)} 的點的 y 坐標是多少？`,ans:[m*x+b,1],steps:[
+ `思路：斜率 m、y 截距 b 的直線就是 y ＝ mx ＋ b（<b>斜截式</b>）。`,`這條直線：y ＝ ${m===1?'':m===-1?'−':num(m)}x ${fx(b,'')}。`,`代入 x ＝ ${num(x)}：y ＝ ${num(m)} × ${par(x)} ${fx(b,'')} ＝ ${num(m*x)} ${fx(b,'')}。`,`＝ ${num(m*x+b)}。`,`答案是 <b>${num(m*x+b)}</b>`]}};
+RX.midC=()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],C=[rnd(-6,6),rnd(-6,6)];if((A[0]+B[0])%2||(A[1]+B[1])%2)LEVELS_RETRY();const Mx=(A[0]+B[0])/2,My=(A[1]+B[1])/2;if(Mx===C[0])LEVELS_RETRY();const v=R(C[1]-My,C[0]-Mx);return{q:`A${P(...A)}、B${P(...B)}、C${P(...C)}，求 C 與 AB 中點連線的斜率。`,ans:v,steps:[
+ `思路：先用中點公式求 AB 的中點 M，再算 CM 的斜率。`,`<b>中點公式</b>：M ＝ ((${num(A[0])} ＋ ${par(B[0])})／2, (${num(A[1])} ＋ ${par(B[1])})／2) ＝ ${P(Mx,My)}。`,
+ `<b>斜率</b>：m ＝ (${num(C[1])} − ${par(My)})／(${num(C[0])} − ${par(Mx)}) ＝ ${num(C[1]-My)}／${num(C[0]-Mx)}。`,`＝ ${rFmt(v)}。`,`答案是 <b>${M(rFmt(v))}</b>`]}};
+RX.intercept=()=>{const a=nz(-8,8),b=nz(-8,8);const v=R(-b,a);return{q:`直線 ${M(`${fr('x',num(a))} ＋ ${fr('y',num(b))} = 1`)} 的斜率是多少？`,ans:v,steps:[
+ `思路：這是<b>截距式</b>，x 截距 ${num(a)}、y 截距 ${num(b)}，直線通過 (${num(a)}, 0) 與 (0, ${num(b)})。`,
+ `<b>斜率</b>：(${num(b)} − 0)／(0 − ${par(a)}) ＝ ${num(b)}／${num(-a)}。`,`＝ ${rFmt(v)}。`,`驗證：通分得 ${num(b)}x ＋ ${num(a)}y ＝ ${num(a*b)}，斜率 −${par(b)}／${par(a)} ＝ ${rFmt(v)}。`,`答案是 <b>${M(rFmt(v))}</b>`]}};
+RX.intersect=()=>{const x=rnd(-5,5),y=rnd(-5,5);const a=nz(-4,4),b=nz(-4,4),c=nz(-4,4),d=nz(-4,4);const D=a*d-b*c;if(!D)LEVELS_RETRY();const e=a*x+b*y,f=c*x+d*y;const ask=Math.random()<.5;return{q:`兩直線 ${eqL(a,b,e)} 與 ${eqL(c,d,f)} 的交點 ${ask?'x':'y'} 坐標是多少？`,ans:[ask?x:y,1],steps:[
+ `思路：交點同時在兩條直線上 → 解聯立方程式。用加減消去法消掉 ${ask?'y':'x'}。`,
+ ask?`第一式乘 ${num(d)}、第二式乘 ${num(b)}：${num(a*d)}x ${fx(b*d,'y')} ＝ ${num(e*d)}；${num(c*b)}x ${fx(d*b,'y')} ＝ ${num(f*b)}。`:`第一式乘 ${num(c)}、第二式乘 ${num(a)}：${num(a*c)}x ${fx(b*c,'y')} ＝ ${num(e*c)}；${num(a*c)}x ${fx(a*d,'y')} ＝ ${num(f*a)}。`,
+ ask?`相減消去 y：${num(a*d-b*c)}x ＝ ${num(e*d-f*b)}，x ＝ ${num(x)}。`:`相減消去 x：${num(b*c-a*d)}y ＝ ${num(e*c-f*a)}，y ＝ ${num(y)}。`,
+ `代回求另一個：交點 ${P(x,y)}。檢查：${num(a)}×${par(x)} ＋ ${par(b)}×${par(y)} ＝ ${num(e)}、${num(c)}×${par(x)} ＋ ${par(d)}×${par(y)} ＝ ${num(f)}，兩式都成立。`,`答案是 <b>${num(ask?x:y)}</b>`]}};
+RX.threeLines=()=>{const P1=[rnd(-4,0),rnd(-4,0)],P2=[rnd(1,5),rnd(-4,0)],P3=[rnd(-4,5),rnd(1,6)];const s=(P2[0]-P1[0])*(P3[1]-P1[1])-(P3[0]-P1[0])*(P2[1]-P1[1]);if(!s)LEVELS_RETRY();const L=(a,b)=>{const A=b[1]-a[1],B=a[0]-b[0],C=A*a[0]+B*a[1];const g=gcd(gcd(A,B),C)||1;return eqL(A/g,B/g,C/g)};const u=[P2[0]-P1[0],P2[1]-P1[1]],w=[P3[0]-P1[0],P3[1]-P1[1]];return{q:`三條直線 ${L(P1,P2)}、${L(P2,P3)}、${L(P3,P1)} 圍成的三角形面積是多少？`,ans:R(Math.abs(s),2),steps:[
+ `思路：三條直線兩兩相交得到三角形的三個頂點，再用坐標求面積。`,`第一、二式聯立 → ${P(...P2)}；第二、三式聯立 → ${P(...P3)}；第三、一式聯立 → ${P(...P1)}（用加減消去法，每組代回檢查）。`,
+ `把 ${P(...P1)} 平移到原點：另兩點變成 ${P(...u)}、${P(...w)}。`,`<b>坐標平面上的三角形面積</b>：½|${num(u[0])}×${par(w[1])} − ${par(w[0])}×${par(u[1])}| ＝ ½|${s}| ＝ ${rFmt(R(Math.abs(s),2))}。`,`答案是 <b>${M(rFmt(R(Math.abs(s),2)))}</b>`]}};
+RX.perpBis=()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)];if(A[0]===B[0]&&A[1]===B[1])LEVELS_RETRY();if((A[0]+B[0])%2||(A[1]+B[1])%2)LEVELS_RETRY();const a=B[0]-A[0],b=B[1]-A[1];const Mm=[(A[0]+B[0])/2,(A[1]+B[1])/2];const g0=gcd(a,b)||1;const sg=(a||b)/g0<0?-1:1;const aa=a/g0*sg,bb=b/g0*sg;const cc=aa*Mm[0]+bb*Mm[1];return{q:`A${P(...A)}、B${P(...B)}，線段 AB 的垂直平分線寫成 ${lin2(aa,bb,0)} ＝ c，求 c。`,ans:[cc,1],fig2:plane({R:RR(...A,...B),pts:[PT(...A,'A'),PT(...B,'B'),PT(...Mm,'M','pen')],segs:[{p:A,q:B,c:'blue'}],lines:[{a:aa,b:bb,c:-cc,col:'pen'}]}),steps:[
+ `思路：垂直平分線 ＝ 通過 AB 中點、而且和 AB <b>垂直</b>的直線。`,`<b>中點公式</b>：M ＝ ${P(...Mm)}。`,
+ `AB 的方向是 (${num(a)}, ${num(b)})；和 AB 垂直的直線，可以把 (${num(a)}, ${num(b)}) 當成 x、y 的係數（法向量），約分後寫成 ${lin2(aa,bb,0)} ＝ c。`,
+ `M 在直線上，代入：c ＝ ${num(aa)}×${par(Mm[0])} ＋ ${par(bb)}×${par(Mm[1])} ＝ ${num(cc)}。`,`檢查：到 A、B 的距離平方相等 ⇔ ${lin2(2*a,2*b,0)} ＝ ${num(B[0]**2+B[1]**2-A[0]**2-A[1]**2)}，約分後一致。`,`答案是 <b>${num(cc)}</b>`]}};
+RX.triType=()=>{const T=pick([['等腰直角三角形',[[4,0],[0,4]]],['直角三角形（不等腰）',[[3,0],[0,4]]],['等腰三角形（非直角）',[[4,0],[2,5]]],['一般三角形（非等腰、非直角）',[[5,0],[2,3]]]]);const s=rnd(-3,3),t=rnd(-3,3);const p=[[0,0],...T[1]].map(([x,y])=>[x+s,y+t]);const d2=(u,v)=>(u[0]-v[0])**2+(u[1]-v[1])**2;const ab=d2(p[0],p[1]),bc=d2(p[1],p[2]),ca=d2(p[2],p[0]);const sides=[ab,bc,ca].sort((x,y)=>x-y);
+ return mc(`A${P(...p[0])}、B${P(...p[1])}、C${P(...p[2])} 圍成的三角形是哪一種？`,T[0],['等腰直角三角形','直角三角形（不等腰）','等腰三角形（非直角）','一般三角形（非等腰、非直角）'].filter(x=>x!==T[0]),[
+ `思路：算三邊長的平方（不用開根號），再比較。`,`<b>兩點距離公式</b>：AB² ＝ ${ab}、BC² ＝ ${bc}、CA² ＝ ${ca}。`,
+ `是否等腰：${ab===bc||bc===ca||ca===ab?'有兩邊平方相等 → 等腰':'三邊都不相等 → 不等腰'}。`,`是否直角（<b>畢氏定理</b>的逆定理）：較短兩邊平方和 ${sides[0]} ＋ ${sides[1]} ＝ ${sides[0]+sides[1]}，最長邊平方 ${sides[2]}，${sides[0]+sides[1]===sides[2]?'相等 → 直角':'不相等 → 不是直角'}。`])};
+RX.minSq=()=>{const a=[rnd(-6,6),rnd(-6,6)],b=[rnd(-6,6),rnd(-6,6)];if(a[0]===b[0])LEVELS_RETRY();const t0=R(a[0]+b[0],2);const C=a[0]**2+a[1]**2+b[0]**2+b[1]**2;const v=R(2*(a[0]**2+b[0]**2)-(a[0]+b[0])**2+2*(a[1]**2+b[1]**2),2);return{q:`A${P(...a)}、B${P(...b)}，P 是 x 軸上的動點，求 PA² ＋ PB² 的最小值。`,ans:v,steps:[
+ `思路：設 P(t, 0)，把 PA² ＋ PB² 寫成 t 的二次函數，再找頂點。`,`<b>兩點距離公式</b>：PA² ＝ (t − ${par(a[0])})² ＋ ${a[1]**2}，PB² ＝ (t − ${par(b[0])})² ＋ ${b[1]**2}。`,
+ `相加展開：2t² ${fx(-2*(a[0]+b[0]),'t')} ＋ ${C}。`,`配方找頂點：開口向上，頂點 t ＝ ${num(2*(a[0]+b[0]))}／4 ＝ ${rFmt(t0)}，也就是 A、B 的 x 坐標平均。`,
+ `代入：最小值 ＝ ${C} − ${rFmt(R((a[0]+b[0])**2,2))} ＝ ${rFmt(v)}。`,`答案是 <b>${M(rFmt(v))}</b>`]}};
+RX.pdistX=()=>{const x=nz(-9,9),y=nz(-9,9),c=rnd(-9,9);if(c===x)LEVELS_RETRY();return{q:`點 P${P(x,y)} 到直線 x ＝ ${num(c)} 的距離是多少？`,ans:[Math.abs(x-c),1],steps:[
+ `思路：x ＝ ${num(c)} 是鉛直線，P 到它的垂線是水平的。`,`垂足 ${P(c,y)}，和 P 只差在 x 坐標。`,`距離 ＝ |${num(x)} − ${par(c)}| ＝ ${Math.abs(x-c)}。`,`注意：y 坐標 ${num(y)} 不影響答案。`,`答案是 <b>${Math.abs(x-c)}</b>`]}};
+RX.parK=()=>{const[a,b,c]=pick([[3,4,5],[4,3,5],[5,12,13],[12,5,13],[6,8,10]]);const c1=rnd(-20,20),d=rnd(1,4);const big=Math.random()<.5;return{q:`和直線 ${a}x ＋ ${b}y ${fx(c1,'')} ＝ 0 平行、且距離為 ${d} 的直線寫成 ${a}x ＋ ${b}y ＋ k ＝ 0，k 的${big?'較大':'較小'}值是多少？`,ans:[big?c1+d*c:c1-d*c,1],steps:[
+ `思路：平行線的 x、y 係數相同，只差常數；用兩平行線距離公式列方程式。`,`兩平行線距離：|k − ${par(c1)}|／√(${a*a} ＋ ${b*b}) ＝ ${d}，分母 ＝ ${c}。`,
+ `|k − ${par(c1)}| ＝ ${d*c} ⇒ k ＝ ${num(c1)} ＋ ${d*c} ＝ ${num(c1+d*c)} 或 k ＝ ${num(c1)} − ${d*c} ＝ ${num(c1-d*c)}。`,`兩條平行線分別在原直線的兩側。${big?'較大':'較小'}值是 ${num(big?c1+d*c:c1-d*c)}。`,`答案是 <b>${num(big?c1+d*c:c1-d*c)}</b>`]}};
+RX.centerDist=()=>{const[a,b,c]=pick([[3,4,5],[6,8,10],[5,12,13],[8,15,17]]);const h=rnd(-5,5),k=rnd(-5,5);const s=[pick([1,-1]),pick([1,-1])];const r1=rnd(1,5),r2=rnd(1,5);return{q:`兩圓 ${M(circStd(h,k,r1*r1))} 與 ${M(circStd(h+a*s[0],k+b*s[1],r2*r2))} 的圓心距離是多少？`,ans:[c,1],steps:[
+ `思路：先從<b>標準式</b>讀出兩個圓心，再用兩點距離公式。`,`第一個圓心 ${P(h,k)}，第二個圓心 ${P(h+a*s[0],k+b*s[1])}（括號裡「減幾」，圓心坐標就是幾）。`,
+ `<b>兩點距離公式</b>：√(${par(a*s[0])}² ＋ ${par(b*s[1])}²) ＝ √(${a*a} ＋ ${b*b}) ＝ √${c*c} ＝ ${c}。`,`半徑 ${r1}、${r2} 用不到（之後判斷兩圓關係時才會用）。`,`答案是 <b>${c}</b>`]}};
+RX.inOut=()=>{const h=rnd(-4,4),k=rnd(-4,4),r=rnd(2,6);const p=[h+rnd(-7,7),k+rnd(-7,7)];const d2=(p[0]-h)**2+(p[1]-k)**2;const ans=d2<r*r?'圓內':d2===r*r?'圓上':'圓外';return mc(`點 P${P(...p)} 和圓 ${M(circStd(h,k,r*r))} 的位置關係？`,ans,['圓內','圓上','圓外'].filter(x=>x!==ans),[
+ `思路：比較「P 到圓心的距離」和「半徑」，比平方就好。`,`圓心 ${P(h,k)}，r² ＝ ${r*r}。`,`P 到圓心的距離平方：(${num(p[0])} − ${par(h)})² ＋ (${num(p[1])} − ${par(k)})² ＝ ${(p[0]-h)**2} ＋ ${(p[1]-k)**2} ＝ ${d2}。`,`${d2} ${d2<r*r?'＜':d2===r*r?'＝':'＞'} ${r*r}，P 在${ans}。`])};
+RX.areaPi=()=>{const h=nz(-5,5),k=nz(-5,5),r=rnd(1,6);const F=h*h+k*k-r*r;return{q:`圓 ${M(`x<sup>2</sup> ＋ y<sup>2</sup> ${fx(-2*h,'x')} ${fx(-2*k,'y')} ${fx(F,'')} = 0`)} 的面積為 kπ，求 k。`,ans:[r*r,1],steps:[
+ `思路：圓面積 ＝ πr²，所以 k ＝ r²；一般式要先<b>配方</b>。`,`x² ${fx(-2*h,'x')} 配成 (x ${fx(-h,'')})² 要加 ${h*h}；y² ${fx(-2*k,'y')} 配成 (y ${fx(-k,'')})² 要加 ${k*k}。`,
+ `(x ${fx(-h,'')})² ＋ (y ${fx(-k,'')})² ＝ ${h*h} ＋ ${k*k} − ${par(F)} ＝ ${r*r}。`,`r² ＝ ${r*r}，面積 ＝ ${r*r}π，k ＝ ${r*r}。`,`答案是 <b>${r*r}</b>`]}};
+RX.tanAxes=()=>{const opts=[];for(let r=1;r<=13;r++)for(let x=0;x<=2*r;x++){const dy2=r*r-(x-r)**2;const dy=Math.round(Math.sqrt(dy2));if(dy*dy===dy2&&r-dy>=0&&x>0)opts.push([x,r-dy])}const pnt=pick(opts);const rs=[];for(let r=1;r<80;r++)if((pnt[0]-r)**2+(pnt[1]-r)**2===r*r)rs.push(r);const big=Math.max(...rs);const S=pnt[0]+pnt[1];const disc=S*S-(pnt[0]**2+pnt[1]**2);
+ return{q:`一圓與 x 軸、y 軸都相切，圓心在第一象限，且通過點 ${P(...pnt)}。這個圓的半徑可能值中，最大的是多少？`,ans:[big,1],steps:[
+ `思路：和兩軸都相切、圓心在第一象限 → 圓心到兩軸的距離都等於半徑，圓心 (r, r)。`,`<b>圓的標準式</b>：(x − r)² ＋ (y − r)² ＝ r²，代入 ${P(...pnt)}：(${pnt[0]} − r)² ＋ (${pnt[1]} − r)² ＝ r²。`,
+ `展開：${pnt[0]**2} − ${2*pnt[0]}r ＋ r² ＋ ${pnt[1]**2} − ${2*pnt[1]}r ＋ r² ＝ r²，整理得 r² − ${2*S}r ＋ ${pnt[0]**2+pnt[1]**2} ＝ 0。`,
+ `解一元二次方程式：r ＝ ${rs.join(' 或 ')}${rs.length===1?'（重根）':''}。`,`最大的是 ${big}。`,`答案是 <b>${big}</b>`]}};
+RX.tanPoint=()=>{const[a,b,c]=pick([[3,4,5],[4,3,5],[5,12,13],[12,5,13]]);const h=rnd(-4,4),k=rnd(-4,4);const s=[pick([1,-1]),pick([1,-1])];const p=[h+a*s[0],k+b*s[1]];const A=p[0]-h,B=p[1]-k,C=A*p[0]+B*p[1];return{q:`圓 ${M(circStd(h,k,c*c))} 上一點 P${P(...p)} 的切線寫成 ${lin2(A,B,0)} ＝ d，求 d。`,ans:[C,1],steps:[
+ `思路：切線和「圓心到切點的半徑」<b>垂直</b>，所以半徑方向 (${num(A)}, ${num(B)}) 就是切線的法向量（x、y 的係數）。`,
+ `圓心 O${P(h,k)}，OP ＝ (${num(p[0])} − ${par(h)}, ${num(p[1])} − ${par(k)}) ＝ (${num(A)}, ${num(B)})。`,`切線：${lin2(A,B,0)} ＝ d，切點 P 在切線上，代入：d ＝ ${num(A)}×${par(p[0])} ＋ ${par(B)}×${par(p[1])} ＝ ${num(C)}。`,
+ `檢查：圓心到這條線的距離 |${num(A*h+B*k)} − ${par(C)}|／√(${A*A} ＋ ${B*B}) ＝ ${c*c}／${c} ＝ ${c}，等於半徑，確實相切。`,`答案是 <b>${num(C)}</b>`]}};
+DX.mid[2][2]=RX.median;DX.mid[3][2]=RX.diag;DX.mid[4][2]=RX.trisect;
+DX.slope[1][2]=RX.incl;DX.slope[2][1]=RX.slopeK;DX.slope[2][2]=RX.slopeInt;DX.slope[3][1]=RX.midC;
+DX.line[2][1]=RX.intercept;DX.line[2][2]=RX.intersect;DX.line[4][2]=RX.threeLines;
+DX.perp[4][2]=RX.perpBis;DX.dist[2][2]=RX.triType;DX.dist[4][1]=RX.minSq;
+DX.pdist[1][2]=RX.pdistX;DX.pdist[2][2]=RX.parK;
+DX.circle[2][2]=RX.centerDist;DX.circle[3][1]=RX.inOut;DX.circle[3][2]=RX.areaPi;DX.circle[4][1]=RX.tanAxes;DX.cline[2][1]=RX.tanPoint;
+
+/* ---- 套用：第二單元與圓的四個難度全部改用詳解版 ---- */
+for(const id in DX){const l=ALL_LESSONS.find(x=>x.id===id);if(!l)continue;l.levels=[1,2,3,4].map(lv=>{const gs=DX[id][lv].filter(Boolean);return retryWrap(mixW(...gs.map(g=>[g,1])))})}
+
+}
+/* ==D2 END== */
 let LESSONS=MATH_LESSONS,TOPICS=SUBJ.math.topics,CHAPTERS=SUBJ.math.chapters;
 const lessonById=id=>ALL_LESSONS.find(l=>l.id===id);
 function genTopic(k,lv=1){const t=TOPICS[k];
@@ -5885,7 +6246,7 @@ const KEY='hs-math-dojo-v1';
 const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},lv:{},tlv:{},diff:'auto',cur:'neg',tab:'learn',subject:'math',curBy:{},enabledBy:{},mockBy:{}});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
-try{if(!S.bankV3){const ids=new Set(ALL_LESSONS.filter(l=>subjectOf(l).startsWith('math')).map(l=>l.id));for(const k in (S.bankRes||{}))if(ids.has(k))delete S.bankRes[k];S.bankV3=1}}catch(e){}
+try{if(!S.bankV4){const ids=new Set(ALL_LESSONS.filter(l=>subjectOf(l).startsWith('math')).map(l=>l.id));for(const k in (S.bankRes||{}))if(ids.has(k))delete S.bankRes[k];S.bankV4=1}}catch(e){}
 S.curBy=S.curBy||{};S.enabledBy=S.enabledBy||{};S.mockBy=S.mockBy||{};
 if(S.mockBest!=null&&!S.mockBy.math)S.mockBy.math={best:S.mockBest,n:S.mockN||0};
 if(!S.enabledBy.math)S.enabledBy.math=S.enabled||[];if(!S.curBy.math)S.curBy.math=S.cur;
@@ -5980,8 +6341,10 @@ function drawLvTabs(){const o=lvOf(S.cur);
 function renderDots(){const o=lvOf(S.cur),n=o.cur,c=Math.min(o.c[n-1],NEED);
   const msg=c<NEED?`Lv${n} ${LVNAME[n]}答對 ${c} / ${NEED} 題得一顆星。難度可以隨時切換。`:`Lv${n} 的星星拿到了，可以繼續練或換別的難度。`;
   $('dots').innerHTML=Array.from({length:NEED},(_,k)=>`<i class="${k<c?'on':''}"></i>`).join('')+`<span>${msg}</span>`}
-function newLessonProblem(){
-  const l=lessonById(S.cur),o=lvOf(S.cur);lp=genLv(l,o.cur);lp.revealed=0;lp.done=false;renderDots();
+function newLessonProblem(mode){
+  const l=lessonById(S.cur),o=lvOf(S.cur),prev=lp;
+  if(mode&&o.cur===4&&prev&&prev._gen&&prev.lv===4){if(mode==='same'){const g=prev._gen;lp=retryWrap(g)();lp._gen=g;lp.lv=4;enrichSol(l,lp,4)}else{for(let t=0;t<40;t++){lp=genLv(l,4);if(lp._gen!==prev._gen)break}}}else lp=genLv(l,o.cur);
+  lp.revealed=0;lp.done=false;renderDots();
   $('lp').innerHTML=`
     <div class="pq-wrap"><div class="qbox"><span class="lvbadge lv${o.cur}">Lv${o.cur}</span> ${lp.q}</div>${lp.fig||''}</div>
     <form class="answer-row" id="lform" autocomplete="off" style="margin-top:12px">
@@ -6018,13 +6381,14 @@ function gradeLesson(e){e.preventDefault();if(lp.done){newLessonProblem();focusA
   $('lres').hidden=false;
   $('lres').innerHTML=`<div class="verdict ${ok?'ok':'no'}">${ok?'答對了！':'差一點'}<small>${ok?'上面是完整算法，可以對照看看':`正確答案是 ${ansText(lp)}。對照上面的${lp.choices?'解析':'步驟'}，找出哪裡想錯了`}</small></div>
     ${lp.fig2?`<div class="sol-fig">${lp.fig2}</div>`:''}${box}${down}
-    <div><button class="btn ${justDone?'btn-ghost':'btn-primary'}" type="button" id="lnext">再一題 →</button></div>`;
+    ${n===4?`<div class="lv4-next" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" type="button" id="lsame">同題型再練一題</button><button class="btn btn-ghost" type="button" id="lnext">換下一種題型 →</button></div>`:`<div><button class="btn ${justDone?'btn-ghost':'btn-primary'}" type="button" id="lnext">再一題 →</button></div>`}`;
   lockAns('lans',lp);$('lsubmit').disabled=true;$('lhint').disabled=true;
-  $('lnext').onclick=()=>{newLessonProblem();focusAns('lans')};
+  $('lnext').onclick=()=>{newLessonProblem(n===4?'other':undefined);focusAns('lans')};
+  if($('lsame'))$('lsame').onclick=()=>{newLessonProblem('same');focusAns('lans')};
   if($('go-up'))$('go-up').onclick=()=>{setLevel(n+1);$('lvnote').scrollIntoView({behavior:'smooth',block:'center'})};
   if($('go-down'))$('go-down').onclick=()=>setLevel(n-1);
   if($('go-next'))$('go-next').onclick=()=>openLesson(LESSONS[i+1].id,true);
-  ($('go-up')||$('go-next')||$('lnext')).focus({preventScroll:true});
+  ($('go-up')||$('go-next')||$('lsame')||$('lnext')).focus({preventScroll:true});
 }
 
 /* ---------- interactive labs ---------- */
