@@ -124,6 +124,10 @@ h1 em{font-style:normal;color:var(--pen)}
 .prose ul{margin:0 0 10px;padding-left:1.3em}.prose li{margin:4px 0}
 .concept-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start}
 @media (max-width:720px){.concept-grid{grid-template-columns:1fr}}
+.ctag{display:inline-block;font-size:11.5px;line-height:1.4;font-weight:500;color:var(--blue);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 7px;margin:0 3px;vertical-align:1px;white-space:normal}
+.sol-head{background:var(--pen-soft);border-radius:8px;padding:6px 10px;line-height:1.9}
+.sol-tip{border-left:3px solid var(--pen);padding:2px 10px;color:var(--ink)}
+.sol-c{color:var(--muted);font-size:14px}
 .tip{border-left:3px solid var(--pen);background:var(--pen-soft);padding:8px 14px;border-radius:0 6px 6px 0;font-size:14.5px;max-width:66ch}
 .tip b{color:var(--pen)}
 .note{border-left:3px solid var(--blue);background:var(--blue-soft);padding:8px 14px;border-radius:0 6px 6px 0;font-size:14.5px;max-width:66ch}
@@ -418,7 +422,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v23・2026/11/14 14:41</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v24・2026/11/14 15:02</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -1084,7 +1088,7 @@ cline:{n4:`<b>圓上的點到直線的距離：</b>直線和圓不相交時（${
 for(const k in LV4)Object.assign(LV[k],LV4[k]);
 const LVNAME=['','基礎','進階','挑戰','段考壓軸'];
 const MAXLV=4;
-function genLv(l,lv){if(l.levels){const p=l.levels[lv-1]();p.lv=lv;return p}const g=LV[l.id];const p=lv===4?g.g4():lv===3?g.g3():lv===2?g.g2():l.gen();p.lv=lv;return p}
+function genLv(l,lv){if(l.levels){const p=l.levels[lv-1]();p.lv=lv;return enrichSol(l,p,lv)}const g=LV[l.id];const p=lv===4?g.g4():lv===3?g.g3():lv===2?g.g2():l.gen();p.lv=lv;return enrichSol(l,p,lv)}
 
 /* ================= random practice topics (all chapters) ================= */
 const MATH_TOPICS={
@@ -2430,7 +2434,7 @@ function bankKey(p){const st=p.q.replace(/<svg[\s\S]*?<\/svg>/g,'').replace(/<[^
 const BANK_CACHE={};
 function subjectOf(l){return l.subj||(l.id.startsWith('c_')?'chem':l.id.startsWith('b_')?'bio':'math')}
 function buildBank(l){if(BANK_CACHE[l.id])return BANK_CACHE[l.id];
- const plan=BANK_PLAN[subjectOf(l)],orig=Math.random;Math.random=seedRand((subjectOf(l).startsWith('math')?'bank-v2:':'bank-v1:')+l.id);const seen=new Set(),out=[];
+ const plan=BANK_PLAN[subjectOf(l)],orig=Math.random;Math.random=seedRand((subjectOf(l).startsWith('math')?'bank-v3:':'bank-v1:')+l.id);const seen=new Set(),out=[];
  const draw=(lv,want,maxTries)=>{let got=0,tries=0;while(got<want&&tries<maxTries){tries++;let p;try{p=genLv(l,lv)}catch(e){continue}const k=bankKey(p);if(seen.has(k))continue;seen.add(k);p.lv=lv;out.push(p);got++}return got};
  try{let carry=0;for(let lv=1;lv<=4;lv++){const want=plan[lv-1]+carry;carry=want-draw(lv,want,want*80)}
   for(const lv of [4,3,2]){if(carry<=0)break;carry-=draw(lv,carry,carry*400)}}
@@ -2441,6 +2445,7 @@ function retryWrap(f){return()=>{for(let i=0;i<80;i++){try{return f()}catch(e){i
 const DEF_NOTES={2:'這一級加入應用與判斷題，需要真的理解觀念才答得對。',3:'這一級要把幾個觀念串在一起，並出現「正確的有幾項」這種段考題型。',4:'段考多選題與壓軸題：每個選項都要獨立判斷，全對才算對。'};
 function mkLesson(o){
  const L={id:o.id,subj:o.subj,unit:o.unit,title:o.title,goal:o.goal,concept:()=>o.concept,deep:o.deep?()=>o.deep:null,example:o.ex,notes:Object.assign({},DEF_NOTES,o.notes||{})};
+ L._T=o.T||null;
  if(o.sec){L.sec=o.sec;L.secName=o.secName}
  const g=o.gens||{},pg=o.P?pairsGen(o.P):null,s2=o.S2&&o.S2.length?bank(o.S2):null,s3=o.S3&&o.S3.length?bank(o.S3):null,st=o.T?stmGens(o.T):null;
  const lvl=(...arr)=>{const a=arr.filter(x=>x&&x[0]);return retryWrap(mixW(...a))};
@@ -5253,6 +5258,607 @@ for(const l of ALL_LESSONS){const x=XG[l.id];if(!x)continue;
  const base=l.levels?l.levels.slice():[()=>l.gen(),()=>LV[l.id].g2(),()=>LV[l.id].g3(),()=>LV[l.id].g4()];
  l.levels=base.map((b,i)=>{const ex=(x[i+1]||[]);if(!ex.length)return b;return retryWrap(mixW([b,2],...ex.map(f=>[f,1.2])))})}
 
+/* ==F4 START== */
+/* ================= 段考壓軸（Lv4）完整解答版：高一 ================= */
+const F4={};
+const ANS=v=>`答案是 <b>${M(rFmt(v))}</b>`;
+F4.m11=[()=>{const a=rnd(1,5),b=rnd(1,5),k=a*b*2*rnd(1,4);/* ax+by=k, xy max */const half=k/2;const xv=R(half,a),yv=R(half,b);const mx=Fm(xv,yv);
+  return{q:`x、y 為正數，且 ${a===1?'':a}x ＋ ${b===1?'':b}y ＝ ${k}，求 xy 的最大值。`,ans:mx,steps:[
+   `① 分析：已知「和」固定、要求「積」的最大值，用<b>算幾不等式</b>。但要先把 xy 湊成 (${a===1?'':a}x)(${b===1?'':b}y)。`,
+   `② 算幾不等式：${a===1?'':a}x、${b===1?'':b}y 都是正數，${M(`${fr(`${a===1?'':a}x ＋ ${b===1?'':b}y`,2)} ≥ ${rt(`${a===1?'':a}x · ${b===1?'':b}y`)}`)}`,
+   `③ 代入：${M(`${fr(k,2)} = ${half} ≥ ${rt(`${a*b}xy`)}`)}，兩邊平方：${half*half} ≥ ${a*b}xy，所以 xy ≤ ${rFmt(R(half*half,a*b))}`,
+   `④ 等號成立條件：${a===1?'':a}x ＝ ${b===1?'':b}y ＝ ${half}，即 x ＝ ${rFmt(xv)}、y ＝ ${rFmt(yv)}（都是正數，可以取到）`,
+   `✔ 檢查：${a}×${rFmt(xv)} ＋ ${b}×${rFmt(yv)} ＝ ${k}，乘積 ${rFmt(mx)}`,ANS(mx)]}},
+ ()=>{const k=rnd(1,4),c=pick([1,4,9,16,25,36,49,64]);const s=Math.sqrt(c);const v=2*k*s;return{q:`x ＞ 0，求 ${k===1?'':k}x ＋ ${M(fr(k*c,'x'))} 的最小值。`,ans:[v,1],steps:[
+   `① 分析：兩項相乘 ${k}x × ${k*c}／x ＝ ${k*k*c} 是常數，「積固定、求和的最小值」→ <b>算幾不等式</b>`,
+   `② 先提出 ${k}：原式 ＝ ${k}(x ＋ ${c}／x)`,
+   `③ 算幾不等式：x ＋ ${c}／x ≥ 2√(x · ${c}／x) ＝ 2√${c} ＝ ${2*s}`,
+   `④ 等號成立：x ＝ ${c}／x，x² ＝ ${c}，x ＝ ${s}（x ＞ 0）`,
+   `⑤ 最小值 ＝ ${k} × ${2*s} ＝ ${v}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const a=rnd(3,15),b=rnd(1,a-1);if(isSq(a)&&isSq(b))LEVELS_RETRY();const v=R(4*(a+b)*(a+b)-2*(a-b)*(a-b),(a-b)*(a-b));const s=R(2*(a+b),a-b);return{q:`x ＝ ${M(fr(`${rt(a)} ＋ ${rt(b)}`,`${rt(a)} − ${rt(b)}`))}，y ＝ ${M(fr(`${rt(a)} − ${rt(b)}`,`${rt(a)} ＋ ${rt(b)}`))}，求 x² ＋ y²。`,ans:v,steps:[
+   `① 分析：直接平方很麻煩，先算 x ＋ y 與 xy（對稱式），再用 x² ＋ y² ＝ (x ＋ y)² − 2xy`,
+   `② xy：x、y 互為倒數，xy ＝ 1`,
+   `③ x ＋ y：通分，分母 (√${a} − √${b})(√${a} ＋ √${b}) ＝ ${a} − ${b} ＝ ${a-b}（<b>平方差公式</b>）；分子 (√${a} ＋ √${b})² ＋ (√${a} − √${b})² ＝ 2(${a} ＋ ${b}) ＝ ${2*(a+b)}`,
+   `④ x ＋ y ＝ ${rFmt(s)}`,
+   `⑤ x² ＋ y² ＝ (${rFmt(s)})² − 2 × 1 ＝ ${rFmt(Fm(s,s))} − 2`,ANS(v)]}}];
+F4.m12=[()=>{const s=new Set();while(s.size<3)s.add(rnd(-8,8));const[a,b,c]=[...s].sort((u,v)=>u-v);const o=shuffle([a,b,c]);const ab=x=>`|x ${x<0?'＋':'−'} ${Math.abs(x)}|`;return{q:`f(x) ＝ ${o.map(ab).join(' ＋ ')} 的最小值是多少？`,ans:[c-a,1],steps:[
+   `① 觀念：|x − p| 是數線上 x 到 p 的<b>距離</b>，所以 f(x) 是 x 到 ${a}、${b}、${c} 三點的距離和`,
+   `② x 在 ${a} 與 ${c} 之間時，到 ${a} 和 ${c} 的距離和固定為 ${c} − ${par(a)} ＝ ${c-a}；在外面會更大`,
+   `③ 剩下到 ${b} 的距離，x ＝ ${b} 時為 0 最小`,
+   `④ 所以 x ＝ ${b}（中位數）時最小，f(${b}) ＝ ${b-a} ＋ 0 ＋ ${c-b} ＝ ${c-a}`,`答案是 <b>${c-a}</b>`]}},
+ ()=>{const p=rnd(-6,2),q=p+rnd(2,6),k=q-p+2*rnd(1,4);const big=(p+q+k)/2;if(!Number.isInteger(big))LEVELS_RETRY();const small=(p+q-k)/2;const ask=Math.random()<.5;return{q:`解 |x ${p<0?'＋':'−'} ${Math.abs(p)}| ＋ |x ${q<0?'＋':'−'} ${Math.abs(q)}| ＝ ${k}，${ask?'較大':'較小'}的解是多少？`,ans:[ask?big:small,1],steps:[
+   `① 觀念：左邊是 x 到 ${p} 與到 ${q} 的距離和（<b>絕對值的幾何意義</b>）。兩點相距 ${q-p} ＜ ${k}，所以解在兩點外側`,
+   `② x ≥ ${q}：(x − ${par(p)}) ＋ (x − ${par(q)}) ＝ ${k} → 2x ＝ ${k+p+q} → x ＝ ${big}（≥ ${q}，合）`,
+   `③ x ≤ ${p}：(${p} − x) ＋ (${q} − x) ＝ ${k} → 2x ＝ ${p+q-k} → x ＝ ${small}（≤ ${p}，合）`,
+   `④ ${p} ＜ x ＜ ${q} 時距離和恆為 ${q-p} ≠ ${k}，無解`,`答案是 <b>${num(ask?big:small)}</b>`]}}];
+F4.m13=[()=>{const b=pick([2,3,5]),k=rnd(1,4),x=rnd(0,4);const S=1+b+b*b;const tot=b**x*S;return{q:`若 ${b}<sup>x</sup> ＋ ${b}<sup>x＋1</sup> ＋ ${b}<sup>x＋2</sup> ＝ ${tot}，求 x。`,ans:[x,1],steps:[
+   `① 觀念：<b>指數律</b> a<sup>m＋n</sup> ＝ a<sup>m</sup> · a<sup>n</sup>，把 ${b}<sup>x＋1</sup> 寫成 ${b} · ${b}<sup>x</sup>`,
+   `② 提出 ${b}<sup>x</sup>：${b}<sup>x</sup>(1 ＋ ${b} ＋ ${b*b}) ＝ ${b}<sup>x</sup> × ${S}`,
+   `③ ${b}<sup>x</sup> ＝ ${tot} ÷ ${S} ＝ ${b**x} ＝ ${b}<sup>${x}</sup>`,
+   `④ 底數相同，指數相等：x ＝ ${x}`,`答案是 <b>${x}</b>`]}},
+ ()=>{const t=rnd(3,9);const v=t*t-2;return{q:`已知 a ＞ 0 且 a<sup>½</sup> ＋ a<sup>−½</sup> ＝ ${t}，求 a ＋ a<sup>−1</sup>。`,ans:[v,1],steps:[
+   `① 分析：a<sup>½</sup> 平方就是 a，a<sup>½</sup> · a<sup>−½</sup> ＝ 1，用<b>乘法公式</b> (u ＋ v)² ＝ u² ＋ 2uv ＋ v²`,
+   `② 兩邊平方：(a<sup>½</sup>)² ＋ 2 · a<sup>½</sup> · a<sup>−½</sup> ＋ (a<sup>−½</sup>)² ＝ ${t*t}`,
+   `③ a ＋ 2 ＋ a<sup>−1</sup> ＝ ${t*t}`,
+   `④ a ＋ a<sup>−1</sup> ＝ ${t*t} − 2 ＝ ${v}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const b=pick([2,3,5]),t=rnd(2,5);const v=Fa([t*t,1],R(1,t));return{q:`已知 ${b}<sup>x</sup> ＝ ${t}，求 ${b*b}<sup>x</sup> ＋ ${b}<sup>−x</sup>。`,ans:v,steps:[
+   `① 觀念：<b>指數律</b> (a<sup>m</sup>)<sup>n</sup> ＝ a<sup>mn</sup>，${b*b}<sup>x</sup> ＝ (${b}²)<sup>x</sup> ＝ (${b}<sup>x</sup>)²`,
+   `② ${b*b}<sup>x</sup> ＝ ${t}² ＝ ${t*t}`,`③ ${b}<sup>−x</sup> ＝ 1／${b}<sup>x</sup> ＝ 1／${t}`,
+   `④ 相加：${t*t} ＋ 1／${t} ＝ ${rFmt(v)}`,ANS(v)]}}];
+F4.m14=[()=>{const b=pick([2,3]),n=rnd(20,80);const L=b===2?0.3010:0.4771;const lg=Math.round(n*L*10000)/10000;const ch=Math.floor(lg);const m=lg-ch;if(m<0.02||1-m<0.02)LEVELS_RETRY();const T=[[0,0],[0.3010,2],[0.4771,3],[0.6020,4],[0.6990,5],[0.7781,6],[0.8451,7],[0.9030,8],[0.9542,9]];if(T.some(([v])=>v&&Math.abs(m-v)<0.004))LEVELS_RETRY();let fd=1;for(const[v,d]of T)if(m>=v)fd=d||1;
+   const ask=Math.random()<.5;return{q:`${b}<sup>${n}</sup> ${ask?'是幾位數':'的首位數字（最左邊那一位）是多少'}？（log 2 ≈ 0.3010、log 3 ≈ 0.4771、log 7 ≈ 0.8451）`,ans:[ask?ch+1:fd,1],steps:[
+   `① 觀念：<b>常用對數</b>的首數決定位數，尾數決定首位數字`,
+   `② log ${b}<sup>${n}</sup> ＝ ${n} × ${L} ＝ ${dec(lg)} ＝ ${ch} ＋ ${dec(Math.round(m*10000)/10000)}`,
+   ask?`③ 首數 ${ch}：${b}<sup>${n}</sup> ＝ 10<sup>${ch}</sup> × 10<sup>${dec(Math.round(m*10000)/10000)}</sup>，介於 10<sup>${ch}</sup> 與 10<sup>${ch+1}</sup> 之間，是 ${ch+1} 位數`
+      :`③ 尾數 ${dec(Math.round(m*10000)/10000)}：log ${fd} ≤ ${dec(Math.round(m*10000)/10000)} ＜ log ${fd+1}，所以 10<sup>尾數</sup> 介於 ${fd} 與 ${fd+1} 之間，首位數字是 ${fd}`,
+   `答案是 <b>${ask?ch+1:fd}</b>`]}}];
+F4.m31=[()=>{const r1=nz(-3,3);let r2;do{r2=nz(-3,3)}while(r2===r1);const a=pick([1,-1,2]),c=rnd(-3,3);/* f=a x^3 + c x^2 + m x + n, divisible by (x−r1)(x−r2) */const A=[r1,1,-(a*r1**3+c*r1**2)],B=[r2,1,-(a*r2**3+c*r2**2)];const m=R(A[2]-B[2],r1-r2);const n=Fs([A[2],1],Fm([r1,1],m));const ask=Math.random()<.5;
+   const fx_=x=>`x ${x<0?'＋':'−'} ${Math.abs(x)}`;return{q:`f(x) ＝ ${polyStr([a,c,0,0]).replace(/ *$/,'')} ＋ mx ＋ n 能被 (${fx_(r1)})(${fx_(r2)}) 整除，求 ${ask?'m':'n'}。`,ans:ask?m:n,steps:[
+   `① 觀念：<b>因式定理</b>：x − a 是 f(x) 的因式 ⇔ f(a) ＝ 0。被兩個因式的乘積整除，兩個都要是因式`,
+   `② f(${r1}) ＝ ${num(a*r1**3+c*r1**2)} ＋ ${par(r1)}m ＋ n ＝ 0 ⇒ ${num(r1)}m ＋ n ＝ ${num(A[2])}`,
+   `③ f(${r2}) ＝ ${num(a*r2**3+c*r2**2)} ＋ ${par(r2)}m ＋ n ＝ 0 ⇒ ${num(r2)}m ＋ n ＝ ${num(B[2])}`,
+   `④ 兩式相減消去 n：(${num(r1)} − ${par(r2)})m ＝ ${num(A[2])} − ${par(B[2])}，m ＝ ${rFmt(m)}`,
+   `⑤ 代回：n ＝ ${num(A[2])} − ${par(r1)} × ${rFmt(m)} ＝ ${rFmt(n)}`,ANS(ask?m:n)]}},
+ ()=>{const a=nz(-3,3),b=nz(-3,3);if(a===b)LEVELS_RETRY();const ra=rnd(-9,9),rb=rnd(-9,9);const p=R(ra-rb,a-b);const q=Fs([ra,1],Fm(p,[a,1]));const ask=Math.random()<.5;const fx_=x=>`x ${x<0?'＋':'−'} ${Math.abs(x)}`;return{q:`f(x) 除以 ${fx_(a)} 餘 ${num(ra)}，除以 ${fx_(b)} 餘 ${num(rb)}。f(x) 除以 (${fx_(a)})(${fx_(b)}) 的餘式為 px ＋ q，求 ${ask?'p':'q'}。`,ans:ask?p:q,steps:[
+   `① 觀念：<b>餘式定理</b>：f(x) 除以 x − a 的餘式是 f(a)；除式是二次，餘式最多一次，設為 px ＋ q`,
+   `② f(x) ＝ (${fx_(a)})(${fx_(b)})Q(x) ＋ px ＋ q`,
+   `③ 代 x ＝ ${a}：f(${a}) ＝ ${num(a)}p ＋ q ＝ ${num(ra)}；代 x ＝ ${b}：${num(b)}p ＋ q ＝ ${num(rb)}`,
+   `④ 相減：(${num(a)} − ${par(b)})p ＝ ${num(ra-rb)}，p ＝ ${rFmt(p)}；q ＝ ${num(ra)} − ${num(a)} × ${rFmt(p)} ＝ ${rFmt(q)}`,ANS(ask?p:q)]}}];
+F4.m32=[()=>{const a=nz(-3,3),h=rnd(-4,4),k=rnd(-6,6);const lo=rnd(-5,3),hi=lo+rnd(2,5);const f=x=>a*(x-h)**2+k;const vals=[[lo,f(lo)],[hi,f(hi)]];if(h>lo&&h<hi)vals.push([h,k]);const ask=Math.random()<.5;const best=vals.reduce((m,v)=>(ask?v[1]>m[1]:v[1]<m[1])?v:m);
+   return{q:`f(x) ＝ ${a===1?'':a===-1?'−':a}(x ${h<0?'＋':'−'} ${Math.abs(h)})² ${fx(k,'')}，在 ${lo} ≤ x ≤ ${hi} 的${ask?'最大值':'最小值'}是多少？`,ans:[best[1],1],steps:[
+   `① 觀念：<b>二次函數在閉區間的極值</b>，要看頂點在不在區間內，再比較端點`,
+   `② 頂點 (${h}, ${k})，開口${a>0?'向上':'向下'}；頂點${h>lo&&h<hi?'在':'不在'}區間內`,
+   `③ 算值：${vals.map(([x,y])=>`f(${x}) ＝ ${num(y)}`).join('，')}`,
+   `④ ${ask?'最大':'最小'}的是 x ＝ ${best[0]} 時的 ${num(best[1])}`,`答案是 <b>${num(best[1])}</b>`]}}];
+F4.m33=[()=>{const r1=rnd(-6,2),r2=r1+rnd(2,7);const strict=Math.random()<.5;const lo=rnd(-10,-6),hi=rnd(6,10);const S=new Set();for(let x=lo;x<=hi;x++){const v=(x-r1)*(x-r2);if(strict?v>0:v>=0)S.add(x)}return{q:`在 ${lo} ≤ x ≤ ${hi} 的範圍內，滿足 x² ${fx(-(r1+r2),'x')} ${fx(r1*r2,'')} ${strict?'＞':'≥'} 0 的整數有幾個？`,ans:[S.size,1],steps:[
+   `① 觀念：<b>一元二次不等式</b>：先因式分解找根，再看開口方向`,
+   `② x² ${fx(-(r1+r2),'x')} ${fx(r1*r2,'')} ＝ (x ${fx(-r1,'')})(x ${fx(-r2,'')})，根為 ${r1}、${r2}`,
+   `③ 開口向上，${strict?'＞':'≥'} 0 的範圍在兩根外側：x ${strict?'＜':'≤'} ${r1} 或 x ${strict?'＞':'≥'} ${r2}`,
+   `④ 在 ${lo} 到 ${hi} 中數整數：${lo}～${strict?r1-1:r1} 有 ${Math.max(0,(strict?r1-1:r1)-lo+1)} 個，${strict?r2+1:r2}～${hi} 有 ${Math.max(0,hi-(strict?r2+1:r2)+1)} 個`,`答案是 <b>${S.size}</b>`]}},
+ ()=>{const k0=rnd(2,6);/* x²+kx+k0² ≥ 0 for all x ⇔ k² ≤ 4k0² ⇔ |k| ≤ 2k0 */const c=k0*k0;return{q:`若 x² ＋ kx ＋ ${c} ≥ 0 對所有實數 x 都成立，整數 k 有幾個？`,ans:[4*k0+1,1],steps:[
+   `① 觀念：開口向上的二次式恆 ≥ 0 ⇔ <b>判別式</b> D ≤ 0`,
+   `② D ＝ k² − 4 × ${c} ≤ 0 ⇒ k² ≤ ${4*c}`,`③ −${2*k0} ≤ k ≤ ${2*k0}`,
+   `④ 整數 k 從 −${2*k0} 到 ${2*k0}，共 ${4*k0+1} 個`,`答案是 <b>${4*k0+1}</b>`]}}];
+
+/* ---------- 高一下 ---------- */
+F4.m2_tri=[()=>{const d=2*rnd(5,40),h=d/2;return mc(`在平地上 A 點測得塔頂的仰角為 30°，向塔前進 ${d} 公尺到 B 點，測得仰角為 60°。塔高為多少公尺？`,`${h}√3`,[`${d}√3`,`${h}`,`${h/2}√3`,`${d}`,`${h}√2`],[
+   `① 設塔頂 P、塔底 Q，A、B、Q 在同一直線上，∠PAQ ＝ 30°、∠PBQ ＝ 60°`,
+   `② <b>三角形外角定理</b>：∠PBQ 是 △PAB 的外角，∠APB ＝ 60° − 30° ＝ 30° ＝ ∠PAB`,
+   `③ 所以 △PAB 是等腰三角形，PB ＝ AB ＝ ${d}`,
+   `④ 在直角 △PBQ 中用<b>直角三角形的三角比</b>：PQ ＝ PB × sin 60° ＝ ${d} × √3／2 ＝ ${h}√3`,
+   `✔ 檢查：BQ ＝ ${d} × cos 60° ＝ ${h}，tan 30° ＝ ${h}√3 ÷ (${d} ＋ ${h}) ＝ 1／√3，符合`])},
+ ()=>{const[a,b,c]=T3();const r=R(c*c,a*b);return{q:`θ 為銳角，sin θ ＝ ${M(fr(a,c))}，求 tan θ ＋ ${M(fr(1,'tan θ'))} 的值。`,ans:r,steps:[
+   `① 畫直角三角形：對邊 ${a}、斜邊 ${c}，由<b>畢氏定理</b>鄰邊 ＝ √(${c*c} − ${a*a}) ＝ ${b}`,
+   `② cos θ ＝ ${b}／${c}，tan θ ＝ ${a}／${b}`,
+   `③ 化簡：tan θ ＋ 1／tan θ ＝ ${M(fr('sin θ','cos θ'))} ＋ ${M(fr('cos θ','sin θ'))} ＝ ${M(fr('sin²θ ＋ cos²θ','sin θ cos θ'))} ＝ ${M(fr(1,'sin θ cos θ'))}（<b>平方關係</b>）`,
+   `④ sin θ cos θ ＝ ${a}／${c} × ${b}／${c} ＝ ${a*b}／${c*c}，倒數 ＝ ${rFmt(r)}`,
+   `✔ 檢查：直接算 ${a}／${b} ＋ ${b}／${a} ＝ ${a*a+b*b}／${a*b} ＝ ${rFmt(r)}`,ANS(r)]}},
+ ()=>{const p=rnd(1,7),q=rnd(1,7);if(p===q)LEVELS_RETRY();const v=R(p*q,p*p+q*q);return{q:`θ 為銳角，tan θ ＝ ${M(rFmt(R(p,q)))}，求 sin θ cos θ。`,ans:v,steps:[
+   `① 方法一（三角比定義）：對邊 ${p}、鄰邊 ${q}，斜邊 √(${p*p} ＋ ${q*q}) ＝ √${p*p+q*q}`,
+   `② sin θ cos θ ＝ ${p}／√${p*p+q*q} × ${q}／√${p*p+q*q} ＝ ${p*q}／${p*p+q*q}`,
+   `③ 方法二（<b>平方關係</b>）：sin θ cos θ ＝ ${M(fr('sin θ cos θ','sin²θ ＋ cos²θ'))}，分子分母同除 cos²θ 得 ${M(fr('tan θ','1 ＋ tan²θ'))}`,
+   `④ ＝ ${rFmt(R(p,q))} ÷ (1 ＋ ${rFmt(R(p*p,q*q))}) ＝ ${rFmt(v)}，兩法一致`,ANS(v)]}}];
+F4.m2_gen=[()=>{const k=rnd(1,6);const th=pick([30,60,120,150,210,240,300,330]);const c=Math.cos(th*Math.PI/180),s=Math.sin(th*Math.PI/180);const f=v=>{const big=Math.abs(Math.abs(v)-Math.sqrt(3)/2)<1e-9;return (v<0?'−':'')+(big?`${k===1?'':k}√3`:`${k}`)};const Q=th<90?1:th<180?2:th<270?3:4;const ref=Math.min(th%180,180-th%180);
+   return{q:`點 P(${f(c)}, ${f(s)}) 的極坐標為 [r, θ]，0° ≤ θ ＜ 360°，求 θ。（填度數）`,ans:[th,1],steps:[
+   `① <b>極坐標</b>：r ＝ √(x² ＋ y²)，cos θ ＝ x／r，sin θ ＝ y／r`,
+   `② r ＝ √(${3*k*k} ＋ ${k*k}) ＝ √${4*k*k} ＝ ${2*k}`,
+   `③ cos θ ＝ ${f(c)}／${2*k}、sin θ ＝ ${f(s)}／${2*k}，參考角為 ${ref}°（cos、sin 的絕對值是 ${Math.abs(c)>0.6?'√3／2、½':'½、√3／2'}）`,
+   `④ x ${c>0?'＞':'＜'} 0、y ${s>0?'＞':'＜'} 0，在第 ${Q} 象限（<b>廣義角</b>）：θ ＝ ${[`${ref}`,`180° − ${ref}°`,`180° ＋ ${ref}°`,`360° − ${ref}°`][Q-1]} ＝ ${th}°`,`θ ＝ <b>${th}</b>°`]}},
+ ()=>{const[a,b,c]=T3();const Q=pick([2,4]);const s=Q===2?R(a,c):R(-a,c),co=Q===2?R(-b,c):R(b,c);const v=Fa(s,co);return{q:`θ 為第 ${Q} 象限角且 tan θ ＝ ${M(rFmt(R(-a,b)))}，求 sin θ ＋ cos θ。`,ans:v,steps:[
+   `① 參考角 α 滿足 tan α ＝ ${a}／${b}，畫直角三角形，斜邊 √(${a*a} ＋ ${b*b}) ＝ ${c}（<b>畢氏定理</b>）`,
+   `② sin α ＝ ${a}／${c}、cos α ＝ ${b}／${c}`,
+   `③ <b>各象限三角比的正負</b>：第 ${Q} 象限 ${Q===2?'sin 正、cos 負':'sin 負、cos 正'}，所以 sin θ ＝ ${rFmt(s)}、cos θ ＝ ${rFmt(co)}`,
+   `✔ 檢查：sin θ ÷ cos θ ＝ ${rFmt(R(-a,b))}，與題目相同`,`④ sin θ ＋ cos θ ＝ ${rFmt(v)}`,ANS(v)]}},
+ ...XG.m2_gen[4]];
+F4.m2_law=[()=>{const H=[[13,14,15,84],[5,5,6,12],[5,5,8,12],[10,13,13,60],[9,10,17,36],[7,15,20,42],[11,13,20,66],[13,20,21,126],[3,4,5,6]];const[a,b,c,A]=pick(H);const k=rnd(1,2);const[x,y,z]=[a*k,b*k,c*k];const s=(x+y+z)/2,Ar=A*k*k;const ask=Math.random()<.5;const r=ask?R(Ar,s):R(x*y*z,4*Ar);
+   return{q:`三角形三邊長為 ${x}、${y}、${z}，求${ask?'內切圓半徑 r':'外接圓半徑 R'}。`,ans:r,steps:[
+   `① 先求面積，用<b>海龍公式</b>：s ＝ (${x} ＋ ${y} ＋ ${z})／2 ＝ ${s}`,
+   `② 面積 ＝ √(s(s−a)(s−b)(s−c)) ＝ √(${s} × ${s-x} × ${s-y} × ${s-z}) ＝ √${s*(s-x)*(s-y)*(s-z)} ＝ ${Ar}`,
+   ask?`③ <b>內切圓半徑</b>：面積 ＝ rs（把三角形切成三個以內心為頂點的小三角形）`:`③ <b>正弦定理</b>推得面積 ＝ abc／(4R)`,
+   ask?`④ r ＝ ${Ar} ÷ ${s} ＝ ${rFmt(r)}`:`④ R ＝ ${x} × ${y} × ${z} ÷ (4 × ${Ar}) ＝ ${x*y*z}／${4*Ar} ＝ ${rFmt(r)}`,ANS(r)]}},
+ ()=>{const a=rnd(3,15),b=rnd(3,15);const sC=R(rnd(1,9),10);const S=Fm(Fm([a*b,1],sC),[1,2]);return{q:`△ABC 中 a ＝ ${a}、b ＝ ${b}，面積為 ${M(rFmt(S))}，求 sin C。`,ans:sC,steps:[
+   `① 觀念：<b>三角形面積公式</b>：面積 ＝ ½ab sin C（兩邊與夾角）`,
+   `② ${rFmt(S)} ＝ ½ × ${a} × ${b} × sin C ＝ ${a*b/2} sin C`,
+   `③ sin C ＝ ${rFmt(S)} ÷ ${a*b/2} ＝ ${rFmt(sC)}`,
+   `✔ 0 ＜ sin C ≤ 1，合理（C 可能是銳角或鈍角）`,ANS(sC)]}},
+ ()=>{const S=[[3,5,7,120],[7,8,13,120],[5,16,19,120],[3,8,7,60],[5,8,7,60],[8,15,13,60]];const[a,b,c,C]=pick(S);const k=rnd(1,3);const cc={60:'½',120:'−½'}[C];return{q:`△ABC 中，a ＝ ${a*k}、b ＝ ${b*k}、c ＝ ${c*k}，求 ∠C 的度數。`,ans:[C,1],steps:[
+   `① 已知三邊求角，用<b>餘弦定理</b>：cos C ＝ (a² ＋ b² − c²)／(2ab)`,
+   `② a² ＝ ${(a*k)**2}、b² ＝ ${(b*k)**2}、c² ＝ ${(c*k)**2}`,
+   `③ cos C ＝ (${(a*k)**2} ＋ ${(b*k)**2} − ${(c*k)**2})／(2 × ${a*k} × ${b*k}) ＝ ${(a*a+b*b-c*c)*k*k}／${2*a*b*k*k} ＝ ${cc}`,
+   `④ 0° ＜ C ＜ 180°，cos C ＝ ${cc} ⇒ C ＝ ${C}°`,`答案是 <b>${C}</b>°`]}}];
+F4.m2_ap=[()=>{const a1=rnd(1,8),d1=rnd(2,7),a2=rnd(1,8),d2=rnd(2,7),N=rnd(100,300);if(d1===d2)LEVELS_RETRY();const s1=new Set();for(let v=a1;v<=N;v+=d1)s1.add(v);let c=0,f=null;for(let v=a2;v<=N;v+=d2)if(s1.has(v)){c++;if(f===null)f=v}if(c<2)LEVELS_RETRY();const L=d1*d2/gcd(d1,d2);const last=f+(c-1)*L;
+   return{q:`數列 ${a1}, ${a1+d1}, ${a1+2*d1}, … 與 ${a2}, ${a2+d2}, ${a2+2*d2}, … 在不超過 ${N} 的範圍內，共有幾個公共項？`,ans:[c,1],steps:[
+   `① 觀念：兩個<b>等差數列</b>的公共項也成等差數列，公差是 ${d1} 與 ${d2} 的最小公倍數 ${L}`,
+   `② 找第一個公共項：第一個數列除以 ${d1} 餘 ${a1%d1}，第二個除以 ${d2} 餘 ${a2%d2}，逐一檢查得 ${f}`,
+   `③ 公共項：${f}, ${f+L}, ${f+2*L}, …，一般項 ${f} ＋ (n − 1) × ${L}`,
+   `④ ${f} ＋ (n − 1) × ${L} ≤ ${N} ⇒ n − 1 ≤ ${dec(Math.floor((N-f)/L*100)/100)}，n 最大 ${c}（最後一項 ${last}）`,`答案是 <b>${c}</b>`]}},
+ ()=>{const a=rnd(-20,20),d=nz(-5,5);const p=rnd(1,6),q=rnd(7,15),m=rnd(2,14);const n=p+q-m;if(n<1||n===m)LEVELS_RETRY();const am=a+(m-1)*d,an=a+(n-1)*d,S=2*a+(p+q-2)*d;return{q:`等差數列中 a<sub>${p}</sub> ＋ a<sub>${q}</sub> ＝ ${num(S)}，a<sub>${m}</sub> ＝ ${num(am)}，求 a<sub>${n}</sub>。`,ans:[an,1],steps:[
+   `① 觀念：<b>等差數列的性質</b>：若 p ＋ q ＝ m ＋ n，則 a<sub>p</sub> ＋ a<sub>q</sub> ＝ a<sub>m</sub> ＋ a<sub>n</sub>`,
+   `② 理由：a<sub>p</sub> ＋ a<sub>q</sub> ＝ 2a<sub>1</sub> ＋ (p ＋ q − 2)d，只和 p ＋ q 有關`,
+   `③ ${p} ＋ ${q} ＝ ${p+q} ＝ ${m} ＋ ${n}，所以 a<sub>${m}</sub> ＋ a<sub>${n}</sub> ＝ ${num(S)}`,
+   `④ a<sub>${n}</sub> ＝ ${num(S)} − ${par(am)} ＝ ${num(an)}`,`答案是 <b>${num(an)}</b>`]}},
+ ()=>{const a=rnd(20,120),d=-rnd(2,9);let k=1;while(a+(k-1)*d>=0)k++;const t=R(a,-d);return{q:`等差數列首項 ${a}、公差 ${num(d)}，從第幾項開始為負數？`,ans:[k,1],steps:[
+   `① <b>等差數列一般項</b>：a<sub>n</sub> ＝ ${a} ＋ (n − 1)(${d})`,
+   `② 要 a<sub>n</sub> ＜ 0：${a} ＋ (n − 1)(${d}) ＜ 0 ⇒ (n − 1) ＞ ${a} ÷ ${-d} ＝ ${rFmt(t)}`,
+   `③ n ＞ ${dec(Math.round((a/(-d)+1)*100)/100)}，最小整數 n ＝ ${k}`,
+   `✔ 檢查：a<sub>${k-1}</sub> ＝ ${a+(k-2)*d} ≥ 0，a<sub>${k}</sub> ＝ ${a+(k-1)*d} ＜ 0`,`答案是 <b>${k}</b>`]}}];
+F4.m2_gp=[()=>{const b=nz(-6,6)*2,r=pick([2,3]);const t=[b/r,b,b*r];if(!Number.isInteger(t[0]))LEVELS_RETRY();const S=t[0]+t[1]+t[2],Pd=t[0]*t[1]*t[2];return{q:`三數成等比，和為 ${num(S)}、積為 ${num(Pd)}，公比大於 1，求最大的數。`,ans:[Math.max(...t),1],steps:[
+   `① 觀念：三數成<b>等比數列</b>，設為 x／r、x、xr，積 ＝ x³`,
+   `② x³ ＝ ${num(Pd)} ⇒ x ＝ ${num(b)}`,
+   `③ 和：${num(b)}(1／r ＋ 1 ＋ r) ＝ ${num(S)} ⇒ 1／r ＋ r ＝ ${rFmt(R(S-b,b))}，兩邊乘 r：r² − ${rFmt(R(S-b,b))}r ＋ 1 ＝ 0`,
+   `④ 解得 r ＝ ${r} 或 1／${r}，取 r ＞ 1 ⇒ r ＝ ${r}，三數 ${t.map(num).join('、')}`,
+   `✔ 檢查：和 ${num(S)}、積 ${num(Pd)}`,`答案是 <b>${num(Math.max(...t))}</b>`]}},
+ ()=>{const a=2**rnd(0,3),r=2**rnd(1,2),n=rnd(4,8);const e0=Math.log2(a),er=Math.log2(r);const v=n*e0+er*n*(n-1)/2;return{q:`等比數列首項 ${a}、公比 ${r}，前 ${n} 項的乘積寫成 2<sup>k</sup>，求 k。`,ans:[v,1],steps:[
+   `① 觀念：<b>等比數列</b>每一項都是 2 的次方：a<sub>k</sub> ＝ ${a} × ${r}<sup>k−1</sup> ＝ 2<sup>${e0} ＋ ${er}(k−1)</sup>`,
+   `② 指數 ${e0}, ${e0+er}, ${e0+2*er}, … 成<b>等差數列</b>（取對數後等比變等差）`,
+   `③ 乘積的指數 ＝ 指數的和 ＝ <b>等差級數</b> ${n}[2 × ${e0} ＋ (${n} − 1) × ${er}] ÷ 2`,
+   `④ ＝ ${n} × ${2*e0+(n-1)*er} ÷ 2 ＝ ${v}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const k=rnd(3,9);const N0=rnd(1,3),N=N0*2**k;return{q:`某細菌每 20 分鐘分裂一次（數量變 2 倍），一開始有 ${N0} 隻，經過幾分鐘後數量變成 ${N} 隻？`,ans:[20*k,1],steps:[
+   `① 每 20 分鐘乘 2，數量是首項 ${N0}、公比 2 的<b>等比數列</b>`,
+   `② 分裂 n 次後：${N0} × 2<sup>n</sup> ＝ ${N} ⇒ 2<sup>n</sup> ＝ ${2**k}`,
+   `③ ${2**k} ＝ 2<sup>${k}</sup>，n ＝ ${k}`,`④ 時間 ＝ ${k} × 20 ＝ ${20*k} 分鐘`,`答案是 <b>${20*k}</b>`]}}];
+F4.m2_sum=[()=>{const n=rnd(5,40);const t=rnd(0,1);if(t===0){const r=R(n,n+1);return{q:`求 ${SIG(n,fr(1,'<i>k</i>(<i>k</i> ＋ 1)'))}。`,ans:r,steps:[
+   `① 觀念：<b>分項對消</b>：${M(`${fr(1,'k(k＋1)')} = ${fr(1,'k')} − ${fr(1,'k＋1')}`)}（通分可驗證）`,
+   `② 展開：(1 − ½) ＋ (½ − ⅓) ＋ (⅓ − ¼) ＋ … ＋ (1／${n} − 1／${n+1})`,
+   `③ 中間一正一負全部抵消，只剩頭尾：1 − 1／${n+1}`,`④ ＝ ${n}／${n+1}`,ANS(r)]}}
+   const r=R(n,2*n+1);return{q:`求 ${SIG(n,fr(1,'(2<i>k</i> − 1)(2<i>k</i> ＋ 1)'))}。`,ans:r,steps:[
+   `① 觀念：<b>分項對消</b>：${M(`${fr(1,'(2k−1)(2k＋1)')} = ${fr(1,2)}(${fr(1,'2k−1')} − ${fr(1,'2k＋1')})`)}`,
+   `② 展開：½[(1 − ⅓) ＋ (⅓ − ⅕) ＋ … ＋ (1／${2*n-1} − 1／${2*n+1})]`,
+   `③ 中間抵消：½(1 − 1／${2*n+1}) ＝ ½ × ${2*n}／${2*n+1}`,`④ ＝ ${n}／${2*n+1}`,ANS(r)]}},
+ ()=>{const a=rnd(20,90),d=-rnd(2,7);let best=-1e9,bn=0,s=0;for(let k=1;k<200;k++){s+=a+(k-1)*d;if(s>best){best=s;bn=k}}const last=a+(bn-1)*d;return{q:`等差數列首項 ${a}、公差 ${num(d)}，前 n 項和的最大值是多少？`,ans:[best,1],steps:[
+   `① 觀念：公差為負，項越來越小。<b>等差級數</b>加到最後一個非負項時和最大`,
+   `② a<sub>n</sub> ＝ ${a} ＋ (n − 1)(${d}) ≥ 0 ⇒ n ≤ ${dec(Math.round((a/(-d)+1)*100)/100)}，最後一個非負項是第 ${bn} 項（＝ ${last}）`,
+   `③ S<sub>${bn}</sub> ＝ ${bn}(${a} ＋ ${last})／2 ＝ ${best}`,`✔ 再加下一項 ${a+bn*d} 會變小`,`答案是 <b>${best}</b>`]}},
+ ()=>{const m=rnd(3,12);const v=(m*(m+1)/2)**2;return{q:`求 1³ ＋ 2³ ＋ … ＋ ${m}³。`,ans:[v,1],steps:[
+   `① 公式：${M(`∑k<sup>3</sup> = [${fr('n(n＋1)',2)}]<sup>2</sup>`)}（可用<b>數學歸納法</b>證明）`,
+   `② n ＝ ${m}：${m}(${m+1})／2 ＝ ${m*(m+1)/2}`,`③ 平方：${m*(m+1)/2}² ＝ ${v}`,
+   `✔ 小檢查：1³ ＋ 2³ ＝ 9 ＝ 3²，公式正確`,`答案是 <b>${v}</b>`]}}];
+F4.m2_rec=[()=>{const n=rnd(4,10);const v=n*(n+1)/2+1;return{q:`平面上 ${n} 條直線，任兩條不平行、任三條不共點，最多把平面分成幾個區域？`,ans:[v,1],steps:[
+   `① 設 a<sub>k</sub> 為 k 條直線分成的區域數，a<sub>0</sub> ＝ 1`,
+   `② 加入第 k 條直線：它和前 k − 1 條各交一點，被分成 k 段，每段把一個區域切成兩個，多出 k 個區域`,
+   `③ <b>遞迴關係</b>：a<sub>k</sub> ＝ a<sub>k−1</sub> ＋ k`,
+   `④ 累加：a<sub>${n}</sub> ＝ 1 ＋ (1 ＋ 2 ＋ … ＋ ${n}) ＝ 1 ＋ ${n*(n+1)/2}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const n=rnd(4,9);const f=[1,1];for(let i=2;i<=n;i++)f[i]=f[i-1]+f[i-2];return{q:`用 1 × 2 的磁磚鋪滿 2 × ${n} 的走道（磁磚可直放或橫放），共有幾種鋪法？`,ans:[f[n],1],steps:[
+   `① 設 a<sub>n</sub> 為 2 × n 的鋪法數。看最左邊：`,
+   `② 直放一塊 → 剩 2 × (n − 1)：a<sub>n−1</sub> 種；橫放（上下各一塊）→ 剩 2 × (n − 2)：a<sub>n−2</sub> 種`,
+   `③ <b>遞迴關係</b>：a<sub>n</sub> ＝ a<sub>n−1</sub> ＋ a<sub>n−2</sub>，a<sub>1</sub> ＝ 1、a<sub>2</sub> ＝ 2`,
+   `④ 依序：${f.slice(1,n+1).join('、')}`,`答案是 <b>${f[n]}</b>`]}},
+ ()=>{const p=pick([2,3]),al=nz(-4,5);const q=al*(1-p);const a1=al+nz(-3,3);const n=rnd(5,8);const v=(a1-al)*p**(n-1)+al;return{q:`a<sub>1</sub> ＝ ${num(a1)}，a<sub>n＋1</sub> ＝ ${p}a<sub>n</sub> ${fx(q,'')}，求 a<sub>${n}</sub>。`,ans:[v,1],steps:[
+   `① 觀念：一階線性<b>遞迴關係</b>，先找不動點 α：α ＝ ${p}α ${fx(q,'')} ⇒ α ＝ ${num(al)}`,
+   `② 兩式相減：a<sub>n＋1</sub> − ${par(al)} ＝ ${p}(a<sub>n</sub> − ${par(al)})，所以 a<sub>n</sub> − ${par(al)} 是公比 ${p} 的等比數列`,
+   `③ 首項 a<sub>1</sub> − ${par(al)} ＝ ${num(a1-al)}，a<sub>n</sub> ＝ ${num(a1-al)} × ${p}<sup>n−1</sup> ＋ ${par(al)}`,
+   `④ a<sub>${n}</sub> ＝ ${num(a1-al)} × ${p**(n-1)} ＋ ${par(al)} ＝ ${num(v)}`,`答案是 <b>${num(v)}</b>`]}}];
+F4.m2_count=[()=>{const k=rnd(4,9);let c=0;for(let a=1;a<=k;a++)for(let b=0;b<=k;b++)for(let d=0;d<=k;d++)if(a!==b&&a!==d&&b!==d&&d%2===0)c++;const z=k*(k-1);const ev=Math.floor(k/2);return{q:`用 0, 1, 2, …, ${k} 組成數字不重複的三位<b>偶數</b>，共有幾個？`,ans:[c,1],steps:[
+   `① 限制：個位要偶數、百位不能是 0，而且 0 本身是偶數 → 兩個限制互相影響，要<b>分類</b>（加法原理）`,
+   `② 情況一 個位是 0：百位 ${k} 種（1～${k}），十位 ${k-1} 種，共 ${k} × ${k-1} ＝ ${z}（<b>乘法原理</b>）`,
+   `③ 情況二 個位是非 0 的偶數（${ev} 種）：百位不能是 0 也不能和個位相同，${k-1} 種；十位剩 ${k-1} 種，共 ${ev} × ${k-1} × ${k-1} ＝ ${c-z}`,
+   `④ 合計 ${z} ＋ ${c-z} ＝ ${c}`,`答案是 <b>${c}</b>`]}},
+ ()=>{const p=[[2,rnd(1,5)],[3,rnd(1,3)],[5,rnd(0,2)]];const n=p.reduce((s,[b,e])=>s*b**e,1);const ev=p[0][1]*(p[1][1]+1)*(p[2][1]+1);const all=(p[0][1]+1)*(p[1][1]+1)*(p[2][1]+1);return{q:`${n} 的正因數中，偶數有幾個？`,ans:[ev,1],steps:[
+   `① 質因數分解：${n} ＝ ${p.filter(x=>x[1]).map(([b,e])=>e>1?`${b}<sup>${e}</sup>`:b).join(' × ')}`,
+   `② 因數形式 2<sup>i</sup> × 3<sup>j</sup> × 5<sup>k</sup>；偶數 ⇔ i ≥ 1`,
+   `③ <b>乘法原理</b>：i 有 ${p[0][1]} 種（1～${p[0][1]}），j 有 ${p[1][1]+1} 種，k 有 ${p[2][1]+1} 種，共 ${ev} 個`,
+   `✔ 檢查：全部因數 ${all} 個，奇數因數（i ＝ 0）${all-ev} 個，${all-ev} ＋ ${ev} ＝ ${all}`,`答案是 <b>${ev}</b>`]}},
+ ...XG.m2_count[4]];
+F4.m2_perm=[()=>{const m=rnd(3,6),n=rnd(3,5);const px=rnd(1,m-1),py=rnd(1,n-1);const C=(a,b)=>fct(a+b)/fct(a)/fct(b);const T=C(m,n),t1=C(px,py),t2=C(m-px,n-py),thr=t1*t2;const avoid=Math.random()<.5;const v=avoid?T-thr:thr;
+   return{q:`棋盤式街道從 A(0, 0) 走到 B(${m}, ${n})，每次只能向右或向上走一段，${avoid?'<b>不</b>':'必須'}經過 P(${px}, ${py}) 的最短路徑有幾種？`,ans:[v,1],steps:[
+   `① 觀念：最短路徑 ＝ 把「右」和「上」排成一列，是<b>有相同物的排列</b>：右 a 次、上 b 次共 (a＋b)!／(a!b!) 種`,
+   `② A → P：右 ${px}、上 ${py}，${fct(px+py)}／(${fct(px)} × ${fct(py)}) ＝ ${t1}；P → B：右 ${m-px}、上 ${n-py}，${t2} 種`,
+   `③ 經過 P（<b>乘法原理</b>）：${t1} × ${t2} ＝ ${thr}`,
+   avoid?`④ 全部 A → B：${fct(m+n)}／(${fct(m)} × ${fct(n)}) ＝ ${T}，不經過 P ＝ ${T} − ${thr} ＝ ${v}`:`④ 答案就是 ${thr}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const b=rnd(2,4),g=rnd(2,4);if(g>b+1)LEVELS_RETRY();const v=fct(b)*nPk(b+1,g);return{q:`${b} 位男生、${g} 位女生排成一列，女生互不相鄰，有幾種排法？`,ans:[v,1],steps:[
+   `① 觀念：「不相鄰」用<b>插空隙法</b>：先排沒有限制的人，再把要分開的人插進空隙`,
+   `② 先排 ${b} 位男生：${b}! ＝ ${fct(b)} 種，產生 ${b+1} 個空隙（含頭尾）`,
+   `③ ${g} 位女生各選一個不同空隙並排序：P(${b+1}, ${g}) ＝ ${nPk(b+1,g)}`,
+   `④ <b>乘法原理</b>：${fct(b)} × ${nPk(b+1,g)} ＝ ${v}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const n=rnd(2,4);const v=fct(n-1)*2**n;return{q:`${n} 對夫妻圍圓桌而坐，每對夫妻都相鄰，有幾種坐法？`,ans:[v,1],steps:[
+   `① 觀念：「相鄰」先綁成一包；圍圓桌用<b>環狀排列</b> (n − 1)!`,
+   `② ${n} 對夫妻綁成 ${n} 包，環狀排列：(${n} − 1)! ＝ ${fct(n-1)}`,
+   `③ 每一包內夫妻可以交換位置：2 種，${n} 包共 2<sup>${n}</sup> ＝ ${2**n}`,
+   `④ <b>乘法原理</b>：${fct(n-1)} × ${2**n} ＝ ${v}`,`答案是 <b>${v}</b>`]}}];
+F4.m2_comb=[()=>{const n=rnd(4,8),a=nz(-3,3),b=nz(-3,4),r=rnd(1,n-1);const c=nCk(n,r)*a**(n-r)*b**r;const ax=a===1?'':a===-1?'−':num(a);return{q:`(${ax}<i>x</i> ${b>0?'＋':'−'} ${Math.abs(b)})<sup>${n}</sup> 展開式中 <i>x</i><sup>${n-r}</sup> 項的係數是多少？`,ans:[c,1],steps:[
+   `① 觀念：<b>二項式定理</b>：(A ＋ B)<sup>n</sup> 的一般項為 C(n, r)A<sup>n−r</sup>B<sup>r</sup>`,
+   `② 這裡 A ＝ ${num(a)}x、B ＝ ${num(b)}，一般項 ＝ C(${n}, r)(${num(a)})<sup>${n}−r</sup>(${num(b)})<sup>r</sup> x<sup>${n}−r</sup>`,
+   `③ 要 x<sup>${n-r}</sup>：${n} − r ＝ ${n-r} ⇒ r ＝ ${r}`,
+   `④ 係數 ＝ C(${n}, ${r}) × (${num(a)})<sup>${n-r}</sup> × (${num(b)})<sup>${r}</sup> ＝ ${nCk(n,r)} × ${num(a**(n-r))} × ${num(b**r)} ＝ ${num(c)}`,`答案是 <b>${num(c)}</b>`]}},
+ ()=>{const n=rnd(4,9),a=nz(-2,3),b=nz(-3,3);const v=(a+b)**n;return{q:`(${a===1?'':a===-1?'−':num(a)}<i>x</i> ${b>0?'＋':'−'} ${Math.abs(b)})<sup>${n}</sup> 展開後各項係數的總和是多少？`,ans:[v,1],steps:[
+   `① 觀念：展開式 c<sub>0</sub> ＋ c<sub>1</sub>x ＋ … ＋ c<sub>${n}</sub>x<sup>${n}</sup>，令 x ＝ 1 就得到係數和（<b>二項式定理</b>的應用）`,
+   `② 代 x ＝ 1：(${num(a)} ${b>0?'＋':'−'} ${Math.abs(b)})<sup>${n}</sup> ＝ (${num(a+b)})<sup>${n}</sup>`,`③ ＝ ${num(v)}`,`答案是 <b>${num(v)}</b>`]}},
+ ()=>{const g=pick([[6,2],[6,3],[8,2],[8,4],[9,3],[4,2],[12,4]]);const[n,s]=g;const m=n/s;let v=fct(n)/fct(s)**m/fct(m);const seq=[];let left=n;for(let i=0;i<m;i++){seq.push(`C(${left}, ${s})`);left-=s}return{q:`${n} 個人平均分成 ${m} 組（每組 ${s} 人，組別沒有名稱），有幾種分法？`,ans:[v,1],steps:[
+   `① 先當作組別有名稱（第一組、第二組…），依序選人：${seq.join(' × ')} ＝ ${fct(n)/fct(s)**m}（<b>組合</b>與乘法原理）`,
+   `② 但組別沒有名稱，${m} 組互換順序算同一種分法，重複了 ${m}! ＝ ${fct(m)} 次`,
+   `③ 分法 ＝ ${fct(n)/fct(s)**m} ÷ ${fct(m)} ＝ ${v}`,`答案是 <b>${v}</b>`]}}];
+F4.m2_prob=[()=>{const n=rnd(4,8);const t=rnd(0,1);if(t===0){const v=R(2,n);return{q:`${n} 人隨機排成一列，甲乙兩人相鄰的機率？`,ans:v,steps:[
+   `① <b>古典機率</b>：樣本空間 ${n}! ＝ ${fct(n)} 種，每種等可能`,
+   `② 相鄰：甲乙綁成一包，和其他 ${n-2} 人共 ${n-1} 個單位排列 (${n-1})! ＝ ${fct(n-1)}，包內 2 種，共 ${2*fct(n-1)}`,
+   `③ P ＝ ${2*fct(n-1)} ÷ ${fct(n)} ＝ 2／${n}`,ANS(v)]}}
+   const v=R(n-2,n*(n-1));return{q:`${n} 人隨機排成一列，甲排第一位且乙不排最後一位的機率？`,ans:v,steps:[
+   `① <b>古典機率</b>：樣本空間 ${n}! ＝ ${fct(n)}`,`② 甲排第一位：其餘 ${n-1} 人任排 ${fct(n-1)} 種`,
+   `③ 其中乙排最後：剩 ${n-2} 人排中間 ${fct(n-2)} 種，所以符合條件 ${fct(n-1)} − ${fct(n-2)} ＝ ${fct(n-1)-fct(n-2)}`,
+   `④ P ＝ ${fct(n-1)-fct(n-2)} ÷ ${fct(n)} ＝ ${rFmt(v)}`,ANS(v)]}},
+ ()=>{const n=rnd(3,4);const v=R(nPk(6,n),6**n);return{q:`擲 ${n} 顆公正骰子，點數全部不同的機率？`,ans:v,steps:[
+   `① <b>古典機率</b>：每顆骰子 6 種，樣本空間 6<sup>${n}</sup> ＝ ${6**n}`,
+   `② 全部不同：第一顆 6 種、第二顆 5 種${n>2?'、第三顆 4 種':''}${n>3?'、第四顆 3 種':''}，共 P(6, ${n}) ＝ ${nPk(6,n)}`,
+   `③ P ＝ ${nPk(6,n)} ÷ ${6**n} ＝ ${rFmt(v)}`,ANS(v)]}},
+ ()=>{const r=rnd(2,6),w=rnd(2,6),k=rnd(2,3);if(k>w)LEVELS_RETRY();const T=nCk(r+w,k),W=nCk(w,k);const v=R(T-W,T);return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，一次取出 ${k} 顆，至少有一顆紅球的機率？`,ans:v,steps:[
+   `① 「至少一顆」用<b>餘事件</b>：P(至少一紅) ＝ 1 − P(全白)`,
+   `② 樣本空間 C(${r+w}, ${k}) ＝ ${T}；全白 C(${w}, ${k}) ＝ ${W}`,
+   `③ P(全白) ＝ ${W}／${T}，所求 ＝ 1 − ${W}／${T} ＝ ${rFmt(v)}`,ANS(v)]}}];
+F4.m2_exp=[()=>{const r=rnd(1,3),w=rnd(2,4);const tot=r+w;let E=[0,1];const rows=[];for(let k=1;k<=w+1;k++){let n1=1,d1=1;for(let i=0;i<k-1;i++){n1*=w-i;d1*=tot-i}n1*=r;d1*=tot-(k-1);const p=R(n1,d1);rows.push(`P(X ＝ ${k}) ＝ ${rFmt(p)}`);E=Fa(E,Fm([k,1],p))}
+   return{q:`袋中有 ${r} 顆紅球、${w} 顆白球，每次取一顆不放回，直到取到紅球為止。取球次數的期望值？`,ans:E,steps:[
+   `① 設 X 為取球次數，X 可能是 1～${w+1}。X ＝ k 表示前 k − 1 次都是白球、第 k 次是紅球（<b>乘法原理</b>求機率）`,
+   `② ${rows.join('；')}`,`③ <b>數學期望值</b> E ＝ ∑ k · P(X ＝ k)`,`④ 計算得 E ＝ ${rFmt(E)}（也可用公式 (n ＋ 1)／(r ＋ 1) ＝ ${tot+1}／${r+1} 驗算）`,ANS(E)]}},
+ ()=>{const w7=rnd(3,12)*10,wd=rnd(2,10)*10,cost=rnd(1,6)*10;const e=R(6*w7+6*wd-36*cost,36);return{q:`擲兩顆公正骰子：點數和為 7 得 ${w7} 元，兩顆點數相同得 ${wd} 元，其他情形不得錢。每玩一次要付 ${cost} 元，玩一次的期望淨值是多少元？`,ans:e,steps:[
+   `① <b>古典機率</b>：樣本空間 36 種。和為 7：(1,6)…(6,1) 共 6 種；點數相同：6 種；兩者不會同時發生（互斥）`,
+   `② 期望獎金 ＝ ${w7} × 6／36 ＋ ${wd} × 6／36 ＝ ${rFmt(R(6*w7+6*wd,36))}`,
+   `③ <b>數學期望值</b>（淨值）＝ 期望獎金 − 成本 ＝ ${rFmt(R(6*w7+6*wd,36))} − ${cost}`,ANS(e)]}}];
+F4.m2_stat1=[()=>{const n1=rnd(2,6)*5,n2=rnd(2,6)*5,m1=rnd(50,80),m2=rnd(50,80),s1=rnd(2,10),s2=rnd(2,10);const N=n1+n2;const q1=n1*(s1*s1+m1*m1),q2=n2*(s2*s2+m2*m2);const sum2=q1+q2;const Mn=R(n1*m1+n2*m2,N);const v=R(sum2*Mn[1]*Mn[1]-N*Mn[0]*Mn[0],N*Mn[1]*Mn[1]);
+   return{q:`甲班 ${n1} 人平均 ${m1} 分、標準差 ${s1} 分；乙班 ${n2} 人平均 ${m2} 分、標準差 ${s2} 分。兩班合併後的<b>變異數</b>是多少？`,ans:v,steps:[
+   `① 觀念：<b>標準差</b>公式 σ² ＝ (∑x²)／n − μ²，所以 ∑x² ＝ n(σ² ＋ μ²)`,
+   `② 甲班 ∑x² ＝ ${n1}(${s1*s1} ＋ ${m1*m1}) ＝ ${q1}；乙班 ∑x² ＝ ${n2}(${s2*s2} ＋ ${m2*m2}) ＝ ${q2}`,
+   `③ 合併：總人數 ${N}，∑x² ＝ ${sum2}，平均 μ ＝ (${n1*m1} ＋ ${n2*m2})／${N} ＝ ${rFmt(Mn)}`,
+   `④ 變異數 ＝ ${sum2}／${N} − (${rFmt(Mn)})²`,ANS(v)]}},
+ ()=>{const a=pick([2,3,0.5,-2]),b=rnd(-20,30),m=rnd(40,80),s=rnd(3,12);const my=a*m+b,sy=Math.abs(a)*s;if(!exact2(my))LEVELS_RETRY();const ask=Math.random()<.5;return{q:`資料每筆 x 經 y ＝ ${dec(a)}x ${fx(b,'')} 調整後，y 的平均為 ${dec(my)}、標準差為 ${dec(sy)}。原資料 x 的${ask?'平均':'標準差'}是多少？`,ans:ask?[m,1]:[s,1],steps:[
+   `① 觀念：<b>資料的線性變換</b> y ＝ ax ＋ b：μ<sub>y</sub> ＝ aμ<sub>x</sub> ＋ b，σ<sub>y</sub> ＝ |a|σ<sub>x</sub>（加常數不影響離散程度）`,
+   ask?`② ${dec(my)} ＝ ${dec(a)}μ<sub>x</sub> ${fx(b,'')} ⇒ ${dec(a)}μ<sub>x</sub> ＝ ${dec(my-b)}`:`② ${dec(sy)} ＝ |${dec(a)}| σ<sub>x</sub>`,
+   ask?`③ μ<sub>x</sub> ＝ ${dec(my-b)} ÷ ${dec(a)} ＝ ${m}`:`③ σ<sub>x</sub> ＝ ${dec(sy)} ÷ ${dec(Math.abs(a))} ＝ ${s}`,`答案是 <b>${ask?m:s}</b>`]}}];
+F4.m2_stat2=[()=>{const d=pick(DEV4),mx=rnd(5,20),my=rnd(10,40);const e=shuffle(d);const sxy=d.reduce((s,x,i)=>s+x*e[i],0),sxx=d.reduce((s,x)=>s+x*x,0);const m=R(sxy,sxx);const x0=mx+rnd(1,4);const y=R(my*m[1]+m[0]*(x0-mx),m[1]);
+   return{q:`五筆資料 (x, y)：${d.map((x,i)=>`(${num(mx+x)}, ${num(my+e[i])})`).join('、')}。用 y 對 x 的迴歸直線預測 x ＝ ${x0} 時的 y。`,ans:y,steps:[
+   `① 求平均：μ<sub>x</sub> ＝ ${mx}，μ<sub>y</sub> ＝ ${my}`,
+   `② 離差：x − μ<sub>x</sub>：${listStr(d)}；y − μ<sub>y</sub>：${listStr(e)}`,
+   `③ ∑(dx · dy) ＝ ${d.map((x,i)=>`${par(x)}×${par(e[i])}`).join(' ＋ ')} ＝ ${sxy}；∑dx² ＝ ${sxx}`,
+   `④ <b>迴歸直線</b>斜率 m ＝ ∑dx·dy／∑dx² ＝ ${rFmt(m)}，且直線通過平均點 (${mx}, ${my})`,
+   `⑤ y ＝ ${my} ＋ ${rFmt(m)} × (${x0} − ${mx})`,ANS(y)]}},
+ ()=>{const r=pick([0.3,0.45,0.6,0.75,0.8,-0.3,-0.6,-0.9]),a=nz(-4,4),b=rnd(-9,9),c=nz(-3,5),d=rnd(-9,9);const rr=a*c>0?r:-r;return{q:`x 與 y 的相關係數為 ${dec(r)}。令 x′ ＝ ${a===1?'':a===-1?'−':num(a)}x ${fx(b,'')}、y′ ＝ ${c===1?'':c===-1?'−':num(c)}y ${fx(d,'')}，則 x′ 與 y′ 的相關係數是多少？`,ans:RD(rr),steps:[
+   `① 觀念：<b>相關係數</b>只看離差的方向與比例。加減常數不影響離差；乘上正數離差等比例放大，r 不變；乘上負數離差方向反轉，r 變號`,
+   `② x′ 的係數 ${a}（${a>0?'正':'負'}），y′ 的係數 ${c}（${c>0?'正':'負'}）`,
+   `③ a × c ＝ ${a*c} ${a*c>0?'＞':'＜'} 0，所以 r′ ＝ ${a*c>0?'r':'−r'} ＝ ${dec(rr)}`,`答案是 <b>${dec(rr)}</b>`]}}];
+
+/* ================= 段考壓軸（Lv4）完整解答版：高一上（直線與圓等） ================= */
+F4.neg=[()=>{const x=nz(-6,-1),a=rnd(-5,5),b=rnd(-5,5);const u=x-a,w=x+b;const v=Math.abs(u)-Math.abs(w)+x*x;return{q:`x ＝ ${num(x)}，求 ${M(`|x − ${par(a)}| − |x ＋ ${par(b)}| ＋ x<sup>2</sup>`)}。`,ans:[v,1],steps:[
+  `① 代入 x ＝ ${num(x)}，<b>絕對值</b>裡面先算：x − ${par(a)} ＝ ${num(x)} − ${par(a)} ＝ ${num(u)}；x ＋ ${par(b)} ＝ ${num(x)} ＋ ${par(b)} ＝ ${num(w)}`,
+  `② 去絕對值（負數變正）：|${num(u)}| ＝ ${Math.abs(u)}，|${num(w)}| ＝ ${Math.abs(w)}`,
+  `③ x² ＝ (${num(x)})² ＝ ${x*x}（負數平方為正，要加括號）`,
+  `④ ${Math.abs(u)} − ${Math.abs(w)} ＋ ${x*x} ＝ ${num(v)}`,`答案是 <b>${num(v)}</b>`]}}];
+F4.coord=[()=>{const p=[[rnd(-6,-1),rnd(-6,-1)],[rnd(1,6),rnd(-6,-1)],[rnd(1,6),rnd(1,6)],[rnd(-6,-1),rnd(1,6)]];const tri=(A,B,C)=>((B[0]-A[0])*(C[1]-A[1])-(C[0]-A[0])*(B[1]-A[1]));const t1=tri(p[0],p[1],p[2]),t2=tri(p[0],p[2],p[3]);const v=R(Math.abs(t1)+Math.abs(t2),2);return{q:`求四邊形 ABCD 的面積：A${P(...p[0])}、B${P(...p[1])}、C${P(...p[2])}、D${P(...p[3])}（頂點依序排列）。`,ans:v,steps:[
+  `① 用對角線 AC 把四邊形切成 △ABC 與 △ACD（<b>坐標平面上的三角形面積</b>）`,
+  `② △ABC：把 A 平移到原點，AB ＝ ${P(p[1][0]-p[0][0],p[1][1]-p[0][1])}、AC ＝ ${P(p[2][0]-p[0][0],p[2][1]-p[0][1])}，面積 ＝ ½|${t1}| ＝ ${rFmt(R(Math.abs(t1),2))}`,
+  `③ △ACD：AC ＝ ${P(p[2][0]-p[0][0],p[2][1]-p[0][1])}、AD ＝ ${P(p[3][0]-p[0][0],p[3][1]-p[0][1])}，面積 ＝ ½|${t2}| ＝ ${rFmt(R(Math.abs(t2),2))}`,
+  `④ 相加 ＝ ${rFmt(v)}`,ANS(v)]}}];
+F4.dist=[()=>{const h=rnd(-5,5),k=rnd(-5,5);const[a,b,c]=pick(TRIPLES.slice(0,2));const pts=[[h+c,k],[h-c,k],[h+a,k+b]];const ask=Math.random()<.5;return{q:`△ABC 的頂點 A${P(...pts[0])}、B${P(...pts[1])}、C${P(...pts[2])}，外心（到三頂點等距的點）的 ${ask?'x':'y'} 坐標是多少？`,ans:[ask?h:k,1],steps:[
+  `① 外心 O 到三頂點等距：OA ＝ OB ＝ OC（<b>兩點距離公式</b>）`,
+  `② OA ＝ OB：A、B 的 y 坐標都是 ${k}，O 在 AB 的中垂線 x ＝ (${num(h+c)} ＋ ${par(h-c)})／2 ＝ ${num(h)} 上`,
+  `③ 設 O(${num(h)}, y)，OA² ＝ OC²：${c}² ＋ (y − ${par(k)})² ＝ ${a}² ＋ (y − ${par(k+b)})²`,`④ 展開整理：${c*c} − ${a*a} ＝ ${b*b} − ${2*b}(y − ${par(k)})，而 ${c*c} − ${a*a} ＝ ${b*b}（畢氏數），所以 y − ${par(k)} ＝ 0`,
+  `⑤ y ＝ ${num(k)}，外心 ${P(h,k)}（驗算：到三頂點距離都是 ${c}）`,`答案是 <b>${num(ask?h:k)}</b>`]}}];
+F4.mid=[()=>{const A=[rnd(-6,6),rnd(-6,6)],B=[rnd(-6,6),rnd(-6,6)],G=[rnd(-4,4),rnd(-4,4)];const C=[3*G[0]-A[0]-B[0],3*G[1]-A[1]-B[1]];const i=rnd(0,1);return{q:`△ABC 的重心 G${P(...G)}，A${P(...A)}、B${P(...B)}，C 的 ${i?'y':'x'} 坐標是多少？`,ans:[C[i],1],steps:[
+  `① <b>重心坐標</b>是三頂點坐標的平均：G ＝ (A ＋ B ＋ C)／3`,`② 只看 ${i?'y':'x'}：${num(G[i])} ＝ (${num(A[i])} ＋ ${par(B[i])} ＋ c)／3`,
+  `③ ${num(A[i])} ＋ ${par(B[i])} ＋ c ＝ ${3*G[i]} ⇒ c ＝ ${3*G[i]} − ${par(A[i]+B[i])} ＝ ${num(C[i])}`,`✔ 驗算：(${num(A[i])} ＋ ${par(B[i])} ＋ ${par(C[i])})／3 ＝ ${num(G[i])}`,`答案是 <b>${num(C[i])}</b>`]}}];
+F4.slope=[()=>{const S=[['m ＞ 0、b ＞ 0','第四象限','往右上升、交 y 軸正半軸：經過三、二、一象限'],['m ＞ 0、b ＜ 0','第二象限','往右上升、交 y 軸負半軸：經過三、四、一象限'],['m ＜ 0、b ＞ 0','第三象限','往右下降、交 y 軸正半軸：經過二、一、四象限'],['m ＜ 0、b ＜ 0','第一象限','往右下降、交 y 軸負半軸：經過二、三、四象限']];const[c,a,w]=pick(S);return mc(`直線 y ＝ mx ＋ b 中 ${c}，這條直線<b>不</b>經過哪一個象限？`,a,['第一象限','第二象限','第三象限','第四象限'].filter(x=>x!==a),[`① <b>斜率</b> m 決定方向（正：右上；負：右下），b 是 y 截距`,`② ${w}`,`③ 所以不經過${a}`])}];
+F4.line=[()=>{const x0=rnd(-4,4),y0=rnd(-4,4),p=nz(-3,3),q=nz(-3,3);if(p*q===1)LEVELS_RETRY();const C=-(x0+p*y0),D=-(q*x0+y0);const ask=Math.random()<.5;return{q:`不論 k 為何值，直線 ${M(`(${lin2(1,p,C)}) ＋ k(${lin2(q,1,D)}) = 0`)} 都通過一個定點，這個定點的 ${ask?'x':'y'} 坐標是多少？`,ans:[ask?x0:y0,1],steps:[
+  `① 觀念：要對所有 k 都成立，k 的係數與常數部分必須同時為 0（<b>直線系</b>：兩直線的交點）`,
+  `② 聯立 ${lin2(1,p,0)} ＝ ${num(-C)} 與 ${lin2(q,1,0)} ＝ ${num(-D)}`,
+  `③ 由第二式 y ＝ ${num(-D)} ${fx(-q,'x')}，代入第一式解得 x ＝ ${x0}，再得 y ＝ ${y0}`,`④ 定點 ${P(x0,y0)}`,`答案是 <b>${num(ask?x0:y0)}</b>`]}}];
+F4.perp=[()=>{const a=nz(-4,4),b=nz(-4,4),c=rnd(-9,9),p=[rnd(-6,6),rnd(-6,6)];const t=R(-(a*p[0]+b*p[1]+c),a*a+b*b);const ask=Math.random()<.5;const H=[Fa([p[0],1],Fm(t,[a,1])),Fa([p[1],1],Fm(t,[b,1]))];return{q:`點 P${P(...p)} 到直線 ${M(`${lin2(a,b,c)} = 0`)} 的垂足 H，H 的 ${ask?'x':'y'} 坐標是多少？`,ans:ask?H[0]:H[1],steps:[
+  `① 觀念：垂足 H 在「過 P 且<b>垂直</b>於直線」的方向上，直線的法向量是 (${a}, ${b})`,
+  `② 設 H ＝ (${num(p[0])} ＋ ${a}t, ${num(p[1])} ＋ ${b}t)，代入直線：${a}(${num(p[0])} ＋ ${a}t) ＋ ${par(b)}(${num(p[1])} ＋ ${b}t) ${fx(c,'')} ＝ 0`,
+  `③ ${a*a+b*b}t ${fx(a*p[0]+b*p[1]+c,'')} ＝ 0 ⇒ t ＝ ${rFmt(t)}`,`④ H ＝ (${rFmt(H[0])}, ${rFmt(H[1])})`,ANS(ask?H[0]:H[1])]}}];
+F4.pdist=[()=>{const[a,b,c]=pick(TRIPLES.slice(0,2));const A=[rnd(-5,5),rnd(-5,5)];const k=rnd(1,3);const B=[A[0]+b*k,A[1]-a*k];const C=[rnd(-6,6),rnd(-6,6)];const cc=-(a*A[0]+b*A[1]);const hN=Math.abs(a*C[0]+b*C[1]+cc);const h=R(hN,c);if(!h[0])LEVELS_RETRY();const S=Fm(Fm([1,2],[c*k,1]),h);return{q:`A${P(...A)}、B${P(...B)}、C${P(...C)}，用「底 AB × 高 ÷ 2」求 △ABC 面積。`,ans:S,steps:[
+  `① 底 AB：<b>兩點距離</b> √(${(b*k)**2} ＋ ${(a*k)**2}) ＝ ${c*k}`,
+  `② 直線 AB：斜率 ${rFmt(R(-a,b))}，寫成 ${a}x ＋ ${b}y ${fx(cc,'')} ＝ 0（代入 A、B 檢查都成立）`,
+  `③ 高 ＝ C 到 AB 的<b>點到直線距離</b>：|${a}×${par(C[0])} ＋ ${b}×${par(C[1])} ${fx(cc,'')}|／√(${a*a} ＋ ${b*b}) ＝ ${hN}／${c}`,
+  `④ 面積 ＝ ½ × ${c*k} × ${rFmt(h)}`,ANS(S)]}}];
+F4.circle=[()=>{const[a,b,c]=pick(TRIPLES.slice(0,3));const r1=rnd(1,c+3),r2=rnd(1,c+3);const d=c;const rel=d>r1+r2?'外離':d===r1+r2?'外切':d>Math.abs(r1-r2)?'相交於兩點':d===Math.abs(r1-r2)?'內切':'內含';return mc(`兩圓圓心距離 ${d}，半徑分別為 ${r1}、${r2}，兩圓的關係是？`,rel,['外離','外切','相交於兩點','內切','內含'].filter(x=>x!==rel),[
+  `① <b>兩圓的位置關係</b>由圓心距 d 與 r₁ ＋ r₂、|r₁ − r₂| 比較決定`,`② r₁ ＋ r₂ ＝ ${r1+r2}，|r₁ − r₂| ＝ ${Math.abs(r1-r2)}，d ＝ ${d}`,
+  `③ d ＞ r₁ ＋ r₂ 外離；d ＝ r₁ ＋ r₂ 外切；|r₁ − r₂| ＜ d ＜ r₁ ＋ r₂ 相交；d ＝ |r₁ − r₂| 內切；d ＜ |r₁ − r₂| 內含`,`④ 所以是「${rel}」`])}];
+
+/* ================= 段考壓軸（Lv4）完整解答版：高二（數A／數B 共用） ================= */
+const F4A={};
+const sgnS=v=>v>=0?'＋':'−';
+F4A.rad=[()=>{const P0=4*rnd(2,15);const v=R(P0*P0,16);return{q:`用長 ${P0} 的鐵絲圍成一個扇形（含兩條半徑），扇形面積最大是多少？此時圓心角是幾弧度？（填最大面積）`,ans:v,steps:[
+  `① 設半徑 r、圓心角 θ（<b>弧度</b>），周長 2r ＋ rθ ＝ ${P0}，弧長 rθ ＝ ${P0} − 2r`,
+  `② <b>扇形面積</b> ＝ ½r · (弧長) ＝ ½r(${P0} − 2r) ＝ −r² ＋ ${P0/2}r`,
+  `③ 這是 r 的二次函數，配方：−(r − ${P0/4})² ＋ ${rFmt(v)}，r ＝ ${P0/4} 時最大`,
+  `④ 此時弧長 ＝ ${P0} − ${P0/2} ＝ ${P0/2}，θ ＝ 弧長 ÷ r ＝ 2 弧度`,ANS(v)]}},
+ ()=>{const L=rnd(2,12),m=pick([10,15,20,30,40,45]);const th=R(m,30);const v=R(L*L*m,60);return{q:`時鐘分針長 ${L} 公分，經過 ${m} 分鐘，分針掃過的面積為 kπ 平方公分，求 k。`,ans:v,steps:[
+  `① 分針 60 分鐘轉一圈 2π，每分鐘轉 π／30`,`② ${m} 分鐘轉過 θ ＝ ${m} × π／30 ＝ ${rFmt(th)}π（<b>弧度</b>）`,
+  `③ <b>扇形面積</b> ＝ ½r²θ ＝ ½ × ${L*L} × ${rFmt(th)}π ＝ ${rFmt(v)}π`,`k ＝ <b>${M(rFmt(v))}</b>`]}},
+ ...XGA.rad[4].slice(0,1)];
+F4A.graph=[()=>{const p=nz(-4,4),q=rnd(-5,5);const f=t=>t*t+p*t+q;const v0=-p/2;const inside=v0>-1&&v0<1;const vals=[[-1,f(-1)],[1,f(1)]];if(inside)vals.push([v0,f(v0)]);const ask=Math.random()<.5;const best=vals.reduce((m,x)=>(ask?x[1]>m[1]:x[1]<m[1])?x:m);
+  return{q:`y ＝ sin²x ${fx(p,'sin x')} ${fx(q,'')} 的${ask?'最大值':'最小值'}是多少？`,ans:RD(best[1]),steps:[
+  `① 換元：令 t ＝ sin x，因為 <b>正弦函數的值域</b> −1 ≤ t ≤ 1`,
+  `② y ＝ t² ${fx(p,'t')} ${fx(q,'')} ＝ (t ${fx(p/2,'')})² ${fx(q-p*p/4,'')}，頂點 t ＝ ${dec(v0)}`,
+  `③ 頂點${inside?'在':'不在'}區間 [−1, 1] 內，比較：${vals.map(([t,y])=>`t ＝ ${dec(t)} 時 y ＝ ${dec(y)}`).join('；')}`,
+  `④ ${ask?'最大':'最小'}值在 t ＝ ${dec(best[0])}（sin x ＝ ${dec(best[0])} 有解）`,`答案是 <b>${dec(best[1])}</b>`]}},
+ ()=>{const p=nz(-4,4),q=rnd(-5,5);const f=t=>-t*t+p*t+1+q;const v0=p/2;const inside=v0>-1&&v0<1;const vals=[[-1,f(-1)],[1,f(1)]];if(inside)vals.push([v0,f(v0)]);const ask=Math.random()<.5;const best=vals.reduce((m,x)=>(ask?x[1]>m[1]:x[1]<m[1])?x:m);
+  return{q:`y ＝ cos²x ${fx(p,'sin x')} ${fx(q,'')} 的${ask?'最大值':'最小值'}是多少？`,ans:RD(best[1]),steps:[
+  `① 用<b>平方關係</b> cos²x ＝ 1 − sin²x，全部換成 sin x`,`② 令 t ＝ sin x（−1 ≤ t ≤ 1）：y ＝ −t² ${fx(p,'t')} ${fx(1+q,'')}，開口向下，頂點 t ＝ ${dec(v0)}`,
+  `③ 頂點${inside?'在':'不在'}區間內，比較：${vals.map(([t,y])=>`t ＝ ${dec(t)} → ${dec(y)}`).join('；')}`,`答案是 <b>${dec(best[1])}</b>`]}},
+ ()=>{const a=rnd(1,5),d=rnd(-3,3);const kk=pick([-1,-0.5,0,0.5,1]);const k=d+a*kk;const b=pick([1,2,3]);const c=kk===0?2*b+1:Math.abs(kk)===1?b:2*b;return{q:`方程式 ${a===1?'':a}sin ${b===1?'':b}x ${fx(d,'')} ＝ ${dec(k)} 在 0 ≤ x ≤ 2π 有幾個解？`,ans:[c,1],steps:[
+  `① 整理：sin ${b===1?'':b}x ＝ (${dec(k)} − ${par(d)})／${a} ＝ ${dec(kk)}`,
+  `② 令 u ＝ ${b===1?'':b}x，u 從 0 到 ${2*b}π，共 ${b} 個<b>週期</b>`,
+  `③ 一個週期 [0, 2π] 內 sin u ＝ ${dec(kk)} 的解：${kk===0?'0、π、2π（相鄰週期共用端點）':Math.abs(kk)===1?'1 個':'2 個'}`,
+  `④ ${kk===0?`共 2 × ${b} ＋ 1`:Math.abs(kk)===1?`共 ${b} × 1`:`共 ${b} × 2`} ＝ ${c} 個`,`答案是 <b>${c}</b>`]}}];
+F4A.sum=[()=>{const s=R(nz(-4,4),pick([5,3,4,7]));if(Math.abs(s[0])>=s[1])LEVELS_RETRY();const s3=Fm(s,Fm(s,s));const v=Fs(Fm([3,1],s),Fm([4,1],s3));return{q:`sin θ ＝ ${M(rFmt(s))}，求 sin 3θ。`,ans:v,steps:[
+  `① 由<b>和角公式</b>：sin 3θ ＝ sin(2θ ＋ θ) ＝ sin 2θ cos θ ＋ cos 2θ sin θ`,
+  `② 用<b>倍角公式</b>：sin 2θ ＝ 2 sin θ cos θ、cos 2θ ＝ 1 − 2sin²θ，再用 cos²θ ＝ 1 − sin²θ`,
+  `③ 整理得 sin 3θ ＝ 3 sin θ − 4 sin³θ`,
+  `④ 代入：3 × ${rFmt(s)} − 4 × ${rFmt(s3)} ＝ ${rFmt(Fm([3,1],s))} − ${rFmt(Fm([4,1],s3))}`,ANS(v)]}},
+ ()=>{const c=R(nz(-6,6),pick([7,8,9,5]));if(Math.abs(c[0])>=c[1])LEVELS_RETRY();const ask=Math.random()<.5;const v=ask?Fd(Fa([1,1],c),[2,1]):Fd(Fs([1,1],c),[2,1]);return{q:`cos θ ＝ ${M(rFmt(c))}，求 ${ask?'cos²':'sin²'}(θ／2)。`,ans:v,steps:[
+  `① <b>倍角公式</b>：cos θ ＝ ${ask?'2cos²(θ／2) − 1':'1 − 2sin²(θ／2)'}（把 θ 看成 θ／2 的兩倍）`,
+  `② 移項得<b>半角公式</b>：${ask?'cos²(θ／2) ＝ (1 ＋ cos θ)／2':'sin²(θ／2) ＝ (1 − cos θ)／2'}`,
+  `③ 代入：(1 ${ask?'＋':'−'} ${rFmt(c)})／2`,ANS(v)]}},
+ ()=>{const A=pick(TRIPLES.slice(0,4)),B=pick(TRIPLES.slice(0,4));const sa=R(A[0],A[2]),ca=R(A[1],A[2]),sb=R(B[0],B[2]),cb=R(B[1],B[2]);const v=Fd(Fs(Fm(ca,cb),Fm(sa,sb)),Fa(Fm(sa,cb),Fm(ca,sb)));const tv=Fd(Fa(R(A[0],A[1]),R(B[0],B[1])),Fs([1,1],Fm(R(A[0],A[1]),R(B[0],B[1]))));if(!tv[1]||Fs([1,1],Fm(R(A[0],A[1]),R(B[0],B[1])))[0]===0)LEVELS_RETRY();
+  return{q:`α、β 為銳角，sin α ＝ ${M(rFmt(sa))}、sin β ＝ ${M(rFmt(sb))}，求 tan(α ＋ β)。`,ans:tv,steps:[
+  `① 由<b>平方關係</b>：cos α ＝ ${rFmt(ca)}、cos β ＝ ${rFmt(cb)}，所以 tan α ＝ ${rFmt(R(A[0],A[1]))}、tan β ＝ ${rFmt(R(B[0],B[1]))}`,
+  `② <b>和角公式</b>：tan(α ＋ β) ＝ (tan α ＋ tan β)／(1 − tan α tan β)`,
+  `③ 分子 ${rFmt(Fa(R(A[0],A[1]),R(B[0],B[1])))}，分母 1 − ${rFmt(Fm(R(A[0],A[1]),R(B[0],B[1])))} ＝ ${rFmt(Fs([1,1],Fm(R(A[0],A[1]),R(B[0],B[1]))))}`,
+  `④ tan(α ＋ β) ＝ ${rFmt(tv)}`,ANS(tv)]}}];
+F4A.amp=[()=>{const[a3,b3,c3]=pick(TRIPLES.slice(0,3));const k=pick([1,2]);const A=rnd(-5,5);const C=A+k*a3*pick([1,-1]);const B=k*b3*pick([1,-1]);const ask=Math.random()<.5;const amp=R(k*c3,2);const base=R(A+C,2);const v=ask?Fa(base,amp):Fs(base,amp);
+  const t=(c,s,first)=>c===0?'':`${first?(c<0?'−':''):(c<0?' − ':' ＋ ')}${Math.abs(c)===1?'':Math.abs(c)}${s}`;const expr=t(A,'sin²x',true)+t(B,'sin x cos x',A===0)+t(C,'cos²x',A===0&&B===0);
+  return{q:`y ＝ ${expr} 的${ask?'最大值':'最小值'}？`,ans:v,steps:[
+  `① 用<b>倍角公式</b>降次：sin²x ＝ (1 − cos 2x)／2、cos²x ＝ (1 ＋ cos 2x)／2、sin x cos x ＝ ½ sin 2x`,
+  `② y ＝ ${A}(1 − cos 2x)／2 ＋ ${B}(½ sin 2x) ＋ ${C}(1 ＋ cos 2x)／2 ＝ ${rFmt(base)} ＋ ${rFmt(R(B,2))} sin 2x ＋ ${rFmt(R(C-A,2))} cos 2x`,
+  `③ <b>正餘弦疊合</b>：p sin 2x ＋ q cos 2x 的範圍是 ±√(p² ＋ q²) ＝ ±√((${rFmt(R(B,2))})² ＋ (${rFmt(R(C-A,2))})²) ＝ ±${rFmt(amp)}`,
+  `④ ${ask?'最大值':'最小值'} ＝ ${rFmt(base)} ${ask?'＋':'−'} ${rFmt(amp)}`,ANS(v)]}},
+ ()=>{const b=2*rnd(1,4);const a=rnd(-3,3);const t0=R(-a,b);if(Math.abs(t0[0]/t0[1])>1.4)LEVELS_RETRY();const v=R(-b*b-a*a,2*b);return{q:`y ＝ ${a?cf(a,true)+'(sin x ＋ cos x) ＋ ':''}${b} sin x cos x 的最小值是多少？`,ans:v,steps:[
+  `① 令 t ＝ sin x ＋ cos x ＝ √2 sin(x ＋ 45°)（<b>正餘弦疊合</b>），所以 −√2 ≤ t ≤ √2`,
+  `② t² ＝ 1 ＋ 2 sin x cos x ⇒ sin x cos x ＝ (t² − 1)／2`,
+  `③ y ＝ ${a?`${a}t ＋ `:''}${b}(t² − 1)／2 ＝ ${b/2}t² ${fx(a,'t')} − ${b/2}，開口向上，頂點 t ＝ ${rFmt(t0)}（在 [−√2, √2] 內）`,
+  `④ 最小值 ＝ ${b/2}(${rFmt(t0)})² ${fx(a,'')}(${rFmt(t0)}) − ${b/2} ＝ ${rFmt(v)}`,ANS(v)]}},
+ ()=>{const[a,b,c]=pick(TRIPLES);const m=rnd(1,3),d=rnd(-6,6);return{q:`方程式 ${a*m} sin x ${cf(b*m,false)} cos x ${fx(d,'')} ＝ k 有實數解，整數 k 有幾個？`,ans:[2*c*m+1,1],steps:[
+  `① <b>正餘弦疊合</b>：${a*m} sin x ＋ ${b*m} cos x ＝ ${c*m} sin(x ＋ φ)，其中 √(${(a*m)**2} ＋ ${(b*m)**2}) ＝ ${c*m}`,
+  `② 所以左邊的範圍是 ${num(-c*m+d)} 到 ${num(c*m+d)}`,`③ 有解 ⇔ k 在這個範圍內，整數 k 共 ${2*c*m} ＋ 1 個`,`答案是 <b>${2*c*m+1}</b>`]}}];
+F4A.exp=[()=>{const r1=rnd(-6,3),r2=r1+rnd(2,8);const p=-(r1+r2),q=r1*r2;if(p===0)LEVELS_RETRY();const small=Math.random()<.5;const c=r2-r1-1;return{q:`不等式 ${small?'(½)':'3'}<sup>x² ${fx(p,'x')}</sup> ${small?'＞':'＜'} ${small?'(½)':'3'}<sup>${num(-q)}</sup> 的整數解有幾個？`,ans:[c,1],steps:[
+  `① 觀念：<b>指數函數的單調性</b>：底數 ${small?'½ ＜ 1 時遞減，比較指數要把不等號反過來':'3 ＞ 1 時遞增，不等號方向不變'}`,
+  `② 得 x² ${fx(p,'x')} ＜ ${num(-q)}，即 x² ${fx(p,'x')} ${fx(q,'')} ＜ 0`,
+  `③ 因式分解：(x ${fx(-r1,'')})(x ${fx(-r2,'')}) ＜ 0 ⇒ ${r1} ＜ x ＜ ${r2}`,
+  `④ 整數 ${r1+1} 到 ${r2-1}，共 ${c} 個`,`答案是 <b>${c}</b>`]}},
+ ()=>{const b=pick([2,3]),k=rnd(1,3);const u=b**k,w=-rnd(1,6);if(u+w===0)LEVELS_RETRY();return{q:`方程式 ${b*b}<sup>x</sup>${fx(-(u+w),'')} · ${b}<sup>x</sup>${fx(u*w,'')} ＝ 0 的實數解是多少？`,ans:[k,1],steps:[
+  `① 觀念：${b*b}<sup>x</sup> ＝ (${b}<sup>x</sup>)²（<b>指數律</b>），令 t ＝ ${b}<sup>x</sup>，注意 t ＞ 0`,
+  `② t² ${fx(-(u+w),'t')} ${fx(u*w,'')} ＝ 0 ⇒ (t − ${u})(t ${fx(-w,'')}) ＝ 0 ⇒ t ＝ ${u} 或 t ＝ ${w}`,
+  `③ t ＝ ${w} ＜ 0 不合（指數函數的值恆正）`,`④ ${b}<sup>x</sup> ＝ ${u} ＝ ${b}<sup>${k}</sup> ⇒ x ＝ ${k}`,`答案是 <b>${k}</b>`]}},
+ ()=>{const t=rnd(2,5);const s=Fa([t,1],R(1,t));const v=Fa([t*t,1],R(1,t*t));return{q:`已知 a<sup>x</sup> ＋ a<sup>−x</sup> ＝ ${M(rFmt(s))}，求 a<sup>2x</sup> ＋ a<sup>−2x</sup>。`,ans:v,steps:[
+  `① 觀念：a<sup>x</sup> · a<sup>−x</sup> ＝ 1（<b>指數律</b>），用平方公式`,
+  `② (a<sup>x</sup> ＋ a<sup>−x</sup>)² ＝ a<sup>2x</sup> ＋ 2 ＋ a<sup>−2x</sup>`,
+  `③ a<sup>2x</sup> ＋ a<sup>−2x</sup> ＝ (${rFmt(s)})² − 2 ＝ ${rFmt(Fm(s,s))} − 2`,ANS(v)]}}];
+F4A.log=[()=>{const a=nz(-5,5),b=a+2*rnd(2,8);const mid=(a+b)/2;let c=0;for(let x=a+1;x<mid;x++)c++;return{q:`不等式 log<sub>½</sub>(x ${a>=0?'−':'＋'} ${Math.abs(a)}) ＞ log<sub>½</sub>(${num(b)} − x) 的整數解有幾個？`,ans:[c,1],steps:[
+  `① <b>真數</b>必須為正：x − ${par(a)} ＞ 0 且 ${num(b)} − x ＞ 0 ⇒ ${a} ＜ x ＜ ${b}`,
+  `② 觀念：<b>對數函數的單調性</b>：底數 ½ ＜ 1 時遞減，log 值大的真數反而小`,
+  `③ x − ${par(a)} ＜ ${num(b)} − x ⇒ 2x ＜ ${a+b} ⇒ x ＜ ${mid}`,
+  `④ 與 ① 取交集：${a} ＜ x ＜ ${mid}，整數 ${a+1}～${Math.ceil(mid)-1}，共 ${c} 個`,`答案是 <b>${c}</b>`]}},
+ ()=>{const i=rnd(0,3),j=rnd(1,4),x0=rnd(-3,6);const a=2**i-x0,b=2**j-x0;if(a===b||a===0||b===0)LEVELS_RETRY();const k=i+j;const x1=-(a+b)-x0;if(x1+a>0&&x1+b>0)LEVELS_RETRY();const t=c=>`x ${c>=0?'＋':'−'} ${Math.abs(c)}`;return{q:`解 log<sub>2</sub>(${t(a)}) ＋ log<sub>2</sub>(${t(b)}) ＝ ${k}。`,ans:[x0,1],steps:[
+  `① 定義域（<b>真數</b>為正）：${t(a)} ＞ 0 且 ${t(b)} ＞ 0`,
+  `② <b>對數律</b>：log M ＋ log N ＝ log MN ⇒ (${t(a)})(${t(b)}) ＝ 2<sup>${k}</sup> ＝ ${2**k}`,
+  `③ 展開：x² ${fx(a+b,'x')} ${fx(a*b-2**k,'')} ＝ 0 ⇒ x ＝ ${num(x0)} 或 x ＝ ${num(x1)}`,
+  `④ 驗根：x ＝ ${num(x1)} 時 ${x1+a<=0?t(a):t(b)} ＝ ${x1+a<=0?num(x1+a):num(x1+b)} ≤ 0，不合；x ＝ ${num(x0)} 時兩真數 ${num(x0+a)}、${num(x0+b)} 都為正`,`x ＝ <b>${num(x0)}</b>`]}},
+ ...XGA.log[4]];
+F4A.logapp=[()=>{const r=pick([0.3010,0.4771]);const n=pick([20,30,40,50,60,100]);const lg=r*n;const dg=Math.floor(lg)+1;if(lg-Math.floor(lg)<0.02||Math.ceil(lg)-lg<0.02)LEVELS_RETRY();const b=r===0.3010?2:3;return{q:`${b}<sup>${n}</sup> 是幾位數？（log 2 ＝ 0.3010，log 3 ＝ 0.4771）`,ans:[dg,1],steps:[
+  `① 觀念：<b>常用對數</b>：N 是 k 位數 ⇔ 10<sup>k−1</sup> ≤ N ＜ 10<sup>k</sup> ⇔ log N 的首數為 k − 1`,
+  `② log ${b}<sup>${n}</sup> ＝ ${n} log ${b} ＝ ${n} × ${r} ＝ ${dec(Math.round(lg*10000)/10000)}（<b>對數律</b>）`,
+  `③ 首數 ${Math.floor(lg)}，所以 10<sup>${Math.floor(lg)}</sup> ≤ ${b}<sup>${n}</sup> ＜ 10<sup>${Math.floor(lg)+1}</sup>`,`④ 是 ${dg} 位數`,`答案是 <b>${dg}</b>`]}},
+ ()=>{const keys=Object.keys(LOGT);const g=pick(keys);const L=LOGT[g];const tgt=pick([[2,0.3010],[3,0.4771]]);const x=tgt[1]/L;const n=Math.ceil(x);if(n-x<0.03||x-Math.floor(x)<0.03)LEVELS_RETRY();return{q:`某投資每年成長 ${dec(Math.round((g-1)*100))}%（複利），至少要幾年資金才會超過原來的 ${tgt[0]} 倍？（log ${g} ＝ ${L}，log ${tgt[0]} ＝ ${tgt[1]}）`,ans:[n,1],steps:[
+  `① 複利成長是<b>指數函數</b>模型：n 年後是原來的 ${g}<sup>n</sup> 倍`,`② ${g}<sup>n</sup> ＞ ${tgt[0]}，兩邊取 log（log 遞增，不等號不變）：n log ${g} ＞ log ${tgt[0]}`,
+  `③ n ＞ ${tgt[1]} ÷ ${L} ≈ ${dec(Math.round(x*100)/100)}`,`④ n 為整數，至少 ${n} 年`,`答案是 <b>${n}</b>`]}},
+ ...XGA.logapp[3]];
+F4A.vec=[()=>{const p=rnd(1,4),q=rnd(1,4),r=rnd(1,4),s=rnd(1,4);const dp=R(p,p+q),er=R(r,r+s);const t=Fd(Fs([1,1],er),Fs([1,1],Fm(dp,er)));const x=Fm(t,dp),y=Fs([1,1],t);const u=x;const ask=Math.random()<.5;
+  return{q:`△ABC 中，D 在 AB 上且 AD : DB ＝ ${p} : ${q}，E 在 AC 上且 AE : EC ＝ ${r} : ${s}，BE 與 CD 交於 P。若 AP ＝ xAB ＋ yAC，求 ${ask?'x':'y'}。`,ans:ask?x:y,steps:[
+  `① 觀念：用<b>分點公式</b>／三點共線的係數和為 1，把 AP 用兩種方式表示，再比較係數（AB、AC 不平行，表示法唯一）`,
+  `② AD ＝ ${rFmt(dp)}AB、AE ＝ ${rFmt(er)}AC`,
+  `③ P 在 CD 上：AP ＝ t·AD ＋ (1 − t)AC ＝ ${rFmt(dp)}t·AB ＋ (1 − t)AC`,
+  `④ P 在 BE 上：AP ＝ u·AB ＋ (1 − u)AE ＝ u·AB ＋ ${rFmt(er)}(1 − u)AC`,
+  `⑤ 比較係數：${rFmt(dp)}t ＝ u、1 − t ＝ ${rFmt(er)}(1 − u) ⇒ 1 − t ＝ ${rFmt(er)} − ${rFmt(Fm(er,dp))}t ⇒ t ＝ ${rFmt(t)}`,
+  `⑥ x ＝ ${rFmt(dp)} × ${rFmt(t)} ＝ ${rFmt(x)}，y ＝ 1 − ${rFmt(t)} ＝ ${rFmt(y)}`,ANS(ask?x:y)]}},
+ ()=>{const a=rnd(1,5),b=rnd(1,5),c=rnd(1,5);const which=rnd(0,2);const w=[a,b,c][which];const T=['△PBC','△PCA','△PAB'][which];return{q:`△ABC 內一點 P 滿足 ${a===1?'':a}PA ＋ ${b===1?'':b}PB ＋ ${c===1?'':c}PC ＝ 0 向量，求 ${T} 面積與 △ABC 面積的比值。`,ans:R(w,a+b+c),steps:[
+  `① 改寫成以 A 為起點：PB ＝ PA ＋ AB、PC ＝ PA ＋ AC，代入得 (${a+b+c})AP ＝ ${b}AB ＋ ${c}AC`,
+  `② AP ＝ ${rFmt(R(b,a+b+c))}AB ＋ ${rFmt(R(c,a+b+c))}AC（<b>向量的線性組合</b>）`,
+  `③ 延長 AP 交 BC 於 D：AD ＝ ${rFmt(R(b,b+c))}AB ＋ ${rFmt(R(c,b+c))}AC（係數和為 1），且 AP ＝ ${rFmt(R(b+c,a+b+c))}AD`,
+  `④ 由面積比與高的比可得：△PBC : △PCA : △PAB ＝ ${a} : ${b} : ${c}`,`⑤ ${T} : △ABC ＝ ${w} : ${a+b+c}`,ANS(R(w,a+b+c))]}}];
+F4A.dot=[()=>{const a=rv(2),b=[nz(-4,4),nz(-4,4)];const ab=a[0]*b[0]+a[1]*b[1],bb=b[0]**2+b[1]**2,aa=a[0]**2+a[1]**2;const tm=R(-ab,bb);const v=R(aa*bb-ab*ab,bb);const ask=Math.random()<.5;return{q:`a ＝ (${a.map(num).join(', ')})、b ＝ (${b.map(num).join(', ')})，t 為實數，${ask?'|a ＋ tb|² 的最小值':'使 |a ＋ tb| 最小的 t'}是多少？`,ans:ask?v:tm,steps:[
+  `① 觀念：用<b>內積</b>展開 |a ＋ tb|² ＝ |b|²t² ＋ 2(a · b)t ＋ |a|²，是 t 的二次函數`,
+  `② |a|² ＝ ${aa}，|b|² ＝ ${bb}，a · b ＝ ${num(ab)} ⇒ |a ＋ tb|² ＝ ${bb}t² ${fx(2*ab,'t')} ＋ ${aa}`,
+  `③ 頂點 t ＝ −${par(2*ab)}／(2 × ${bb}) ＝ ${rFmt(tm)}`,
+  `④ 最小值 ＝ ${aa} − (a · b)²／|b|² ＝ ${aa} − ${ab*ab}／${bb} ＝ ${rFmt(v)}（幾何上：此時 a ＋ tb ⊥ b）`,ANS(ask?v:tm)]}},
+ ()=>{const p=rnd(1,8),q=rnd(1,8);const ab=rnd(-p*q+1,p*q-1);const v=4*p*p-4*ab+q*q;return{q:`|a| ＝ ${p}、|b| ＝ ${q}、a · b ＝ ${num(ab)}，求 |2a − b|²。`,ans:[v,1],steps:[
+  `① 觀念：向量長度平方 ＝ 自己和自己的<b>內積</b>：|2a − b|² ＝ (2a − b) · (2a − b)`,
+  `② 展開（內積有分配律）：4(a · a) − 4(a · b) ＋ b · b ＝ 4|a|² − 4(a · b) ＋ |b|²`,
+  `③ ＝ 4 × ${p*p} − 4 × ${par(ab)} ＋ ${q*q}`,`④ ＝ ${4*p*p} ${fx(-4*ab,'')} ＋ ${q*q} ＝ ${v}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const[x,y,z]=pick(TRIPLES.slice(0,3));const b=[x*pick([1,-1]),y*pick([1,-1])];const a=rv(2);const d=a[0]*b[0]+a[1]*b[1];if(!d)LEVELS_RETRY();const k=R(d,z*z);const i=rnd(0,1);const v=Fm(k,[b[i],1]);return{q:`a ＝ (${a.map(num).join(', ')})、b ＝ (${b.map(num).join(', ')})，求 a 在 b 上的正射影向量的 ${'xy'[i]} 分量。`,ans:v,steps:[
+  `① 觀念：<b>正射影</b>向量 ＝ ${M(fr('a · b','|b|²'))} b`,`② a · b ＝ ${num(a[0])}×${par(b[0])} ＋ ${num(a[1])}×${par(b[1])} ＝ ${num(d)}，|b|² ＝ ${z*z}`,
+  `③ 係數 ${num(d)}／${z*z} ＝ ${rFmt(k)}，正射影 ＝ ${rFmt(k)}(${b.map(num).join(', ')})`,`④ ${'xy'[i]} 分量 ＝ ${rFmt(k)} × ${par(b[i])}`,ANS(v)]}}];
+F4A.area=[()=>{const[a,b,c]=pick(TRIPLES);const A=a*pick([1,-1]),B=b*pick([1,-1]);const r=rnd(1,5);const ask=Math.random()<.5;const X0=R(A*r,c),Y0=R(B*r,c);return{q:`實數 x、y 滿足 x² ＋ y² ＝ ${r*r}，求 ${A===1?'':num(A)}x ${B>0?'＋':'−'} ${Math.abs(B)}y 的${ask?'最大值':'最小值'}。`,ans:[ask?r*c:-r*c,1],steps:[
+  `① 觀念：<b>柯西不等式</b> (a² ＋ b²)(x² ＋ y²) ≥ (ax ＋ by)²`,
+  `② (${A*A} ＋ ${B*B})(${r*r}) ≥ (${num(A)}x ${B>0?'＋':'−'} ${Math.abs(B)}y)² ⇒ (…)² ≤ ${c*c*r*r}`,
+  `③ −${r*c} ≤ ${num(A)}x ${B>0?'＋':'−'} ${Math.abs(B)}y ≤ ${r*c}`,
+  `④ 等號成立：(x, y) 與 (${num(A)}, ${num(B)}) 平行，${ask?`(x, y) ＝ (${rFmt(X0)}, ${rFmt(Y0)})`:`(x, y) ＝ (${rFmt(Fm([-1,1],X0))}, ${rFmt(Fm([-1,1],Y0))})`}，代入確實滿足 x² ＋ y² ＝ ${r*r}`,`答案是 <b>${num(ask?r*c:-r*c)}</b>`]}},
+ ()=>{const a=nz(-5,5),b=nz(-5,5),k=nz(-12,12);const v=R(k*k,a*a+b*b);return{q:`實數 x、y 滿足 ${pl3([a,b,0])} ＝ ${num(k)}，求 x² ＋ y² 的最小值。`,ans:v,steps:[
+  `① 觀念：<b>柯西不等式</b> (a² ＋ b²)(x² ＋ y²) ≥ (ax ＋ by)²`,`② (${a*a} ＋ ${b*b})(x² ＋ y²) ≥ (${num(k)})² ＝ ${k*k}`,
+  `③ x² ＋ y² ≥ ${k*k}／${a*a+b*b}`,`④ 幾何意義：x² ＋ y² 的最小值是原點到直線距離的平方（<b>點到直線距離</b> |${num(-k)}|／√${a*a+b*b}）`,ANS(v)]}}];
+F4A.space=[()=>{const lab={'0,0,0':'A','1,0,0':'B','1,1,0':'C','0,1,0':'D','0,0,1':'E','1,0,1':'F','1,1,1':'G','0,1,1':'H'};const K=Object.keys(lab);const p=()=>shuffle(K).slice(0,2).map(k=>k.split(',').map(Number));const[a1,a2]=p(),[b1,b2]=p();const u=a2.map((x,i)=>x-a1[i]),w=b2.map((x,i)=>x-b1[i]);const d=dot3(u,w),uu=dot3(u,u),ww=dot3(w,w);if(d===0)LEVELS_RETRY();const v=R(d*d,uu*ww);
+  return{q:`正立方體 ABCD-EFGH（ABCD 為底面，E、F、G、H 依序在 A、B、C、D 正上方），向量 ${lab[a1]}${lab[a2]} 與 ${lab[b1]}${lab[b2]} 的夾角為 θ，求 cos²θ。`,ans:v,steps:[
+  `① 建立<b>空間坐標</b>：A 為原點、邊長 1，B(1,0,0)、D(0,1,0)、E(0,0,1)，其他頂點依此類推`,
+  `② ${lab[a1]}${lab[a2]} ＝ ${v3s(a2)} − ${v3s(a1)} ＝ ${v3s(u)}；${lab[b1]}${lab[b2]} ＝ ${v3s(w)}`,
+  `③ <b>空間向量內積</b>：${v3s(u)} · ${v3s(w)} ＝ ${d}；長度平方 ${uu}、${ww}`,
+  `④ cos θ ＝ ${d}／√(${uu} × ${ww})，cos²θ ＝ ${d*d}／${uu*ww}`,ANS(v)]}},
+ ()=>{const d=nv3(),k=rnd(1,2),A=rv(3);const B=A.map((x,i)=>x+k*d[i]);const M_=A.map((x,i)=>R(x+B[i],2));const i=rnd(0,2);return{q:`A${v3s(A)}、B${v3s(B)}，以 AB 為直徑的球面，球心的 ${'xyz'[i]} 坐標與半徑的和是多少？`,ans:Fa(M_[i],R(k*len3(d),2)),steps:[
+  `① 球心是 AB 中點：(${M_.map(rFmt).join(', ')})（<b>中點公式</b>）`,`② AB ＝ √(${(k*d[0])**2} ＋ ${(k*d[1])**2} ＋ ${(k*d[2])**2}) ＝ ${k*len3(d)}（<b>空間中兩點距離</b>），半徑 ${rFmt(R(k*len3(d),2))}`,
+  `③ ${rFmt(M_[i])} ＋ ${rFmt(R(k*len3(d),2))}`,ANS(Fa(M_[i],R(k*len3(d),2)))]}}];
+F4A.cross=[()=>{const a=rv(3),b=rv(3);const x=nz(-2,2),y=nz(-2,2);const c=a.map((t,i)=>x*t+y*b[i]);const j=rnd(0,2);const c0=c.slice();c0[j]=0;const c1=c.slice();c1[j]=1;const d0=det3(a,b,c0),d1=det3(a,b,c1);const al=d1-d0;if(!al)LEVELS_RETRY();const k=R(-d0,al);const cs=c.map((t,i)=>i===j?'k':num(t));const n=crs(a,b);
+  return{q:`a ＝ ${v3s(a)}、b ＝ ${v3s(b)}、c ＝ (${cs.join(', ')}) 三向量共平面，求 k。`,ans:k,steps:[
+  `① 觀念：三向量共平面 ⇔ 張出的平行六面體體積為 0 ⇔ c · (a × b) ＝ 0（<b>外積與體積</b>）`,
+  `② <b>外積</b> a × b ＝ ${v3s(n)}`,
+  `③ c · (a × b) ＝ ${c.map((t,i)=>i===j?`${par(n[i])}k`:`${par(t)}×${par(n[i])}`).join(' ＋ ')} ＝ ${num(al)}k ${fx(d0,'')}`,
+  `④ ${num(al)}k ${fx(d0,'')} ＝ 0 ⇒ k ＝ ${rFmt(k)}`,ANS(k)]}},
+ ()=>{let u,w,c,L;for(let t=0;t<600;t++){u=rv(3);w=rv(3);c=crs(u,w);const s=dot3(c,c);L=Math.round(Math.sqrt(s));if(s>0&&L*L===s)break;L=null}if(!L)LEVELS_RETRY();const A=rv(3);const B=A.map((x,i)=>x+u[i]),C=A.map((x,i)=>x+w[i]);const v=R(L,2);return{q:`A${v3s(A)}、B${v3s(B)}、C${v3s(C)}，求 △ABC 面積。`,ans:v,steps:[
+  `① AB ＝ ${v3s(u)}，AC ＝ ${v3s(w)}`,`② <b>外積</b>：AB × AC ＝ (${u[1]}·${par(w[2])} − ${par(u[2])}·${par(w[1])}, ${u[2]}·${par(w[0])} − ${par(u[0])}·${par(w[2])}, ${u[0]}·${par(w[1])} − ${par(u[1])}·${par(w[0])}) ＝ ${v3s(c)}`,
+  `③ |AB × AC| ＝ √(${c.map(x=>x*x).join(' ＋ ')}) ＝ ${L}，這是平行四邊形面積`,`④ △ABC 面積 ＝ ½ × ${L}`,ANS(v)]}}];
+F4A.plane=[()=>{const n=nv3(),P_=rv(3),d=rnd(-10,10);const L2=dot3(n,n);const t=R(-(dot3(n,P_)+d),L2);const i=rnd(0,2);const sym=Math.random()<.5;const v=Fa([P_[i],1],Fm(sym?Fm([2,1],t):t,[n[i],1]));return{q:`點 P${v3s(P_)} 在平面 ${pl3(n)} ${fx(d,'')} ＝ 0 的${sym?'對稱點':'投影點'}，${'xyz'[i]} 坐標是多少？`,ans:v,steps:[
+  `① 觀念：從 P 沿<b>平面的法向量</b> ${v3s(n)} 走到平面上，垂足 Q ＝ P ＋ t${v3s(n)}`,
+  `② Q 在平面上，代入：${pl3(n)} 在 Q 的值 ＝ ${num(dot3(n,P_))} ＋ ${L2}t，所以 ${num(dot3(n,P_))} ＋ ${L2}t ${fx(d,'')} ＝ 0`,
+  `③ t ＝ ${rFmt(t)}`,sym?`④ 對稱點 P′ ＝ P ＋ 2t${v3s(n)}（Q 是 PP′ 中點），${'xyz'[i]} 坐標 ＝ ${num(P_[i])} ＋ 2 × ${rFmt(t)} × ${par(n[i])}`:`④ 投影點 ${'xyz'[i]} 坐標 ＝ ${num(P_[i])} ＋ ${rFmt(t)} × ${par(n[i])}`,ANS(v)]}},
+ ()=>{const n=nv3(),P_=rv(3),d=rnd(-12,12);const v=R(Math.abs(dot3(n,P_)+d),len3(n));return{q:`P${v3s(P_)} 到平面 ${pl3(n)} ${fx(d,'')} ＝ 0 的距離？`,ans:v,steps:[
+  `① <b>點到平面距離</b>：|ax₀ ＋ by₀ ＋ cz₀ ＋ d|／√(a² ＋ b² ＋ c²)`,`② 分子：|${n.map((c,i)=>`${par(c)}×${par(P_[i])}`).join(' ＋ ')} ${fx(d,'')}| ＝ ${Math.abs(dot3(n,P_)+d)}`,
+  `③ 分母：√(${n.map(x=>x*x).join(' ＋ ')}) ＝ ${len3(n)}`,ANS(v)]}},
+ ...XGA.plane[4]];
+F4A.line=[()=>{const A=rv(3),v=nv3(),P_=rv(3);const ap=P_.map((x,i)=>x-A[i]);const L=len3(v);const v2=R(dot3(ap,ap)*L*L-dot3(ap,v)**2,L*L);if(v2[0]===0)LEVELS_RETRY();return{q:`點 P${v3s(P_)} 到直線 ${v3s(A)} ＋ t${v3s(v)} 的距離為 d，求 d²。`,ans:v2,steps:[
+  `① 取直線上一點 A${v3s(A)}，AP ＝ ${v3s(ap)}，|AP|² ＝ ${dot3(ap,ap)}`,
+  `② AP 在直線方向上的<b>正射影</b>長 ＝ |AP · v|／|v| ＝ |${dot3(ap,v)}|／${L}`,
+  `③ <b>畢氏定理</b>：d² ＝ |AP|² − (正射影長)² ＝ ${dot3(ap,ap)} − ${dot3(ap,v)**2}／${L*L}`,ANS(v2)]}},
+ ()=>{const P_=rv(3),v=[nz(-3,3),nz(-3,3),nz(-3,3)],n=[nz(-3,3),nz(-3,3),nz(-3,3)];const vn=dot3(v,n);if(!vn)LEVELS_RETRY();const t=nz(-3,3);const Q=P_.map((x,j)=>x+t*v[j]);const d=dot3(n,Q);const i=rnd(0,2);return{q:`直線 ${v3s(P_)} ＋ t${v3s(v)} 與平面 ${pl3(n)} ＝ ${num(d)} 的交點，${'xyz'[i]} 坐標是多少？`,ans:[Q[i],1],steps:[
+  `① 直線上的點寫成<b>參數式</b> (${P_.map((x,j)=>`${num(x)} ＋ ${par(v[j])}t`).join(', ')})`,
+  `② 代入平面：${n.map((c,j)=>`${par(c)}(${num(P_[j])} ＋ ${par(v[j])}t)`).join(' ＋ ')} ＝ ${num(d)}`,
+  `③ 整理：${num(dot3(n,P_))} ＋ ${par(vn)}t ＝ ${num(d)} ⇒ t ＝ ${num(t)}`,`④ 交點 ${v3s(Q)}`,`答案是 <b>${num(Q[i])}</b>`]}},
+ ...XGA.line[4]];
+F4A.cond=[()=>{const r=rnd(2,6),w=rnd(2,6);const N=r+w;const v=R(r-1,N-1);return{q:`袋中 ${r} 紅 ${w} 白，依序不放回取兩球。已知第二球是紅球，第一球也是紅球的機率？`,ans:v,steps:[
+  `① 觀念：<b>條件機率</b> P(第一紅 | 第二紅) ＝ P(兩球都紅)／P(第二紅)`,
+  `② P(兩紅) ＝ ${r}／${N} × ${r-1}／${N-1} ＝ ${rFmt(R(r*(r-1),N*(N-1)))}（<b>乘法原理</b>）`,
+  `③ P(第二紅) ＝ P(紅紅) ＋ P(白紅) ＝ ${r*(r-1)}／${N*(N-1)} ＋ ${w*r}／${N*(N-1)} ＝ ${rFmt(R(r,N))}（抽籤公平性）`,
+  `④ 相除：${rFmt(R(r*(r-1),N*(N-1)))} ÷ ${rFmt(R(r,N))} ＝ ${rFmt(v)}`,ANS(v)]}},
+ ()=>{const n=rnd(2,4);const v=R(1,2**n-1);return{q:`某家庭有 ${n} 個小孩（生男生女機率相等且獨立），已知至少有一個男孩，全部都是男孩的機率？`,ans:v,steps:[
+  `① 樣本空間：每個小孩男或女，共 2<sup>${n}</sup> ＝ ${2**n} 種等可能`,`② 條件「至少一個男孩」：扣掉全女 1 種，剩 ${2**n-1} 種（<b>條件機率</b>縮小樣本空間）`,
+  `③ 其中全男只有 1 種`,`④ P ＝ 1／${2**n-1}（注意：不是 ½）`,ANS(v)]}},
+ ()=>{const p=R(rnd(1,4),5),q=R(rnd(1,3),4);const v=Fs([1,1],Fm(Fs([1,1],p),Fs([1,1],q)));return{q:`甲、乙兩人獨立射擊，命中率分別為 ${M(rFmt(p))}、${M(rFmt(q))}，至少一人命中的機率？`,ans:v,steps:[
+  `① 「至少一人」用<b>餘事件</b>：1 − P(兩人都沒中)`,`② <b>獨立事件</b>：P(都沒中) ＝ (1 − ${rFmt(p)})(1 − ${rFmt(q)}) ＝ ${rFmt(Fs([1,1],p))} × ${rFmt(Fs([1,1],q))} ＝ ${rFmt(Fm(Fs([1,1],p),Fs([1,1],q)))}`,
+  `③ 所求 ＝ 1 − ${rFmt(Fm(Fs([1,1],p),Fs([1,1],q)))}`,`✔ 也可用 P(A) ＋ P(B) − P(A)P(B) 驗算`,ANS(v)]}}];
+F4A.bayes=[()=>{const r1=rnd(1,5),w1=rnd(1,5),r2=rnd(1,5),w2=rnd(1,5);const a=R(r1,r1+w1),b=R(r2,r2+w2);const pa=Fm([1,2],a),pb=Fm([1,2],b);const v=Fd(pa,Fa(pa,pb));return{q:`甲袋 ${r1} 紅 ${w1} 白、乙袋 ${r2} 紅 ${w2} 白。擲公正硬幣決定袋子，再從中取一球是紅球，它來自甲袋的機率？`,ans:v,steps:[
+  `① 樹狀圖：甲袋（½）→ 紅 ${rFmt(a)}；乙袋（½）→ 紅 ${rFmt(b)}`,`② 路徑機率：甲且紅 ＝ ½ × ${rFmt(a)} ＝ ${rFmt(pa)}；乙且紅 ＝ ${rFmt(pb)}`,
+  `③ <b>全機率</b>：P(紅) ＝ ${rFmt(pa)} ＋ ${rFmt(pb)} ＝ ${rFmt(Fa(pa,pb))}`,`④ <b>貝氏定理</b>：P(甲 | 紅) ＝ ${rFmt(pa)} ÷ ${rFmt(Fa(pa,pb))}`,ANS(v)]}},
+ ()=>{const prev=pick([1,2,5,10]),sens=pick([90,95,99,80]),fp=pick([5,10,2,20]);const tp=prev*sens,fpp=(100-prev)*fp;const v=R(tp,tp+fpp);return{q:`某疾病盛行率 ${prev}%，檢驗靈敏度 ${sens}%（生病者陽性），偽陽性率 ${fp}%（健康者陽性）。某人檢驗陽性，他真的生病的機率？`,ans:v,steps:[
+  `① 想像 10000 人：生病 ${prev*100} 人、健康 ${10000-prev*100} 人`,`② 生病且陽性 ${prev*100} × ${sens}% ＝ ${tp}；健康卻陽性 ${10000-prev*100} × ${fp}% ＝ ${fpp}`,
+  `③ <b>全機率</b>：陽性共 ${tp+fpp} 人`,`④ <b>貝氏定理</b>：P(生病 | 陽性) ＝ ${tp}／${tp+fpp}（盛行率低時偽陽性的人數可能比真陽性多）`,ANS(v)]}},
+ ()=>{const p=R(rnd(1,9),10),k=pick([4,5]);const g=Fm(Fs([1,1],p),R(1,k));const v=Fd(p,Fa(p,g));return{q:`某生會做一題選擇題的機率是 ${M(rFmt(p))}，不會時就從 ${k} 個選項中隨機猜。已知他答對了，他真的會做的機率？`,ans:v,steps:[
+  `① 樹狀圖：會（${rFmt(p)}）→ 一定答對；不會（${rFmt(Fs([1,1],p))}）→ 猜對 1／${k}`,`② P(會且對) ＝ ${rFmt(p)}；P(不會且對) ＝ ${rFmt(Fs([1,1],p))} × 1／${k} ＝ ${rFmt(g)}`,
+  `③ <b>全機率</b> P(對) ＝ ${rFmt(Fa(p,g))}`,`④ <b>貝氏定理</b>：P(會 | 對) ＝ ${rFmt(p)} ÷ ${rFmt(Fa(p,g))}`,ANS(v)]}}];
+F4A.mat=[()=>{const A=[[rnd(-2,2),rnd(-2,2)],[rnd(-2,2),rnd(-2,2)]];const n=rnd(3,4);const pows=[A];for(let t=1;t<n;t++)pows.push(mmul(pows[t-1],A));const P_=pows[n-1];const i=rnd(0,1),j=rnd(0,1);if(Math.abs(P_[i][j])>500)LEVELS_RETRY();return{q:`A ＝ ${mStr(A)}，求 A<sup>${n}</sup> 第 ${i+1} 列第 ${j+1} 行的元素。`,ans:[P_[i][j],1],steps:[
+  `① <b>矩陣乘法</b>：第 i 列第 j 行 ＝ 左矩陣第 i 列與右矩陣第 j 行對應相乘再相加`,
+  ...pows.slice(1).map((Pk,t)=>`${t===0?'②':t===1?'③':'④'} A<sup>${t+2}</sup> ＝ A<sup>${t+1}</sup> × A ＝ ${mStr(Pk)}`),
+  `答案是 <b>${num(P_[i][j])}</b>`]}},
+ ()=>{const A=[rv(2),rv(2)],B=[rv(2),rv(2)];const dA=A[0][0]*A[1][1]-A[0][1]*A[1][0],dB=B[0][0]*B[1][1]-B[0][1]*B[1][0];const k=rnd(2,3);return{q:`A ＝ ${mStr(A)}，B ＝ ${mStr(B)}，求 det(${k}AB)。`,ans:[k*k*dA*dB,1],steps:[
+  `① <b>行列式</b>：det A ＝ ${num(A[0][0])}×${par(A[1][1])} − ${par(A[0][1])}×${par(A[1][0])} ＝ ${num(dA)}；det B ＝ ${num(dB)}`,
+  `② 性質：det(AB) ＝ det A · det B；二階矩陣每個元素乘 k，行列式乘 k²`,`③ det(${k}AB) ＝ ${k*k} × ${par(dA)} × ${par(dB)}`,`答案是 <b>${num(k*k*dA*dB)}</b>`]}},
+ ()=>{const A=[rv(2),rv(2)];const D=A[0][0]*A[1][1]-A[0][1]*A[1][0];if(Math.abs(D)!==1)LEVELS_RETRY();const X=[rv(2),rv(2)];const B=mmul(A,X);const inv=[[A[1][1]*D,-A[0][1]*D],[-A[1][0]*D,A[0][0]*D]];const i=rnd(0,1),j=rnd(0,1);return{q:`A ＝ ${mStr(A)}，B ＝ ${mStr(B)}，矩陣 X 滿足 AX ＝ B，求 X 第 ${i+1} 列第 ${j+1} 行的元素。`,ans:[X[i][j],1],steps:[
+  `① AX ＝ B，兩邊<b>左乘反矩陣</b>：X ＝ A⁻¹B（不能寫成 BA⁻¹）`,`② det A ＝ ${D}，A⁻¹ ＝ ${mStr(inv)}（主對角交換、副對角變號、除以行列式）`,
+  `③ X ＝ A⁻¹B ＝ ${mStr(X)}`,`✔ 驗算：AX ＝ ${mStr(mmul(A,X))} ＝ B`,`答案是 <b>${num(X[i][j])}</b>`]}}];
+F4A.lin=[()=>{const r1=rv(3),r2=rv(3);const x=nz(-2,2),y=nz(-2,2);const r3=r1.map((t,i)=>x*t+y*r2[i]);const j=rnd(0,2);const z0=r3.slice();z0[j]=0;const z1=r3.slice();z1[j]=1;const d0=det3(r1,r2,z0),d1=det3(r1,r2,z1);const al=d1-d0;if(!al)LEVELS_RETRY();const k=R(-d0,al);const e=r3.map((t,i)=>i===j?'k':num(t));
+  return{q:`三元一次方程組的係數為 ${mStr([r1,r2])} 與第三式 (${e.join(', ')})。k 為何值時，方程組<b>沒有唯一解</b>？`,ans:k,steps:[
+  `① 觀念：<b>克拉瑪公式</b>：係數行列式 Δ ≠ 0 ⇔ 恰有一解。沒有唯一解 ⇔ Δ ＝ 0`,
+  `② 把第三列寫成 (${e.join(', ')})，按第三列展開，Δ 是 k 的一次式`,
+  `③ 代 k ＝ 0 得 Δ ＝ ${num(d0)}；代 k ＝ 1 得 Δ ＝ ${num(d1)}，所以 Δ ＝ ${num(al)}k ${fx(d0,'')}`,
+  `④ Δ ＝ 0 ⇒ k ＝ ${rFmt(k)}（此時方程組無解或無限多解，要看常數項）`,ANS(k)]}},
+ ()=>{const s=[rnd(-4,4),rnd(-4,4),rnd(-4,4)];const a=nz(-2,2),b=nz(-2,2),c=nz(-2,2),d=nz(-2,2);const r1=[1,a,b],r2=[0,1,c],r3=[0,d,1];const det=1-c*d;if(!det)LEVELS_RETRY();const rhs=[dot3(r1,s),dot3(r2,s),dot3(r3,s)];return{q:`解方程組：x ${fx(a,'y')} ${fx(b,'z')} ＝ ${num(rhs[0])}；y ${fx(c,'z')} ＝ ${num(rhs[1])}；${pl3([0,d,1])} ＝ ${num(rhs[2])}。求 x ＋ y ＋ z。`,ans:[s[0]+s[1]+s[2],1],steps:[
+  `① <b>高斯消去法</b>：第二、三式只有 y、z，先解它們`,`② 由第二式 y ＝ ${num(rhs[1])} ${fx(-c,'z')}，代入第三式：${num(d)}(${num(rhs[1])} ${fx(-c,'z')}) ＋ z ＝ ${num(rhs[2])} ⇒ ${cf(det,true)}z ＝ ${num(rhs[2]-d*rhs[1])} ⇒ z ＝ ${s[2]}`,
+  `③ y ＝ ${num(rhs[1])} ${fx(-c,'')}×${par(s[2])} ＝ ${s[1]}`,`④ 代回第一式：x ＝ ${num(rhs[0])} ${fx(-a,'')}×${par(s[1])} ${fx(-b,'')}×${par(s[2])} ＝ ${s[0]}`,
+  `⑤ x ＋ y ＋ z ＝ ${s[0]} ＋ ${par(s[1])} ＋ ${par(s[2])}`,`答案是 <b>${num(s[0]+s[1]+s[2])}</b>`]}}];
+F4A.trans=[()=>{const a=rnd(1,9),b=rnd(1,9),N=(a+b)*rnd(10,100)*10;const v=N*b/(a+b);return{q:`某城市共 ${N} 人，每年市區有 ${a*10}% 的人搬到郊區，郊區有 ${b*10}% 的人搬到市區（總人口不變）。長期而言，市區有多少人？`,ans:[v,1],steps:[
+  `① <b>轉移矩陣</b>（行為目前狀態）：P ＝ [${dec(1-a/10)} ${dec(b/10)}; ${dec(a/10)} ${dec(1-b/10)}]`,
+  `② <b>穩定狀態</b> PX ＝ X：設市區比例 x，流出 ${dec(a/10)}x ＝ 流入 ${dec(b/10)}(1 − x)`,
+  `③ ${dec(a/10)}x ＋ ${dec(b/10)}x ＝ ${dec(b/10)} ⇒ x ＝ ${b}／${a+b}`,`④ 市區人數 ＝ ${N} × ${b}／${a+b} ＝ ${v}`,`答案是 <b>${v}</b>`]}},
+ ()=>{const P_=[[0.5,0.2,0.1],[0.3,0.6,0.3],[0.2,0.2,0.6]];const X=[rnd(1,6)/10];X.push(rnd(1,Math.round(9-X[0]*10))/10);X.push(Math.round((1-X[0]-X[1])*10)/10);if(X[2]<=0)LEVELS_RETRY();const Y=P_.map(r=>r.reduce((s,p,j)=>s+p*X[j],0));const i=rnd(0,2);const v=Math.round(Y[i]*1000)/10;return{q:`三種狀態的轉移矩陣（行為目前狀態）為 ${mStr(P_)}，目前狀態比例為 (${X.map(dec).join(', ')})，下一期第 ${i+1} 種狀態佔百分之幾？`,ans:RD(v),steps:[
+  `① <b>轉移矩陣</b>：X<sub>1</sub> ＝ P X<sub>0</sub>，第 ${i+1} 個分量 ＝ P 的第 ${i+1} 列與 X<sub>0</sub> 的內積`,
+  `② ${P_[i].map((p,j)=>`${dec(p)} × ${dec(X[j])}`).join(' ＋ ')}`,`③ ＝ ${P_[i].map((p,j)=>dec(Math.round(p*X[j]*1000)/1000)).join(' ＋ ')} ＝ ${dec(Math.round(Y[i]*1000)/1000)}`,
+  `✔ 三個分量和為 ${dec(Math.round(Y.reduce((a,b)=>a+b,0)*1000)/1000)}`,`答案是 <b>${dec(v)}</b>%`]}}];
+F4A.ptrans=[()=>{const[a,b,c]=pick(TRIPLES);const s=Math.random()<.5;const A=s?a:b,B=s?b:a;const ask=Math.random()<.5;return{q:`矩陣 ${mStr([[A,-B],[B,A]])} 表示「旋轉後再伸縮 r 倍」，${ask?'求 r':'圖形面積變為幾倍'}？`,ans:[ask?c:c*c,1],steps:[
+  `① 觀念：<b>旋轉矩陣</b> [cos θ −sin θ; sin θ cos θ] 乘上 r 就是「旋轉伸縮」`,
+  `② 比對：r cos θ ＝ ${A}、r sin θ ＝ ${B}，平方相加 r² ＝ ${A*A} ＋ ${B*B} ＝ ${c*c}，r ＝ ${c}`,
+  `③ 面積倍率 ＝ |det| ＝ ${A}×${A} − (−${B})×${B} ＝ ${c*c}（也就是 r²）`,`答案是 <b>${ask?c:c*c}</b>`]}},
+ ()=>{const k=nz(-3,3),n=rnd(2,6),P0=[nz(-5,5),nz(-5,5)];return{q:`推移變換 ${mStr([[1,k],[0,1]])} 連續作用 ${n} 次在點 (${P0.map(num).join(', ')}) 上，像的 x 坐標是多少？`,ans:[P0[0]+n*k*P0[1],1],steps:[
+  `① <b>合成變換</b>＝矩陣連乘：[1 k; 0 1]² ＝ [1 2k; 0 1]，依此類推 [1 k; 0 1]<sup>n</sup> ＝ [1 nk; 0 1]`,`② 作用 ${n} 次的矩陣 ${mStr([[1,n*k],[0,1]])}`,
+  `③ 像 ＝ (${num(P0[0])} ＋ ${n*k} × ${par(P0[1])}, ${num(P0[1])})`,`答案是 <b>${num(P0[0]+n*k*P0[1])}</b>`]}}];
+
+/* ================= 段考壓軸（Lv4）完整解答版：數B 專屬 ================= */
+const F4B={};
+F4B.cont=[()=>{const T=[[0.01,12,1.1268],[0.005,24,1.1272],[0.02,10,1.2190],[0.01,24,1.2697],[0.005,36,1.1967]];const[i,n,val]=pick(T);const P0=pick([100000,200000,500000,60000]);const x=Math.round(P0*val*i/(val-1));return{q:`借款 ${P0} 元，每期利率 ${dec(i*100)}%，分 ${n} 期，每期期末等額還款。每期約還多少元？（${dec(1+i)}<sup>${n}</sup> ≈ ${val}，四捨五入到整數）`,ans:[x,1],steps:[
+  `① 觀念：把借款與每期還款都換算到「最後一期」的價值，兩邊相等（<b>複利</b>）`,
+  `② 借款滾到最後：${P0} × ${dec(1+i)}<sup>${n}</sup> ≈ ${P0} × ${val} ＝ ${dec(Math.round(P0*val*100)/100)}`,
+  `③ 每期還 x，滾到最後是<b>等比級數</b>：x[1 ＋ ${dec(1+i)} ＋ … ＋ ${dec(1+i)}<sup>${n-1}</sup>] ＝ x × (${val} − 1)／${i} ＝ ${dec(Math.round((val-1)/i*10000)/10000)}x`,
+  `④ x ＝ ${dec(Math.round(P0*val*100)/100)} ÷ ${dec(Math.round((val-1)/i*10000)/10000)} ≈ ${x}`,`答案是 <b>${x}</b>`]}},
+ ()=>{const T=[[0.01,12,1.1268],[0.02,10,1.2190],[0.05,10,1.6289],[0.01,24,1.2697]];const[i,n,val]=pick(T);const G=pick([100000,200000,500000]);const a=Math.round(G*i/(val-1));return{q:`每期期末存入 a 元，每期利率 ${dec(i*100)}%，共 ${n} 期，希望期滿領到 ${G} 元。a 約為多少元？（${dec(1+i)}<sup>${n}</sup> ≈ ${val}，四捨五入到整數）`,ans:[a,1],steps:[
+  `① 第 1 期存的錢滾 ${n-1} 期、…、最後一期的錢沒有利息：本利和 ＝ a ＋ a(1＋i) ＋ … ＋ a(1＋i)<sup>${n-1}</sup>`,
+  `② <b>等比級數</b>求和：a × [(1＋i)<sup>${n}</sup> − 1]／i ＝ a × (${val} − 1)／${i} ＝ ${dec(Math.round((val-1)/i*10000)/10000)}a`,
+  `③ ${dec(Math.round((val-1)/i*10000)/10000)}a ＝ ${G} ⇒ a ≈ ${a}`,`答案是 <b>${a}</b>`]}},
+ ()=>{const E={'0.5':1.6487,'0.2':1.2214,'0.3':1.3499,'0.4':1.4918,'0.6':1.8221,'1':2.7183};const rt=pick(Object.keys(E));const P0=pick([10000,1000,5000,100000]);const v=Math.round(P0*E[rt]);const r=pick([5,10,2]);const t=Math.round(+rt*100/r);if(Math.abs(t*r/100-(+rt))>1e-9)LEVELS_RETRY();const yearly=Math.round(P0*(1+r/100)**t);return{q:`本金 ${P0} 元，年利率 ${r}% <b>連續複利</b> ${t} 年，本利和約多少元？（e<sup>${rt}</sup> ≈ ${E[rt]}，四捨五入到整數）`,ans:[v,1],steps:[
+  `① <b>連續複利</b>：一年複利 n 次、n → ∞ 時，(1 ＋ r／n)<sup>nt</sup> → e<sup>rt</sup>，所以 A ＝ Pe<sup>rt</sup>`,
+  `② rt ＝ ${r/100} × ${t} ＝ ${rt}`,`③ A ＝ ${P0} × e<sup>${rt}</sup> ≈ ${P0} × ${E[rt]} ≈ ${v}`,
+  `✔ 比較：每年複利一次約 ${yearly} 元，連續複利稍多，合理`,`答案是 <b>${v}</b>`]}}];
+F4B.persp=[()=>{const n=rnd(3,10);const F=[0,1,1];for(let i=3;i<=n;i++)F[i]=F[i-1]+F[i-2];const ask=Math.random()<.5;const rows=[];for(let k=3;k<=Math.min(n,6);k++)rows.push(`φ<sup>${k}</sup> ＝ ${F[k]}φ ＋ ${F[k-1]}`);return{q:`<b>黃金比例</b> φ 滿足 φ² ＝ φ ＋ 1。把 φ<sup>${n}</sup> 寫成 aφ ＋ b（a、b 為整數），求 ${ask?'a':'b'}。`,ans:[ask?F[n]:F[n-1],1],steps:[
+  `① 每次乘 φ，再把出現的 φ² 換成 φ ＋ 1 降次`,`② φ³ ＝ φ · φ² ＝ φ(φ ＋ 1) ＝ φ² ＋ φ ＝ 2φ ＋ 1`,`③ 依此類推：${rows.join('，')}${n>6?'，…':''}`,
+  `④ 係數是<b>費氏數列</b>：φ<sup>n</sup> ＝ F<sub>n</sub>φ ＋ F<sub>n−1</sub>，φ<sup>${n}</sup> ＝ ${F[n]}φ ＋ ${F[n-1]}`,`答案是 <b>${ask?F[n]:F[n-1]}</b>`]}},
+ ()=>mc('線段 AB 長 1，點 C 在 AB 上使 AB : AC ＝ AC : CB（黃金分割），則 AC 的長度是？','(√5 − 1)／2',['(√5 ＋ 1)／2','½','(3 − √5)／2','√5 − 2'],[
+  '① 設 AC ＝ x，則 CB ＝ 1 − x','② 比例式 1 : x ＝ x : (1 − x) ⇒ x² ＝ 1 − x ⇒ x² ＋ x − 1 ＝ 0（<b>黃金比例</b>）','③ <b>一元二次方程式</b>公式解：x ＝ (−1 ± √5)／2，取正值 x ＝ (√5 − 1)／2 ≈ 0.618','④ 注意 AB／AC ＝ 1／x ＝ (√5 ＋ 1)／2 ＝ φ，正好是黃金比例']),
+ ()=>{const f=pick([30,40,60]),H=pick([6,8,10,12]),d0=pick([10,20,30]),s=pick([10,20,30]),k=rnd(1,4);const d=d0+k*s;const h=f*H/d;if(!exact2(h))LEVELS_RETRY();const h0=f*H/d0;return{q:`路旁電線桿高 ${H} 公尺、間隔 ${s} 公尺，最近的一根距離 ${d0} 公尺。眼睛到畫面 ${f} 公分，從近數來第 ${k+1} 根在畫面上高幾公分？`,ans:RD(h),steps:[
+  `① <b>單點透視</b>與相似三角形：畫面高度 h ＝ f × H ÷ d（f、H 單位要一致，這裡 f 用公分、H 與 d 用公尺，比值不受影響）`,
+  `② 第 ${k+1} 根的距離 ＝ ${d0} ＋ ${k} × ${s} ＝ ${d} 公尺`,`③ h ＝ ${f} × ${H} ÷ ${d} ＝ ${dec(h)} 公分`,
+  `✔ 比較：最近一根 ${dec(Math.round(h0*100)/100)} 公分，越遠越小，間隔也越來越密`,`答案是 <b>${dec(h)}</b>`]}}];
+F4B.earth=[()=>{const L=[0,60,-60];const p1=pick(L),p2=pick(L),dl=pick([0,60,90,120,180]);const c=x=>x===0?[1,1]:[1,2];const s=x=>x===0?0:(x>0?1:-1);const cdl={0:[1,1],60:[1,2],90:[0,1],120:[-1,2],180:[-1,1]}[dl];const cc=Fm(Fm(c(p1),c(p2)),cdl);const ss=p1&&p2?R(3*s(p1)*s(p2),4):[0,1];const v=Fa(cc,ss);const lab=x=>x>0?`北緯 ${x}°`:x<0?`南緯 ${-x}°`:'赤道（緯度 0°）';
+  return{q:`甲地在${lab(p1)}、乙地在${lab(p2)}，兩地經度相差 ${dl}°。兩地對地心的夾角為 θ，求 cos θ。`,ans:v,steps:[
+  `① 以地心為原點建立<b>空間坐標</b>，緯度 φ、經度 λ 的點：(R cos φ cos λ, R cos φ sin λ, R sin φ)`,
+  `② 兩位置向量的<b>內積</b> ＝ R² cos θ，展開得 cos θ ＝ cos φ₁ cos φ₂ cos Δλ ＋ sin φ₁ sin φ₂`,
+  `③ cos φ₁ cos φ₂ cos Δλ ＝ ${rFmt(c(p1))} × ${rFmt(c(p2))} × ${rFmt(cdl)} ＝ ${rFmt(cc)}；sin φ₁ sin φ₂ ＝ ${rFmt(ss)}`,
+  `④ cos θ ＝ ${rFmt(cc)} ＋ ${rFmt(ss)}`,ANS(v)]}},
+ ()=>{const phi=pick([30,45,60,75]);const ang=180-2*phi;const v=R(6400*ang,180);const par_=R(3200*(phi===60?1:0),1);return{q:`甲、乙兩地都在北緯 ${phi}°，經度相差 180°。地球半徑 6400 公里，兩地的大圓航線（經過北極）距離為 kπ 公里，求 k。`,ans:v,steps:[
+  `① 經度差 180°，兩地在同一個經線圈（<b>大圓</b>）上，分別在北極的兩側`,
+  `② 甲到北極的球心角 ＝ 90° − ${phi}° ＝ ${90-phi}°，北極到乙也是 ${90-phi}°，合計 ${ang}°`,
+  `③ ${ang}° ＝ ${rFmt(R(ang,180))}π，大圓弧長 ＝ R × 球心角 ＝ 6400 × ${rFmt(R(ang,180))}π`,
+  `✔ 若沿緯線走，緯線圈半徑 6400 cos ${phi}°，走半圈較長，所以飛機選大圓航線`,`k ＝ <b>${M(rFmt(v))}</b>`]}}];
+F4B.conic=[()=>{const a=rnd(4,12),d=rnd(1,2*a-1);return{q:`橢圓的長軸長為 ${2*a}，P 在橢圓上且 P 到一個焦點的距離為 ${d}，P 到另一個焦點的距離是多少？`,ans:[2*a-d,1],steps:[
+  `① <b>橢圓的定義</b>：橢圓上任一點到兩焦點的距離和為定值 2a`,`② 長軸長就是 2a ＝ ${2*a}（長軸端點到兩焦點的距離和恰為長軸長）`,
+  `③ PF₁ ＋ PF₂ ＝ ${2*a} ⇒ PF₂ ＝ ${2*a} − ${d} ＝ ${2*a-d}`,`答案是 <b>${2*a-d}</b>`]}},
+ ()=>{const a=rnd(2,6),d=rnd(2*a+1,2*a+12);return{q:`雙曲線的貫軸長（2a）為 ${2*a}，P 在雙曲線上且 P 到一個焦點的距離為 ${d}，P 到另一個焦點的距離可能是多少？（填較大的那個值）`,ans:[d+2*a,1],steps:[
+  `① <b>雙曲線的定義</b>：雙曲線上任一點到兩焦點距離差的絕對值為 2a`,`② |PF₁ − PF₂| ＝ ${2*a}，PF₁ ＝ ${d}`,
+  `③ PF₂ ＝ ${d} ＋ ${2*a} ＝ ${d+2*a} 或 PF₂ ＝ ${d} − ${2*a} ＝ ${d-2*a}`,`④ 較大的值是 ${d+2*a}`,`答案是 <b>${d+2*a}</b>`]}},
+ ()=>{const c=rnd(1,6),x0=rnd(1,15);return{q:`拋物線 y² ＝ ${4*c}x 上一點 P 的 x 坐標為 ${x0}，P 到焦點的距離是多少？`,ans:[x0+c,1],steps:[
+  `① 標準式 y² ＝ 4cx：4c ＝ ${4*c}，c ＝ ${c}，焦點 (${c}, 0)、準線 x ＝ −${c}`,`② <b>拋物線的定義</b>：拋物線上的點到焦點與到準線的距離相等`,
+  `③ P 到準線 x ＝ −${c} 的距離 ＝ ${x0} − (−${c}) ＝ ${x0+c}`,`④ 所以 P 到焦點的距離也是 ${x0+c}`,`答案是 <b>${x0+c}</b>`]}}];
+/* ---- 套用：Lv4 改用完整解答版（保留多選觀念題） ---- */
+for(const k in F4A){F4['ma_'+k]=F4A[k];F4['mb_'+k]=F4A[k]}
+for(const k in F4B)F4['mb_'+k]=F4B[k];
+for(const l of ALL_LESSONS){const f=F4[l.id];if(!f)continue;const parts=f.map(g=>[g,1.2]);if(l._T)parts.unshift([stmGens(l._T).multi,1.2]);if(LV[l.id]&&LV[l.id].g4){const o=LV[l.id];parts.unshift([()=>o.g4(),2.4])}l.levels[3]=retryWrap(mixW(...parts))}
+
+/* ================= 解答加註：觀念＋單元名稱；段考壓軸加上觀念總覽與易錯提醒 ================= */
+const KW_MAN=[['算幾不等式','m11'],['平方差公式','m11'],['分母有理化','m11'],['絕對值','m12'],['絕對值的幾何意義','m12'],['指數律','m13'],['常用對數','m14'],['兩點距離','dist'],['兩點距離公式','dist'],['畢氏定理','dist'],['中點公式','mid','space'],['重心坐標','mid'],['分點公式','mid','vec'],['斜率','slope'],['直線系','line'],['截距式','line'],['垂直','perp'],['點到直線距離','pdist'],['兩圓的位置關係','circle'],['坐標平面上的三角形面積','coord'],
+ ['餘式定理','m31'],['因式定理','m31'],['二次函數在閉區間的極值','m32'],['一元二次不等式','m33'],['判別式','m33'],['一元二次方程式','m33'],['乘法公式','m11'],
+ ['直角三角形的三角比','m2_tri'],['平方關係','m2_tri'],['三角形外角定理','m2_tri'],['廣義角','m2_gen'],['各象限三角比的正負','m2_gen'],['極坐標','m2_gen'],['正弦定理','m2_law'],['餘弦定理','m2_law'],['海龍公式','m2_law'],['三角形面積公式','m2_law'],['內切圓半徑','m2_law'],
+ ['等差數列','m2_ap'],['等差數列的性質','m2_ap'],['等差數列一般項','m2_ap'],['等比數列','m2_gp'],['等差級數','m2_sum'],['等比級數','m2_sum','cont'],['分項對消','m2_sum'],['數學歸納法','m2_rec'],['遞迴關係','m2_rec'],['費氏數列','m2_rec'],
+ ['加法原理','m2_count'],['乘法原理','m2_count'],['分類','m2_count'],['有相同物的排列','m2_perm'],['插空隙法','m2_perm'],['環狀排列','m2_perm'],['組合','m2_comb'],['二項式定理','m2_comb'],['古典機率','m2_prob'],['餘事件','m2_prob'],['數學期望值','m2_exp'],['標準差','m2_stat1'],['資料的線性變換','m2_stat1'],['相關係數','m2_stat2'],['迴歸直線','m2_stat2'],
+ ['弧度',null,'rad'],['扇形面積',null,'rad'],['正弦函數的值域',null,'graph'],['週期',null,'graph'],['和角公式',null,'sum'],['倍角公式',null,'sum'],['半角公式',null,'sum'],['正餘弦疊合',null,'amp'],['指數函數的單調性',null,'exp'],['指數函數',null,'exp'],['對數律',null,'log'],['真數',null,'log'],['對數函數的單調性',null,'log'],
+ ['向量的線性組合',null,'vec'],['內積',null,'dot'],['正射影',null,'dot'],['柯西不等式',null,'area'],['行列式',null,'area'],['空間坐標',null,'space'],['空間向量內積',null,'space'],['空間中兩點距離',null,'space'],['外積',null,'cross'],['外積與體積',null,'cross'],['平面的法向量',null,'plane'],['點到平面距離',null,'plane'],['參數式',null,'line'],
+ ['條件機率',null,'cond'],['獨立事件',null,'cond'],['全機率',null,'bayes'],['貝氏定理',null,'bayes'],['矩陣乘法',null,'mat'],['左乘反矩陣',null,'mat'],['克拉瑪公式',null,'lin'],['高斯消去法',null,'lin'],['轉移矩陣',null,'trans'],['穩定狀態',null,'trans'],['旋轉矩陣',null,'ptrans'],['合成變換',null,'ptrans'],
+ ['複利',null,'cont'],['連續複利',null,'cont'],['黃金比例',null,'persp'],['單點透視',null,'persp'],['大圓',null,'earth'],['橢圓的定義',null,'conic'],['雙曲線的定義',null,'conic'],['拋物線的定義',null,'conic']];
+const KW_IDX={};for(const[k,a,b]of KW_MAN)KW_IDX[k]=[a,b];
+function findConcept(k,l){const subj=subjectOf(l);
+ if(l.title.includes(k))return l;
+ const m=KW_IDX[k];if(m){if((subj==='mathA'||subj==='mathB')&&m[1]){const L=lessonById((subj==='mathA'?'ma_':'mb_')+m[1]);if(L)return L}if(m[0]){const L=lessonById(m[0]);if(L)return L}if(m[1]&&subj.startsWith('math')){const L=lessonById('ma_'+m[1])||lessonById('mb_'+m[1]);if(L&&!(subj==='math'))return L}}
+ const fam=ALL_LESSONS.filter(x=>{const s=subjectOf(x);return subj.startsWith('math')?s===subj||s==='math':s===subj});
+ return fam.find(x=>x.title.includes(k))||null}
+function ctagOf(L){const s=SUBJ[subjectOf(L)];const u=(L.unit||'').replace(/^[^　\s]*[　\s]/,'');return `<span class="ctag">${s?s.name:''}${u?'・'+u:''}／${L.title}</span>`}
+const TIP_CACHE={};
+function tipOf(l){if(l.id in TIP_CACHE)return TIP_CACHE[l.id];let t='';try{const h=l.concept();const m=h.match(/<div class="tip">([\s\S]*?)<\/div>/);if(m)t=m[1].replace(/^\s*<b>[^<]*<\/b>\s*/,'').replace(/^[：:]\s*/,'').trim()}catch(e){}return TIP_CACHE[l.id]=t}
+function enrichSol(l,p,lv){if(p._en||!p.steps||!p.steps.length)return p;const used=[l],tagged=new Set();const last=p.steps.length-1;
+ const steps=p.steps.map((s,i)=>i===last?s:String(s).replace(/<b>([^<>]{2,18})<\/b>/g,(m0,k)=>{const L=findConcept(k,l);if(!L)return m0;if(!used.includes(L))used.push(L);if(tagged.has(k))return m0;tagged.add(k);return `<b>${k}</b>${ctagOf(L)}`}));
+ if(p.multi){for(let i=0;i<last;i++)steps[i]=steps[i]+ctagOf(l)}
+ let out;if(lv===4){out=[`<div class="sol-head">📌 <b>本題觀念</b>：${used.map(L=>`${L.title}${ctagOf(L)}`).join('；')}</div>`,...steps];const tip=tipOf(l);if(tip)out.splice(out.length-1,0,`<div class="sol-tip">⚠ <b>易錯提醒</b>：${tip}</div>`)}
+ else out=[`<span class="sol-c">📌 觀念：${l.title}${ctagOf(l)}</span>`,...steps];
+ p.steps=out;p._en=1;return p}
+
+/* ==F4 END== */
 let LESSONS=MATH_LESSONS,TOPICS=SUBJ.math.topics,CHAPTERS=SUBJ.math.chapters;
 const lessonById=id=>ALL_LESSONS.find(l=>l.id===id);
 function genTopic(k,lv=1){const t=TOPICS[k];
@@ -5279,7 +5885,7 @@ const KEY='hs-math-dojo-v1';
 const fresh=()=>({stats:{},wrong:[],streak:0,best:0,total:0,right:0,enabled:Object.keys(TOPICS),lessons:{},lv:{},tlv:{},diff:'auto',cur:'neg',tab:'learn',subject:'math',curBy:{},enabledBy:{},mockBy:{}});
 let S=fresh();
 try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
-try{if(!S.bankV2){const ids=new Set(ALL_LESSONS.filter(l=>subjectOf(l).startsWith('math')).map(l=>l.id));for(const k in (S.bankRes||{}))if(ids.has(k))delete S.bankRes[k];S.bankV2=1}}catch(e){}
+try{if(!S.bankV3){const ids=new Set(ALL_LESSONS.filter(l=>subjectOf(l).startsWith('math')).map(l=>l.id));for(const k in (S.bankRes||{}))if(ids.has(k))delete S.bankRes[k];S.bankV3=1}}catch(e){}
 S.curBy=S.curBy||{};S.enabledBy=S.enabledBy||{};S.mockBy=S.mockBy||{};
 if(S.mockBest!=null&&!S.mockBy.math)S.mockBy.math={best:S.mockBest,n:S.mockN||0};
 if(!S.enabledBy.math)S.enabledBy.math=S.enabled||[];if(!S.curBy.math)S.curBy.math=S.cur;
