@@ -184,6 +184,13 @@ details summary{cursor:pointer;color:var(--blue);font-size:14px}
 .links a{color:var(--blue);font-weight:500}.links span{font-size:13.5px;color:var(--muted)}
 .hright{display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:0;max-width:100%}
 @media (max-width:640px){.hright{align-items:stretch;width:100%}.tabs{overflow-x:auto}}
+.grades{display:inline-flex;border:1.5px solid var(--ink,#17233A);border-radius:999px;overflow:hidden;align-self:flex-end}
+@media (max-width:640px){.grades{align-self:flex-start}}
+.grade{font:inherit;font-size:16px;font-weight:600;border:0;background:var(--card);color:var(--muted);padding:5px 20px;cursor:pointer;letter-spacing:.08em}
+.grade+.grade{border-left:1.5px solid var(--line)}
+.grade[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+.grade:focus-visible{outline:2px solid var(--blue);outline-offset:-3px}
+.subj-empty{font-size:13.5px;color:var(--muted);padding:4px 2px}
 .subjects{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 @media (max-width:640px){.subjects{justify-content:flex-start}.subj{padding:4px 12px}}
 .subj{font:inherit;font-size:15px;font-weight:500;border:1.5px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:4px 16px;cursor:pointer}
@@ -318,17 +325,23 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
       <p class="sub" id="subline">從頭學第二章「直線與圓」：每一課先看懂，再深入理解，跟著做，最後自己練。</p>
     </div>
     <div class="hright">
+    <div class="grades" role="group" aria-label="年級">
+      <button class="grade" type="button" data-g="1" aria-pressed="true">高一</button>
+      <button class="grade" type="button" data-g="2" aria-pressed="false">高二</button>
+      <button class="grade" type="button" data-g="3" aria-pressed="false">高三</button>
+    </div>
     <div class="subjects" role="group" aria-label="科目">
-      <button class="subj" type="button" data-s="math" aria-pressed="true">數學</button>
-      <button class="subj" type="button" data-s="chem" aria-pressed="false">化學</button>
-      <button class="subj" type="button" data-s="bio" aria-pressed="false">生物</button>
-      <button class="subj" type="button" data-s="phys" aria-pressed="false">物理</button>
-      <button class="subj" type="button" data-s="earth" aria-pressed="false">地科</button>
-      <button class="subj" type="button" data-s="geo" aria-pressed="false">地理</button>
-      <button class="subj" type="button" data-s="hist" aria-pressed="false">歷史</button>
-      <button class="subj" type="button" data-s="civ" aria-pressed="false">公民</button>
-      <button class="subj" type="button" data-s="mathA" aria-pressed="false">數A</button>
-      <button class="subj" type="button" data-s="mathB" aria-pressed="false">數B</button>
+      <button class="subj" type="button" data-s="math" data-g="1" aria-pressed="true">數學</button>
+      <button class="subj" type="button" data-s="chem" data-g="1" aria-pressed="false">化學</button>
+      <button class="subj" type="button" data-s="bio" data-g="1" aria-pressed="false">生物</button>
+      <button class="subj" type="button" data-s="phys" data-g="1" aria-pressed="false">物理</button>
+      <button class="subj" type="button" data-s="earth" data-g="1" aria-pressed="false">地科</button>
+      <button class="subj" type="button" data-s="geo" data-g="1" aria-pressed="false">地理</button>
+      <button class="subj" type="button" data-s="hist" data-g="1" aria-pressed="false">歷史</button>
+      <button class="subj" type="button" data-s="civ" data-g="1" aria-pressed="false">公民</button>
+      <button class="subj" type="button" data-s="mathA" data-g="2" aria-pressed="false">數A</button>
+      <button class="subj" type="button" data-s="mathB" data-g="2" aria-pressed="false">數B</button>
+      <span class="subj-empty" hidden>高三的科目還在製作中，先選高一或高二。</span>
     </div>
     <div class="tabs" role="tablist" aria-label="模式">
       <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="view-learn" type="button">從頭學・第二章</button>
@@ -422,7 +435,7 @@ aside{display:flex;flex-direction:column;gap:16px;min-width:0}
   </div>
 </div>
 
-<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v27・2026/11/14 15:51</div>
+<div class="ver" id="site-ver" title="網站版本：和對話中回報的版本號比對，就知道有沒有更新">版本 v28・2026/11/21 12:27</div>
 <button class="pad-fab" id="pad-fab" type="button" aria-expanded="false" aria-controls="pad">✎ 計算紙</button>
 <aside class="pad" id="pad" hidden aria-label="計算紙">
   <div class="pad-bar">
@@ -6371,11 +6384,18 @@ function badMsg(p){return p.choices?'還沒有選答案。':'看不懂這個答�
 function setTab(t){const SUB=SUBJ[S.subject].sub;if(!SUB[t])t='learn';S.tab=t;save();
   ['learn','prac','past','bank'].forEach((k,i)=>{$('tab-'+k).setAttribute('aria-selected',k===t);$('tab-'+k).textContent=SUBJ[S.subject].tabs[i];$('view-'+k).hidden=k!==t});
   $('subline').textContent=SUB[t];if(t==='bank')showBank();}
-function renderSubjects(){document.querySelectorAll('.subj').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===S.subject));
+const GRADE_OF={};document.querySelectorAll('.subj').forEach(b=>GRADE_OF[b.dataset.s]=b.dataset.g);S.gview=null;
+function renderSubjects(){const g=S.gview||GRADE_OF[S.subject]||'1';let n=0;
+  document.querySelectorAll('.grade').forEach(b=>b.setAttribute('aria-pressed',b.dataset.g===g));
+  document.querySelectorAll('.subj').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.s===S.subject);b.hidden=b.dataset.g!==g;if(!b.hidden)n++});
+  document.querySelector('.subj-empty').hidden=n>0;
   $('ch2-only').hidden=S.subject!=='math';$('past-math').hidden=S.subject!=='math'}
-function setSubject(s){if(!SUBJ[s]||s===S.subject)return;save();S.subject=s;useSubject(s);save();
+function setSubject(s){if(!SUBJ[s])return;S.gview=GRADE_OF[s];S.lastSubj=S.lastSubj||{};S.lastSubj[S.gview]=s;if(s===S.subject){renderSubjects();save();return}save();S.subject=s;useSubject(s);save();
   bankInit();renderSubjects();renderPast();mockIntro();renderDiff();renderChips();renderPrac();newProblem();openLesson(S.cur,false);setTab(S.tab)}
 document.querySelector('.subjects').addEventListener('click',e=>{const b=e.target.closest('.subj');if(b)setSubject(b.dataset.s)});
+document.querySelector('.grades').addEventListener('click',e=>{const b=e.target.closest('.grade');if(!b)return;const g=b.dataset.g;
+  const list=[...document.querySelectorAll('.subj')].filter(x=>x.dataset.g===g).map(x=>x.dataset.s);
+  const want=S.lastSubj&&S.lastSubj[g];if(list.length)setSubject(list.includes(want)?want:list[0]);else{S.gview=g;renderSubjects();save()}});
 $('tab-learn').onclick=()=>setTab('learn');$('tab-prac').onclick=()=>setTab('prac');$('tab-past').onclick=()=>setTab('past');$('tab-bank').onclick=()=>setTab('bank');
 
 /* ---------- lesson path ---------- */
